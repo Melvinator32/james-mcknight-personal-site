@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Wisdom — a local app that emails you one small lesson at a time</title>
+<meta name="description" content="Daily Wisdom is a local Flask + SQLite app that emails a short digest of lessons every morning across five streams. Click through a live demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sage:#77b28c; --teal:#00859b; --cyan:#00bfb8;
+    --green:#38a66f; --lime:#bce194;
+    --pale:#cce7eb; --offwhite:#ebf2e6; --cream:#f8ecdb;
+    --gray:#d9d9d6; --midgray:#b3b3b3;
+    --ink:#12292f; --ink-2:#3d565c; --paper:#fbfaf6;
+    --rule:#e3e6df;
+    --shadow:0 1px 2px rgba(18,41,47,.05), 0 12px 32px -18px rgba(18,41,47,.35);
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Outfit",system-ui,sans-serif; font-weight:400; font-size:16px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:"Fraunces",Georgia,serif; font-weight:600; line-height:1.1; margin:0; letter-spacing:-.01em}
+  a{color:var(--teal)}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px}
+  .eyebrow{
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    font-weight:600; color:var(--teal);
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead{border-bottom:1px solid var(--rule); background:#fff}
+  .masthead .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px; padding-top:18px; padding-bottom:18px}
+  .brand{display:flex; align-items:center; gap:12px}
+  .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(150deg,var(--cyan),var(--teal) 55%,var(--sage));flex:none}
+  .brand b{font-family:"Fraunces",serif; font-weight:600; font-size:19px}
+  .brand span{display:block; font-size:12px; color:var(--ink-2); letter-spacing:.02em}
+  .runs{font-family:var(--mono); font-size:12px; color:var(--ink-2); background:var(--offwhite); border:1px solid var(--rule); padding:6px 10px; border-radius:999px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:64px 0 40px}
+  .hero h1{font-size:clamp(38px,6vw,66px); max-width:16ch; margin:14px 0 0}
+  .hero h1 em{font-style:normal; color:var(--teal)}
+  .hero p.lede{max-width:56ch; font-size:18px; color:var(--ink-2); margin:20px 0 0}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px}
+  .chip{
+    display:inline-flex; align-items:baseline; gap:7px; padding:7px 13px; border-radius:999px;
+    background:#fff; border:1px solid var(--rule); font-size:13.5px; box-shadow:0 1px 0 rgba(18,41,47,.03);
+  }
+  .chip i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none;align-self:center}
+  .chip u{text-decoration:none; color:var(--midgray); font-family:var(--mono); font-size:11.5px; margin-left:2px}
+  .chip i{margin-right:2px}
+
+  /* ---------- app frame ---------- */
+  .app-section{padding:24px 0 8px}
+  .frame{
+    background:#fff; border:1px solid var(--rule); border-radius:14px; overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .titlebar{
+    display:flex; align-items:center; gap:10px; padding:11px 14px;
+    background:var(--offwhite); border-bottom:1px solid var(--rule);
+  }
+  .dots{display:flex; gap:6px}
+  .dots i{width:10px;height:10px;border-radius:50%;background:var(--gray);display:block}
+  .addr{
+    flex:1; text-align:center; font-family:var(--mono); font-size:12px; color:var(--ink-2);
+    background:#fff; border:1px solid var(--rule); border-radius:6px; padding:4px 10px; max-width:320px; margin:0 auto;
+  }
+  .demo-flag{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); font-weight:600}
+
+  .tabs{display:flex; gap:2px; overflow-x:auto; padding:0 8px; background:#fff; border-bottom:1px solid var(--rule); scrollbar-width:thin}
+  .tabs button{
+    appearance:none; background:none; border:0; border-bottom:2px solid transparent;
+    font-family:inherit; font-size:14px; color:var(--ink-2); padding:14px 14px 12px; cursor:pointer;
+    white-space:nowrap; letter-spacing:.01em;
+  }
+  .tabs button:hover{color:var(--ink); background:var(--paper)}
+  .tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--teal); font-weight:500}
+  .tabs button:focus-visible{outline:2px solid var(--cyan); outline-offset:-2px}
+
+  .panel{padding:26px 26px 30px; display:none}
+  .panel[data-open]{display:block}
+  .panel-head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:20px}
+  .panel-head h2{font-size:26px}
+  .panel-head p{margin:6px 0 0; color:var(--ink-2); font-size:14.5px; max-width:60ch}
+
+  .btn{
+    appearance:none; font-family:inherit; font-size:14px; font-weight:500; cursor:pointer;
+    border-radius:8px; padding:9px 15px; border:1px solid var(--teal); background:var(--teal); color:#fff;
+    transition:filter .15s ease;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:#fff; color:var(--teal)}
+  .btn.ghost:hover{background:var(--pale)}
+  .btn:focus-visible{outline:2px solid var(--cyan); outline-offset:2px}
+
+  /* ---------- signature: coverage rail ---------- */
+  .rail{
+    border:1px solid var(--rule); border-radius:12px; background:var(--paper);
+    padding:18px 20px; margin-bottom:24px;
+  }
+  .rail-top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px}
+  .rail-top h3{font-size:15px; font-family:"Outfit",sans-serif; font-weight:600; letter-spacing:.01em}
+  .rail-top h3 span{color:var(--ink-2); font-weight:400}
+  .bars{display:grid; gap:11px}
+  .bar-row{display:grid; grid-template-columns:112px 1fr 84px; align-items:center; gap:12px; font-size:13px}
+  .bar-row b{font-weight:500}
+  .track{height:9px; border-radius:99px; background:var(--gray); overflow:hidden}
+  .fill{height:100%; width:0; border-radius:99px; transition:width .7s cubic-bezier(.2,.8,.2,1)}
+  .bar-row u{text-decoration:none; font-family:var(--mono); font-size:11.5px; color:var(--ink-2); text-align:right}
+  .bar-row.off{opacity:.42}
+
+  /* ---------- lesson cards ---------- */
+  .stream-block{margin-top:26px}
+  .stream-title{
+    display:flex; align-items:center; gap:10px; padding-bottom:9px; border-bottom:1px solid var(--rule); margin-bottom:14px;
+  }
+  .stream-title h3{font-size:17px}
+  .stream-title i{width:9px;height:9px;border-radius:50%;flex:none}
+  .stream-title span{margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--midgray)}
+  .cards{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(288px,1fr))}
+  .card{
+    border:1px solid var(--rule); border-left:3px solid var(--sage); border-radius:10px; background:#fff;
+    padding:14px 16px; animation:rise .45s both;
+  }
+  .card h4{
+    font-size:15.5px; font-family:"Outfit",sans-serif; font-weight:600; letter-spacing:0;
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+  }
+  .card h4 .tag{
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--green);
+    font-weight:600; white-space:nowrap; flex:none;
+  }
+  .card p{margin:6px 0 0; font-size:14px; color:var(--ink-2); line-height:1.5}
+  .card cite{display:block; margin-top:10px; font-style:normal; font-size:11.5px; color:var(--midgray); font-family:var(--mono)}
+  @keyframes rise{from{opacity:0; transform:translateY(7px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){
+    .card{animation:none} .fill{transition:none} html{scroll-behavior:auto}
+  }
+
+  /* ---------- tables & lists ---------- */
+  table{width:100%; border-collapse:collapse; font-size:14px}
+  th{
+    text-align:left; font-weight:600; font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-2); padding:0 12px 9px; border-bottom:1px solid var(--rule);
+  }
+  td{padding:12px; border-bottom:1px solid var(--rule); vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .num{font-family:var(--mono); font-size:12.5px; color:var(--ink-2)}
+
+  .switch{
+    appearance:none; width:38px; height:22px; border-radius:99px; background:var(--gray); border:0;
+    position:relative; cursor:pointer; flex:none; transition:background .2s ease;
+  }
+  .switch::after{content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:transform .2s ease}
+  .switch[aria-checked="true"]{background:var(--green)}
+  .switch[aria-checked="true"]::after{transform:translateX(16px)}
+  .switch:focus-visible{outline:2px solid var(--cyan); outline-offset:2px}
+
+  .field{display:block; margin-bottom:16px}
+  .field span{display:block; font-size:12.5px; font-weight:500; color:var(--ink-2); margin-bottom:6px}
+  input[type=text], input[type=number], select, textarea{
+    width:100%; font-family:inherit; font-size:14px; color:var(--ink); background:#fff;
+    border:1px solid var(--rule); border-radius:8px; padding:9px 11px;
+  }
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--cyan); outline-offset:-1px; border-color:var(--cyan)}
+  textarea{min-height:150px; resize:vertical; font-size:13.5px; line-height:1.6}
+  .grid-2{display:grid; gap:22px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+
+  .settings-card{border:1px solid var(--rule); border-radius:11px; padding:18px 20px; background:#fff}
+  .settings-card header{display:flex; align-items:center; gap:9px; margin-bottom:14px}
+  .settings-card header i{width:9px;height:9px;border-radius:50%;flex:none}
+  .settings-card header h3{font-size:16px}
+  .settings-card header .switch{margin-left:auto}
+  .row-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+
+  .note{
+    background:var(--cream); border:1px solid #ecdcc4; border-radius:9px; padding:12px 14px;
+    font-size:13.5px; color:#6b5637; margin-top:16px;
+  }
+  .note b{color:#4d3d26}
+
+  .tips-groups{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .tip-group{border:1px solid var(--rule); border-radius:11px; overflow:hidden}
+  .tip-group h3{font-size:14px; font-family:"Outfit",sans-serif; font-weight:600; padding:12px 15px; background:var(--offwhite); border-bottom:1px solid var(--rule)}
+  .tip-group h3 span{float:right; font-family:var(--mono); font-size:11px; color:var(--ink-2); font-weight:400}
+  .tip-group ul{list-style:none; margin:0; padding:6px 15px 14px}
+  .tip-group li{padding:9px 0; border-bottom:1px solid var(--rule); font-size:14px}
+  .tip-group li:last-child{border-bottom:0}
+  .tip-group li em{display:block; font-style:normal; color:var(--ink-2); font-size:13px; margin-top:3px}
+
+  .dropzone{
+    border:1.5px dashed var(--sage); border-radius:11px; background:var(--offwhite);
+    padding:30px 20px; text-align:center; color:var(--ink-2); font-size:14px;
+  }
+  .dropzone b{display:block; font-size:15px; color:var(--ink); font-family:"Fraunces",serif; font-weight:600; margin-bottom:5px}
+
+  .toolbar{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px}
+  .toolbar input[type=text]{max-width:280px}
+  .toolbar select{max-width:190px}
+
+  .out{
+    margin-top:16px; border:1px solid var(--rule); border-radius:10px; background:var(--paper); padding:16px 18px;
+  }
+  .out h4{font-size:13px; font-family:"Outfit",sans-serif; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); font-weight:600; margin-bottom:12px}
+  .empty{color:var(--midgray); font-size:14px; padding:8px 0}
+
+  /* ---------- email preview ---------- */
+  .email-section{padding:56px 0 20px}
+  .email-shell{
+    max-width:660px; margin:26px auto 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden;
+    box-shadow:var(--shadow); background:#fff;
+  }
+  .email-meta{padding:14px 20px; background:var(--offwhite); border-bottom:1px solid var(--rule); font-size:13px; color:var(--ink-2)}
+  .email-meta b{color:var(--ink); font-weight:500}
+  .email-body{padding:0}
+  .email-hd{background:var(--teal); color:#fff; padding:24px 26px}
+  .email-hd h3{font-size:24px; color:#fff}
+  .email-hd p{margin:5px 0 0; font-size:13px; opacity:.85}
+  .email-inner{padding:22px 26px 30px}
+  .sec-label{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; color:var(--teal);
+    padding-top:20px; margin-bottom:10px; border-top:1px solid var(--rule);
+  }
+  .sec-label:first-child{padding-top:0; border-top:0}
+  .email-item{margin-bottom:14px}
+  .email-item b{font-size:14.5px; font-weight:600}
+  .email-item p{margin:3px 0 0; font-size:13.5px; color:var(--ink-2)}
+  .email-foot{padding:16px 26px; background:var(--paper); border-top:1px solid var(--rule); font-size:11.5px; color:var(--midgray); font-family:var(--mono)}
+
+  /* ---------- how it works ---------- */
+  .how{padding:60px 0 70px}
+  .how-grid{display:grid; gap:22px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin-top:28px}
+  .how-item h3{font-size:17px; margin-bottom:7px}
+  .how-item p{margin:0; font-size:14.5px; color:var(--ink-2)}
+  .how-item .k{font-family:var(--mono); font-size:11px; color:var(--midgray); letter-spacing:.08em; text-transform:uppercase; display:block; margin-bottom:9px}
+
+  footer{border-top:1px solid var(--rule); background:#fff; padding:26px 0; font-size:13px; color:var(--ink-2)}
+  footer .wrap{display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between}
+
+  @media (max-width:640px){
+    .panel{padding:20px 16px 24px}
+    .bar-row{grid-template-columns:88px 1fr 64px; font-size:12.5px}
+    .row-2{grid-template-columns:1fr}
+    .hero{padding:44px 0 30px}
+  }
+</style>
+<link rel="icon" type="image/png" href="/bonsai-logo.png">
+<link rel="apple-touch-icon" href="/bonsai-logo.png">
+<style>.app-bonsai{width:48px;height:48px;object-fit:contain;flex-shrink:0;vertical-align:middle;background:#E1E2D8;border-radius:10px;padding:4px}</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <img class="app-bonsai" src="/bonsai-logo.png" alt="Bonsai logo" width="48" height="48">
+      <div>
+        <b>Daily Wisdom</b>
+        <span>Flask · SQLite · runs on my machine</span>
+      </div>
+    </div>
+    <div class="runs">127.0.0.1:5050</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Personal tooling</p>
+    <h1>A book you finished is a book you <em>forgot</em>.</h1>
+    <p class="lede">Daily Wisdom keeps five running streams of short lessons — books, style rules, banking technicals, life tips, and my refining course notes — and mails a handful of them to me every morning. It draws what I've never seen first, so it works through a whole stream before anything comes back around.</p>
+    <div class="chips">
+      <span class="chip"><i style="background:var(--teal)"></i>Daily Wisdom <u>3–5/day</u></span>
+      <span class="chip"><i style="background:var(--cyan)"></i>Writing <u>2/day</u></span>
+      <span class="chip"><i style="background:var(--green)"></i>IB Prep <u>3–5/day</u></span>
+      <span class="chip"><i style="background:var(--sage)"></i>Life Tips <u>1–2/day</u></span>
+      <span class="chip"><i style="background:#b28a3e"></i>Oil 101 <u>10/day</u></span>
+    </div>
+  </div>
+</section>
+
+<section class="app-section">
+  <div class="wrap">
+    <div class="frame">
+      <div class="titlebar">
+        <img class="app-bonsai" style="width:28px;height:28px;padding:2px" src="/bonsai-logo.png" alt="Bonsai logo" width="48" height="48">
+        <div class="addr">127.0.0.1:5050/today</div>
+        <div class="demo-flag">Demo</div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Daily Wisdom sections">
+        <button role="tab" aria-selected="true" data-tab="today">Today's Wisdom</button>
+        <button role="tab" aria-selected="false" data-tab="books">Books</button>
+        <button role="tab" aria-selected="false" data-tab="life">Life Tips</button>
+        <button role="tab" aria-selected="false" data-tab="settings">Settings</button>
+        <button role="tab" aria-selected="false" data-tab="bank">Bank</button>
+        <button role="tab" aria-selected="false" data-tab="paste">Paste</button>
+        <button role="tab" aria-selected="false" data-tab="import">Import</button>
+        <button role="tab" aria-selected="false" data-tab="history">History</button>
+      </div>
+
+      <!-- TODAY -->
+      <div class="panel" data-panel="today" data-open>
+        <div class="panel-head">
+          <div>
+            <h2 id="todayHeading">Tuesday, March 4</h2>
+            <p>Today's picks, already logged. Opening this tab counts as the day's delivery, so the set stays put on reload.</p>
+          </div>
+          <button class="btn" id="rollBtn">Run tomorrow's pick</button>
+        </div>
+
+        <div class="rail">
+          <div class="rail-top">
+            <h3>Stream coverage <span id="coverSummary">— nothing repeats until a stream is finished</span></h3>
+            <button class="btn ghost" id="resetBtn">Start the cycle over</button>
+          </div>
+          <div class="bars" id="bars"></div>
+        </div>
+
+        <div id="todayOut"></div>
+      </div>
+
+      <!-- BOOKS -->
+      <div class="panel" data-panel="books">
+        <div class="panel-head">
+          <div>
+            <h2>Books</h2>
+            <p>Every source in the database. Turn one off to hold it back from the draw, or move it to a different stream.</p>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Source</th><th>Stream</th><th>Entries</th><th>Draw from it</th></tr></thead>
+          <tbody id="booksBody"></tbody>
+        </table>
+      </div>
+
+      <!-- LIFE TIPS -->
+      <div class="panel" data-panel="life">
+        <div class="panel-head">
+          <div>
+            <h2>Life Tips</h2>
+            <p>Tips grouped by category. Add one by hand, or drop in a screenshot and let the vision model pull the tips out and put them in my own words.</p>
+          </div>
+        </div>
+        <div class="tips-groups" id="tipsOut"></div>
+        <div class="dropzone" style="margin-top:20px">
+          <b>Drop a screenshot of an infographic</b>
+          The model reads the tips, paraphrases each one, and files it under a category you confirm.
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="panel" data-panel="settings">
+        <div class="panel-head">
+          <div>
+            <h2>Settings</h2>
+            <p>Each stream gets its own recipient, daily count, and delivery. Wisdom anchors the combined email; anything set to send on its own arrives separately.</p>
+          </div>
+        </div>
+        <div class="grid-2" id="settingsOut"></div>
+        <div class="note"><b>Heads up:</b> changes here take effect on the next scheduled run. The task fires at 6:05 a.m. and catches up if the machine was asleep.</div>
+      </div>
+
+      <!-- BANK -->
+      <div class="panel" data-panel="bank">
+        <div class="panel-head">
+          <div>
+            <h2>Bank</h2>
+            <p>Everything in the database, searchable by title, text, or source.</p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input type="text" id="bankQ" placeholder="Search titles and lessons" aria-label="Search the bank">
+          <select id="bankStream" aria-label="Filter by stream"><option value="">All streams</option></select>
+        </div>
+        <table>
+          <thead><tr><th style="width:34%">Title</th><th>Lesson</th><th style="width:110px">Last sent</th></tr></thead>
+          <tbody id="bankBody"></tbody>
+        </table>
+        <p class="empty" id="bankEmpty" hidden>No entries match that search. Try a shorter word.</p>
+      </div>
+
+      <!-- PASTE -->
+      <div class="panel" data-panel="paste">
+        <div class="panel-head">
+          <div>
+            <h2>Paste</h2>
+            <p>Bulk add. One entry per line as <code>Title | lesson</code>, or separate whole blocks with a blank line. Duplicates are caught on source plus title.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label class="field">
+              <span>Stream</span>
+              <select id="pasteStream"></select>
+            </label>
+            <label class="field">
+              <span>Source label</span>
+              <input type="text" id="pasteSource" value="Refining course — Cat cracking">
+            </label>
+            <label class="field">
+              <span>Entries</span>
+              <textarea id="pasteText">Cat cracking — Regenerator | Burning coke off the catalyst is what supplies the reactor's heat. The unit runs on a heat balance, not just a mass balance.
+Cat cracking — Riser | Contact time is measured in seconds. Longer isn't better; it just cracks the good product into gas.
+Cat cracking — Slurry | The bottom of the main fractionator carries catalyst fines, which is why slurry gets filtered before it's sold or recycled.</textarea>
+            </label>
+            <button class="btn" id="pasteBtn">Preview 3 entries</button>
+          </div>
+          <div>
+            <div class="out">
+              <h4>Preview</h4>
+              <div id="pasteOut"><p class="empty">Nothing parsed yet. Hit preview to see how the rows split.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMPORT -->
+      <div class="panel" data-panel="import">
+        <div class="panel-head">
+          <div>
+            <h2>Import</h2>
+            <p>Paste a chapter or drop a PDF. The model breaks it into one-idea entries and rewrites each in plain language — nothing copyrighted is stored word for word.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label class="field">
+              <span>Source</span>
+              <input type="text" value="Good Strategy Bad Strategy — ch. 5">
+            </label>
+            <label class="field">
+              <span>Text to distill</span>
+              <textarea readonly>A strategy that names no obstacle is not a strategy. The work starts with a diagnosis: what, specifically, is in the way? Only then does a guiding policy make sense, and only then can the actions be coherent rather than a scattering of initiatives that each sound reasonable on their own…</textarea>
+            </label>
+            <button class="btn" id="distillBtn">Distill into entries</button>
+          </div>
+          <div>
+            <div class="out">
+              <h4>Distilled</h4>
+              <div id="distillOut"><p class="empty">Output lands here — title, one-sentence lesson, ready to save.</p></div>
+            </div>
+            <div class="note"><b>Rule:</b> paraphrase everything. Verbatim only for public-domain authors or my own typed notes.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="panel" data-panel="history">
+        <div class="panel-head">
+          <div>
+            <h2>History</h2>
+            <p>One row per send. The log is what keeps a day's set stable and stops a second email going out.</p>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Date</th><th>Email</th><th>Entries</th><th>Streams</th><th>Status</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="email-section">
+  <div class="wrap">
+    <p class="eyebrow">What lands in the inbox</p>
+    <h2 style="font-size:clamp(28px,4vw,40px); margin-top:12px">One email, four sections. Oil 101 comes in its own.</h2>
+    <div class="email-shell">
+      <div class="email-meta">
+        <div><b>Daily Wisdom — Tuesday, March 4</b></div>
+        <div>to me · 6:05 AM</div>
+      </div>
+      <div class="email-body">
+        <div class="email-hd">
+          <h3>Daily Wisdom</h3>
+          <p>Four streams, eleven entries, about two minutes</p>
+        </div>
+        <div class="email-inner" id="emailInner"></div>
+        <div class="email-foot">sent by lessons.py · 11 entries · reply to nothing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2 style="font-size:clamp(28px,4vw,40px); margin-top:12px">Four rules the whole thing runs on.</h2>
+    <div class="how-grid">
+      <div class="how-item">
+        <span class="k">Selection</span>
+        <h3>Never-shown first</h3>
+        <p>Every entry gets covered once before anything repeats. When a stream runs dry the cycle restarts from the oldest.</p>
+      </div>
+      <div class="how-item">
+        <span class="k">Size</span>
+        <h3>One idea per entry</h3>
+        <p>A title and a sentence or two. Long notes get split and prefixed by section so a set stays organized.</p>
+      </div>
+      <div class="how-item">
+        <span class="k">Sourcing</span>
+        <h3>My words, not the book's</h3>
+        <p>Copyrighted material is paraphrased on the way in. Verbatim is reserved for public-domain writers and my own notes.</p>
+      </div>
+      <div class="how-item">
+        <span class="k">Delivery</span>
+        <h3>Once a day, catch-up safe</h3>
+        <p>A scheduled task fires each morning and runs late if the machine was off. The send log guards against doubles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Daily Wisdom — built for one user, running locally.</div>
+    <div>Sample content shown. Nothing in this demo sends mail.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var STREAMS = [
+    {key:"wisdom",  title:"Daily Wisdom", color:"#00859b", min:3, max:5, merge:true,  to:"me@home.local"},
+    {key:"writing", title:"Daily Writing", color:"#00bfb8", min:2, max:2, merge:true,  to:"me@home.local"},
+    {key:"ib",      title:"Daily IB Prep", color:"#38a66f", min:3, max:5, merge:true,  to:"me@home.local"},
+    {key:"life",    title:"Daily Life Tips", color:"#77b28c", min:1, max:2, merge:true,  to:"me@home.local"},
+    {key:"oil",     title:"Daily Oil 101", color:"#b28a3e", min:10, max:10, merge:false, to:"me@home.local"}
+  ];
+
+  var LESSONS = {
+    wisdom:[
+      ["Start with the diagnosis","A strategy that names no obstacle is just a wish list. Say what is actually in the way before you say what you'll do.","Good Strategy Bad Strategy"],
+      ["Pick a target you can reach","Set the objective close enough that the team can plausibly hit it. Distant goals paralyze; near ones mobilize.","Good Strategy Bad Strategy"],
+      ["Systems outrank goals","You don't rise to your ambitions, you fall back on your routines. Build the routine and the outcome follows.","Atomic Habits"],
+      ["Never miss twice","One skipped day is noise. Two in a row is the start of a different identity.","Atomic Habits"],
+      ["Vote for the person you want to be","Each small action is evidence about who you are. Ask what that person would do next, then do only that.","Atomic Habits"],
+      ["Choose your problems, not your outcomes","Every good result arrives bundled with its own set of problems. Pick the ones you're willing to keep solving.","The Subtle Art"],
+      ["Pain plus reflection","A hard experience teaches nothing by itself. The lesson gets extracted in the review afterward, on paper.","Principles"],
+      ["Believability-weighted input","Not all opinions are equal. Weight advice by whether the person has actually done the thing, repeatedly.","Principles"],
+      ["Persist, pivot, or concede","When something isn't working, name which of the three you're choosing. Drifting between them is the expensive option.","Everything Is F*cked"]
+    ],
+    writing:[
+      ["Cut needless words","Every word should be doing work. If a sentence survives the deletion, the word wasn't needed.","Elements of Style"],
+      ["Use the active voice","It's more direct, usually shorter, and it tells the reader who did the thing.","Elements of Style"],
+      ["Put statements in positive form","Say what is, not what isn't. Avoid the hedge that says nothing at greater length.","Elements of Style"],
+      ["Keep related words together","Distance between a subject and its verb is where confusion moves in.","Elements of Style"],
+      ["One paragraph, one topic","Break where the subject turns. The paragraph mark is a signal, not a spacing preference.","Elements of Style"],
+      ["Prefer the specific to the vague","Concrete detail holds. Abstraction slides off the reader without leaving anything behind.","Elements of Style"],
+      ["End with the emphatic word","The close of a sentence is where weight lands. Put the thing you want remembered there.","Elements of Style"],
+      ["Don't drift between tenses","Pick one and stay in it, especially when summarizing.","Elements of Style"]
+    ],
+    ib:[
+      ["Depreciation, all three statements","Raise depreciation by 10 and net income falls by 10 times one minus the tax rate. Add it back on the cash flow statement and cash actually rises by the tax shield.","IB technicals"],
+      ["Enterprise value vs. equity value","Enterprise value belongs to every capital provider; equity value is what's left after net debt. Bridge across debt, cash, preferred, and minority interest.","IB technicals"],
+      ["Building WACC","Blend the after-tax cost of debt with a CAPM cost of equity, weighted at target capital structure rather than book values.","IB technicals"],
+      ["Unlever, then relever beta","Strip each comp's leverage out of its beta, take the median, then relever at the target's own structure.","IB technicals"],
+      ["Accretion or dilution, fast","Compare the after-tax cost of the consideration to the inverse P/E of the acquirer. Cheaper funding than the earnings yield means accretive.","IB technicals"],
+      ["Where LBO returns come from","Three places only: paying down debt, growing EBITDA, and exiting at a higher multiple. Know which one your case leans on.","IB technicals"],
+      ["Sanity-check terminal value","Back the perpetuity growth number into an implied exit multiple. If it doesn't look like the comps, the assumption is wrong.","IB technicals"],
+      ["Mid-year convention","Cash arrives through the year, not on December 31. Discounting at the half-period raises value modestly and is standard.","IB technicals"],
+      ["Why cash flow beats net income","Net income carries non-cash charges and accounting choices. Free cash flow is what actually services debt.","IB technicals"]
+    ],
+    life:[
+      ["Send the question, not the deck","People skim attachments and answer questions. Put the decision in the first line of the invite.","Meetings"],
+      ["Say what a yes means","Close a meeting by naming who owns what and by when, out loud, before anyone stands up.","Meetings"],
+      ["Leave space","Silence is what pulls the real answer out. Count to three before filling it.","Conversation"],
+      ["Match energy before changing it","Meet someone where they are, then move. Leading with your own pace reads as pressure.","Conversation"],
+      ["Invert the question","Instead of asking how to succeed, ask what would guarantee failure, then avoid that list.","Mental Models"],
+      ["Ask what happens next","First-order effects are obvious and usually priced in. The second-order ones are where the surprise lives.","Mental Models"],
+      ["Name the feeling","Putting one accurate word on a state takes most of the heat out of it.","Mindfulness"],
+      ["Single-task the first hour","Whatever the first hour goes to sets the shape of the day. Guard it before anything else.","Mindfulness"]
+    ],
+    oil:[
+      ["Crude distillation — Overhead","Naphtha, steam, and corrosive salt breakdown products leave the tower top together. Wash water and neutralizer are what keep the overhead condenser alive.","Refining course notes"],
+      ["Crude distillation — Cut points","The cuts aren't sharp. Where you set them trades one product's yield against the next one's quality.","Refining course notes"],
+      ["Cat cracking — Regenerator","Burning coke off the catalyst supplies the heat the riser needs. The unit runs on a heat balance, not just a mass balance.","Refining course notes"],
+      ["Cat cracking — Riser","Contact time is seconds. Longer isn't better; it cracks the good product down into dry gas.","Refining course notes"],
+      ["Alkylation — Acid strength","Water is the enemy. Diluted acid stops making alkylate and starts making acid-soluble oil.","Refining course notes"],
+      ["Reforming — Severity","Severity buys octane and costs liquid volume. The hydrogen that comes off is what feeds every hydrotreater on site.","Refining course notes"],
+      ["Hydrotreating — Sulfur","Sulfur leaves as hydrogen sulfide, gets stripped, and heads to the amine system and then to sulfur recovery.","Refining course notes"],
+      ["Isomerization — Light naphtha","Straight-run pentane and hexane have poor octane. Isomerizing them is cheap octane with no aromatics.","Refining course notes"],
+      ["Coker — Residue reduction","The coker turns the bottom of the barrel into liquid product and a solid you sell or burn. It is the refinery's last resort on residue.","Refining course notes"],
+      ["Hydrocracking — Flexibility","Run it one way for distillate, another for naphtha. That optionality is what justifies the hydrogen bill.","Refining course notes"],
+      ["Blending — Vapor pressure","Summer gasoline has to hold vapor pressure down, which means butane comes out of the pool and the octane has to come from somewhere else.","Refining course notes"],
+      ["Blending — Octane give-away","Every tenth of octane above spec is money handed over. Blend control exists to shave that margin down.","Refining course notes"]
+    ]
+  };
+
+  var BOOKS = [
+    ["Good Strategy Bad Strategy","wisdom",2,true],
+    ["Atomic Habits","wisdom",3,true],
+    ["The Subtle Art","wisdom",1,true],
+    ["Principles","wisdom",2,true],
+    ["Everything Is F*cked","wisdom",1,true],
+    ["Elements of Style","writing",8,true],
+    ["IB technicals","ib",9,true],
+    ["Meetings","life",2,true],
+    ["Conversation","life",2,true],
+    ["Mental Models","life",2,true],
+    ["Mindfulness","life",2,true],
+    ["Refining course notes","oil",12,true],
+    ["Deep Work","wisdom",6,false]
+  ];
+
+  var HISTORY = [
+    ["Mar 3","Daily Wisdom",11,"wisdom, writing, ib, life","Sent 6:05 AM"],
+    ["Mar 3","Daily Oil 101",10,"oil","Sent 6:05 AM"],
+    ["Mar 2","Daily Wisdom",12,"wisdom, writing, ib, life","Sent 6:05 AM"],
+    ["Mar 2","Daily Oil 101",10,"oil","Sent 6:05 AM"],
+    ["Mar 1","Daily Wisdom",11,"wisdom, writing, ib, life","Caught up 9:41 AM"],
+    ["Feb 28","Daily Wisdom",12,"wisdom, writing, ib, life","Sent 6:05 AM"]
+  ];
+
+  // ---------- state ----------
+  var enabled = {};   // stream on/off for the draw
+  var shown = {};     // Set of indexes already sent
+  var picks = {};     // today's picks per stream
+  var dayIndex = 0;
+  var DAYS = ["Tuesday, March 4","Wednesday, March 5","Thursday, March 6","Friday, March 7","Saturday, March 8","Sunday, March 9","Monday, March 10"];
+
+  STREAMS.forEach(function(s){ enabled[s.key] = true; shown[s.key] = []; });
+
+  function stream(key){ for(var i=0;i<STREAMS.length;i++){ if(STREAMS[i].key===key) return STREAMS[i]; } }
+  function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function el(id){ return document.getElementById(id); }
+
+  // never-shown first; when a stream is exhausted, start the cycle again
+  function draw(key){
+    var pool = LESSONS[key], s = stream(key);
+    var n = s.min === s.max ? s.min : s.min + Math.floor(Math.random()*(s.max - s.min + 1));
+    n = Math.min(n, pool.length);
+    var unseen = [], seen = [];
+    for(var i=0;i<pool.length;i++){ (shown[key].indexOf(i)===-1 ? unseen : seen).push(i); }
+    shuffle(unseen); shuffle(seen);
+    var out = unseen.slice(0,n);
+    var fresh = out.length;
+    if(out.length < n){ shown[key] = []; out = out.concat(seen.slice(0, n - out.length)); }
+    out.forEach(function(i){ if(shown[key].indexOf(i)===-1) shown[key].push(i); });
+    return {idx:out, fresh:fresh};
+  }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  function rollAll(){
+    STREAMS.forEach(function(s){ picks[s.key] = enabled[s.key] ? draw(s.key) : {idx:[],fresh:0}; });
+    renderToday(); renderBars(); renderEmail();
+  }
+
+  // ---------- render: today ----------
+  function renderToday(){
+    var html = "";
+    STREAMS.forEach(function(s){
+      var p = picks[s.key];
+      if(!enabled[s.key] || !p || !p.idx.length) return;
+      html += '<div class="stream-block"><div class="stream-title"><i style="background:'+s.color+'"></i><h3>'+s.title+'</h3>'+
+              '<span>'+p.idx.length+' picked · '+(s.merge?"in the combined email":"sends on its own")+'</span></div><div class="cards">';
+      p.idx.forEach(function(i,n){
+        var L = LESSONS[s.key][i];
+        var isFresh = n < p.fresh;
+        html += '<article class="card" style="border-left-color:'+s.color+'; animation-delay:'+(n*35)+'ms">'+
+                '<h4><span>'+esc(L[0])+'</span>'+(isFresh?'<span class="tag">first time</span>':'')+'</h4>'+
+                '<p>'+esc(L[1])+'</p><cite>'+esc(L[2])+'</cite></article>';
+      });
+      html += '</div></div>';
+    });
+    if(!html) html = '<p class="empty">Every stream is switched off. Turn one back on in Settings and run the pick again.</p>';
+    el("todayOut").innerHTML = html;
+    el("todayHeading").textContent = DAYS[dayIndex % DAYS.length];
+    el("rollBtn").textContent = "Run " + (dayIndex+1 < DAYS.length ? DAYS[(dayIndex+1)].split(",")[0] : "the next day") + "'s pick";
+  }
+
+  function renderBars(){
+    var html = "", totalShown = 0, totalAll = 0;
+    STREAMS.forEach(function(s){
+      var tot = LESSONS[s.key].length, sh = shown[s.key].length;
+      totalShown += sh; totalAll += tot;
+      var pct = Math.round(sh/tot*100);
+      html += '<div class="bar-row'+(enabled[s.key]?"":" off")+'"><b>'+s.title.replace("Daily ","")+'</b>'+
+              '<span class="track"><span class="fill" style="width:'+pct+'%; background:'+s.color+'"></span></span>'+
+              '<u>'+sh+' / '+tot+'</u></div>';
+    });
+    el("bars").innerHTML = html;
+    el("coverSummary").textContent = "— " + totalShown + " of " + totalAll + " entries seen this cycle";
+  }
+
+  // ---------- render: email ----------
+  function renderEmail(){
+    var html = "", count = 0;
+    STREAMS.forEach(function(s){
+      if(!s.merge || !enabled[s.key]) return;
+      var p = picks[s.key]; if(!p || !p.idx.length) return;
+      html += '<div class="sec-label">'+esc(s.title)+'</div>';
+      p.idx.forEach(function(i){
+        var L = LESSONS[s.key][i]; count++;
+        html += '<div class="email-item"><b>'+esc(L[0])+'</b><p>'+esc(L[1])+'</p></div>';
+      });
+    });
+    el("emailInner").innerHTML = html || '<p class="empty">No streams are set to ride in the combined email.</p>';
+    var hd = document.querySelector(".email-hd p");
+    if(hd) hd.textContent = count + " entries, about two minutes";
+    var foot = document.querySelector(".email-foot");
+    if(foot) foot.textContent = "sent by lessons.py · " + count + " entries · reply to nothing";
+  }
+
+  // ---------- render: books ----------
+  function renderBooks(){
+    var html = "";
+    BOOKS.forEach(function(b,i){
+      var s = stream(b[1]);
+      html += '<tr><td><b style="font-weight:500">'+esc(b[0])+'</b></td>'+
+              '<td><select data-book="'+i+'" style="max-width:180px">'+STREAMS.map(function(x){
+                return '<option value="'+x.key+'"'+(x.key===b[1]?" selected":"")+'>'+x.title+'</option>';
+              }).join("")+'</select></td>'+
+              '<td class="num">'+b[2]+'</td>'+
+              '<td><button class="switch" role="switch" aria-checked="'+(b[3]?"true":"false")+'" aria-label="Draw from '+esc(b[0])+'" data-bookswitch="'+i+'"></button></td></tr>';
+    });
+    el("booksBody").innerHTML = html;
+  }
+
+  // ---------- render: life tips ----------
+  function renderTips(){
+    var groups = {};
+    LESSONS.life.forEach(function(L){ (groups[L[2]] = groups[L[2]] || []).push(L); });
+    var html = "";
+    Object.keys(groups).forEach(function(cat){
+      html += '<div class="tip-group"><h3>'+esc(cat)+'<span>'+groups[cat].length+'</span></h3><ul>';
+      groups[cat].forEach(function(L){ html += '<li>'+esc(L[0])+'<em>'+esc(L[1])+'</em></li>'; });
+      html += '</ul></div>';
+    });
+    el("tipsOut").innerHTML = html;
+  }
+
+  // ---------- render: settings ----------
+  function renderSettings(){
+    var html = "";
+    STREAMS.forEach(function(s){
+      html += '<div class="settings-card"><header><i style="background:'+s.color+'"></i><h3>'+esc(s.title)+'</h3>'+
+              '<button class="switch" role="switch" aria-checked="'+(enabled[s.key]?"true":"false")+'" aria-label="'+esc(s.title)+' on" data-streamswitch="'+s.key+'"></button></header>'+
+              '<label class="field"><span>Send to</span><input type="text" value="'+s.to+'"></label>'+
+              '<div class="row-2"><label class="field"><span>Fewest per day</span><input type="number" value="'+s.min+'" min="1"></label>'+
+              '<label class="field"><span>Most per day</span><input type="number" value="'+s.max+'" min="1"></label></div>'+
+              '<label class="field" style="margin-bottom:0"><span>Delivery</span><select data-merge="'+s.key+'">'+
+              '<option value="1"'+(s.merge?" selected":"")+'>Include in the Daily Wisdom email</option>'+
+              '<option value="0"'+(s.merge?"":" selected")+'>Send as its own email</option></select></label></div>';
+    });
+    el("settingsOut").innerHTML = html;
+  }
+
+  // ---------- render: bank ----------
+  function allRows(){
+    var rows = [];
+    STREAMS.forEach(function(s){
+      LESSONS[s.key].forEach(function(L,i){
+        rows.push({stream:s, title:L[0], text:L[1], src:L[2], sent: shown[s.key].indexOf(i)>-1});
+      });
+    });
+    return rows;
+  }
+  function renderBank(){
+    var q = (el("bankQ").value||"").toLowerCase();
+    var f = el("bankStream").value;
+    var rows = allRows().filter(function(r){
+      if(f && r.stream.key !== f) return false;
+      if(!q) return true;
+      return (r.title+" "+r.text+" "+r.src).toLowerCase().indexOf(q) > -1;
+    });
+    el("bankBody").innerHTML = rows.map(function(r){
+      return '<tr><td><b style="font-weight:500">'+esc(r.title)+'</b>'+
+             '<div class="num" style="margin-top:4px">'+esc(r.src)+'</div></td>'+
+             '<td style="color:var(--ink-2)">'+esc(r.text)+'</td>'+
+             '<td class="num">'+(r.sent?"this cycle":"—")+'</td></tr>';
+    }).join("");
+    el("bankEmpty").hidden = rows.length > 0;
+  }
+
+  function renderHistory(){
+    el("histBody").innerHTML = HISTORY.map(function(h){
+      return '<tr><td class="num">'+h[0]+'</td><td><b style="font-weight:500">'+esc(h[1])+'</b></td>'+
+             '<td class="num">'+h[2]+'</td><td style="color:var(--ink-2); font-size:13px">'+esc(h[3])+'</td>'+
+             '<td class="num">'+esc(h[4])+'</td></tr>';
+    }).join("");
+  }
+
+  // ---------- tabs ----------
+  var tabs = [].slice.call(document.querySelectorAll('.tabs button'));
+  tabs.forEach(function(btn, i){
+    btn.addEventListener("click", function(){ openTab(btn.dataset.tab); });
+    btn.addEventListener("keydown", function(e){
+      var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if(!d) return;
+      e.preventDefault();
+      var next = tabs[(i + d + tabs.length) % tabs.length];
+      next.focus(); openTab(next.dataset.tab);
+    });
+  });
+  function openTab(name){
+    tabs.forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === name ? "true" : "false"); });
+    [].slice.call(document.querySelectorAll(".panel")).forEach(function(p){
+      if(p.dataset.panel === name) p.setAttribute("data-open",""); else p.removeAttribute("data-open");
+    });
+    document.querySelector(".addr").textContent = "127.0.0.1:5050/" + name;
+  }
+
+  // ---------- interactions ----------
+  el("rollBtn").addEventListener("click", function(){
+    dayIndex = (dayIndex + 1) % DAYS.length;
+    rollAll();
+  });
+  el("resetBtn").addEventListener("click", function(){
+    STREAMS.forEach(function(s){ shown[s.key] = []; });
+    dayIndex = 0; rollAll(); renderBank();
+  });
+
+  document.addEventListener("click", function(e){
+    var sw = e.target.closest ? e.target.closest(".switch") : null;
+    if(!sw) return;
+    var on = sw.getAttribute("aria-checked") !== "true";
+    sw.setAttribute("aria-checked", on ? "true" : "false");
+    if(sw.dataset.streamswitch){
+      enabled[sw.dataset.streamswitch] = on;
+      if(on && (!picks[sw.dataset.streamswitch] || !picks[sw.dataset.streamswitch].idx.length)){
+        picks[sw.dataset.streamswitch] = draw(sw.dataset.streamswitch);
+      }
+      renderToday(); renderBars(); renderEmail();
+    }
+  });
+
+  el("bankQ").addEventListener("input", renderBank);
+  el("bankStream").addEventListener("change", renderBank);
+
+  el("pasteBtn").addEventListener("click", function(){
+    var src = el("pasteSource").value || "Untitled source";
+    var lines = el("pasteText").value.split(/\n\s*\n|\n/).filter(function(l){ return l.trim(); });
+    if(!lines.length){ el("pasteOut").innerHTML = '<p class="empty">Nothing to parse. Add a line as Title | lesson.</p>'; return; }
+    el("pasteOut").innerHTML = lines.map(function(l,i){
+      var parts = l.split("|");
+      var t = parts.length > 1 ? parts[0].trim() : ("Entry " + (i+1));
+      var b = parts.length > 1 ? parts.slice(1).join("|").trim() : l.trim();
+      return '<article class="card" style="border-left-color:#b28a3e; animation-delay:'+(i*45)+'ms"><h4>'+esc(t)+'</h4><p>'+esc(b)+'</p><cite>'+esc(src)+' · new</cite></article>';
+    }).join("");
+  });
+
+  el("distillBtn").addEventListener("click", function(){
+    var out = [
+      ["Diagnosis comes first","Name the obstacle in plain words before proposing anything. A plan with no named obstacle is a list of hopes."],
+      ["A guiding policy, then actions","The policy says how you'll deal with the obstacle. The actions are only coherent if they come from it."],
+      ["Initiatives aren't strategy","A set of reasonable-sounding projects that don't reinforce each other is the most common counterfeit."]
+    ];
+    el("distillOut").innerHTML = out.map(function(o,i){
+      return '<article class="card" style="animation-delay:'+(i*90)+'ms"><h4>'+esc(o[0])+'</h4><p>'+esc(o[1])+'</p><cite>paraphrased · ready to save</cite></article>';
+    }).join("");
+  });
+
+  // ---------- boot ----------
+  el("bankStream").innerHTML = '<option value="">All streams</option>' + STREAMS.map(function(s){
+    return '<option value="'+s.key+'">'+s.title+'</option>';
+  }).join("");
+  el("pasteStream").innerHTML = STREAMS.map(function(s){
+    return '<option value="'+s.key+'"'+(s.key==="oil"?" selected":"")+'>'+s.title+'</option>';
+  }).join("");
+
+  rollAll();
+  renderBooks(); renderTips(); renderSettings(); renderBank(); renderHistory();
+})();
+</script>
+</body>
+</html>

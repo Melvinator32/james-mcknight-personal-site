@@ -1,0 +1,2777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Zen Garden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
+  body {
+    height: 100dvh;   /* iOS Safari: track the real visible viewport under its dynamic toolbars */
+    font-family: "Outfit", system-ui, sans-serif;
+    display: flex; flex-direction: column;
+    background: var(--sand);
+    color: var(--ink);
+  }
+  :root {
+    --sand: #f8ecdb; --sand2: #f0e2cc; --sand3: #f5edd3;
+    --ink: #2c2a26; --bar: rgba(245, 239, 228, 0.94); --hair: #e3d9c6; --dim: #9a8f7d;
+    --accent: #00859b; --accent2: #77b28c;
+  }
+
+  #stage { flex: 1; position: relative; min-height: 0; width: 100%; }
+  #garden { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; display: block; }
+  #wordmark {
+    position: absolute; bottom: 10px; left: 14px; pointer-events: none;
+    font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 18px;
+    color: rgba(44, 42, 38, 0.55); letter-spacing: 0.3px; z-index: 5;
+  }
+  #zoomctl {
+    position: absolute; top: 12px; right: 12px; z-index: 6;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #corner {
+    position: absolute; top: 12px; left: 12px; z-index: 6;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #objbar {
+    position: absolute; top: 12px; left: 60px; z-index: 6;
+    display: none; flex-wrap: wrap; gap: 6px; max-width: 240px;
+    background: rgba(255,255,255,0.72); border: 1px solid var(--hair);
+    border-radius: 14px; padding: 7px;
+    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  }
+  #objbar.show { display: flex; }
+  .objbtn { width: 46px; height: 46px; padding: 1px; border-radius: 10px; justify-content: center; }
+  .objbtn canvas { width: 40px; height: 40px; display: block; }
+  #sheet.show { display: flex; }
+  button.round {
+    width: 38px; height: 38px; padding: 0; justify-content: center;
+    border-radius: 50%; font-size: 17px; background: rgba(255,255,255,0.85);
+  }
+
+  #sheet {
+    background: var(--bar); border-top: 1px solid var(--hair);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    padding: 6px 10px calc(6px + max(0px, env(safe-area-inset-bottom)));
+    display: none; flex-direction: column; gap: 6px; flex-shrink: 0;
+    max-height: 55vh; overflow-y: auto;
+  }
+  .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .row.scroll { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .row.scroll::-webkit-scrollbar { display: none; }
+
+  button {
+    touch-action: manipulation;
+    font-family: inherit; font-size: 12px; font-weight: 600; color: var(--ink);
+    background: #fff; border: 1px solid var(--hair); border-radius: 999px; /* pill */
+    padding: 9px 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 5px; line-height: 1;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  button:hover { background: var(--sand3); }
+  button:active { transform: scale(0.96); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  /* Black & white icons: geometric glyphs are already mono; pictorial ones get desaturated */
+  .ico { filter: grayscale(1) contrast(1.1); }
+  button.on .ico { filter: grayscale(1) brightness(3); }
+
+  .spacer { flex: 1; }
+  .hint { font-size: 11px; color: var(--dim); line-height: 1.3; }
+
+  #objects, #tune, #styles { display: none; flex-direction: column; gap: 6px; padding-top: 4px; border-top: 1px dashed var(--hair); }
+  #objects.open, #tune.open, #styles.open { display: flex; }
+  #rakeopts, #layopts { display: none; align-items: center; }
+  #rakeopts.show, #layopts.show { display: flex; }
+
+  .slider { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .slider label { font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .3px; color: var(--dim); width: 70px; flex-shrink: 0; }
+  .slider input { flex: 1; accent-color: var(--accent); min-height: 22px; }
+  .slider output { font-weight: 700; color: var(--accent); width: 26px; text-align: right; font-size: 11px; }
+
+  .styles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 6px; }
+  .style-btn { font-size: 11px; padding: 8px 6px; justify-content: center; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: max(16px, calc(16px + env(safe-area-inset-bottom)));
+    transform: translateX(-50%) translateY(8px);
+    background: rgba(44, 42, 38, 0.9); color: #fff; font-size: 12px; padding: 8px 14px; border-radius: 999px;
+    opacity: 0; transition: opacity 0.25s, transform 0.25s; pointer-events: none; z-index: 100;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #sizechip {
+    position: absolute; z-index: 8; display: none;
+    align-items: center; gap: 8px; padding: 5px 8px;
+    background: rgba(255,255,255,0.92); border: 1px solid var(--hair); border-radius: 999px;
+    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  }
+  #sizechip.show { display: flex; }
+  #sizechip button { width: 30px; height: 30px; padding: 0; border-radius: 50%; font-size: 17px; }
+  #szLabel { font-size: 12px; font-weight: 700; color: var(--ink); min-width: 38px; text-align: center; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  @media (max-width: 600px) {
+    #wordmark { font-size: 16px; top: 8px; left: 12px; }
+    button { font-size: 11px; padding: 8px 11px; }
+    .slider label { width: 60px; }
+  }
+</style>
+<link rel="icon" type="image/png" href="/bonsai-logo.png">
+<link rel="apple-touch-icon" href="/bonsai-logo.png">
+<style>.app-bonsai{width:48px;height:48px;object-fit:contain;flex-shrink:0;vertical-align:middle;background:#E1E2D8;border-radius:10px;padding:4px}</style>
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="garden" aria-label="Zen garden — drag to rake, tap to place, pinch to zoom"></canvas>
+  <div id="wordmark" style="display:flex;align-items:center;gap:12px"><img class="app-bonsai" src="/bonsai-logo.png" alt="Bonsai logo" width="48" height="48">Zen</div>
+  <div id="corner">
+    <button class="round" id="settingsBtn" title="Settings">⚙</button>
+    <button class="round" data-tool="rake" title="Rake">∿</button>
+    <button class="round" data-tool="move" title="Move / pan">✥</button>
+    <button class="round" id="addBtn" title="Add objects">＋</button>
+  </div>
+  <div id="objbar"></div>
+  <div id="zoomctl">
+    <button class="round" id="zin" title="Zoom in">＋</button>
+    <button class="round" id="zout" title="Zoom out">−</button>
+    <button class="round" id="zreset" title="Reset view">⌖</button>
+  </div>
+  <div id="toast" role="status"></div>
+  <div id="sizechip">
+    <button id="szDown" title="Smaller">−</button>
+    <span id="szLabel">100%</span>
+    <button id="szUp" title="Larger">＋</button>
+  </div>
+</div>
+
+<div id="sheet">
+  <div class="row scroll">
+    <button data-tool="path" title="Drag to lay a stepping-stone path">⋯ Path</button>
+    <button data-tool="stream" title="Drag to carve a gravel-lined stream">≈ Stream</button>
+    <button id="random" title="Generate a new garden"><span class="ico">⚄</span> New</button>
+    <button id="tuneBtn" title="Map size, lines, wiggle, reach">≡ Tune</button>
+    <span class="spacer"></span>
+    <button id="undoBtn" title="Undo last stroke or placement">↶</button>
+    <button id="musicBtn" title="Toggle ambient music">♫ Music</button>
+    <button id="soundBtn" title="Toggle sound">♪ Sound</button>
+    <button id="save" title="Save as image">⇩ Save</button>
+    <button id="share" class="primary" title="Share">↗ Share</button>
+  </div>
+
+  <div class="row scroll" id="layopts">
+    <span class="hint" style="flex-shrink:0">Lay:</span>
+    <button data-lay="drag" class="on" title="Stones or water appear as you drag">While dragging</button>
+    <button data-lay="trace" title="Sketch the course, it's set on release">Trace course</button>
+  </div>
+
+  <div class="row scroll" id="rakeopts">
+    <span class="hint" style="flex-shrink:0">Pattern:</span>
+    <button data-rake="fine" title="One thin line">Fine</button>
+    <button data-rake="classic" class="on" title="Classic groove">Classic</button>
+    <button data-rake="wide" title="Broad sweep">Wide</button>
+    <button data-rake="triple" title="Three parallel tines">Triple</button>
+  </div>
+
+  <div id="tune">
+    <div class="slider"><label for="s-size">Map size</label><input id="s-size" type="range" min="1" max="8"><output id="o-size"></output></div>
+    <div class="slider"><label for="s-items">Items</label><input id="s-items" type="range" min="2" max="12"><output id="o-items"></output></div>
+    <div class="slider"><label for="s-density">Lines</label><input id="s-density" type="range" min="0" max="20"><output id="o-density"></output></div>
+    <div class="slider"><label for="s-wiggle">Wiggle</label><input id="s-wiggle" type="range" min="0" max="30"><output id="o-wiggle"></output></div>
+    <div class="slider"><label for="s-reach">Reach</label><input id="s-reach" type="range" min="10" max="140"><output id="o-reach"></output></div>
+    <div class="hint">Rake: drag to carve grooves. Move: drag items, double-tap removes. Pinch, scroll, or use ＋/− to zoom. No sound? Tap ♪, flip your phone's silent switch, raise volume.</div>
+  </div>
+
+  </div>
+</div>
+
+<script>
+"use strict";
+/*
+  Zen Garden v3.2
+  - Rake tool actually works: live groove feedback while dragging, strokes persist
+  - Per-style item rendering: flat, realistic (speckled stone, rich gradients),
+    and seasonal (Autumn foliage + leaf litter, Winter snow caps)
+  - Objects tucked behind an Objects button; pill buttons; monochrome icons
+*/
+const BUILD = "4.5";
+
+/* If anything throws — during boot or later — show it on screen instead of a
+   silent blank canvas, so a phone failure is diagnosable without devtools. */
+window.addEventListener("error", (e) => {
+  try {
+    let bar = document.getElementById("errbar");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "errbar";
+      bar.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:999;background:#b3261e;color:#fff;" +
+        "font:12px/1.4 -apple-system,system-ui,sans-serif;padding:8px 12px;white-space:pre-wrap;";
+      document.body.appendChild(bar);
+    }
+    bar.textContent = "Zen v" + BUILD + " error: " + (e.message || e.error) +
+      (e.lineno ? " (line " + e.lineno + ")" : "");
+  } catch (_) {}
+});
+
+/* ============ STYLES ============ */
+/* Each style: sand colors, groove colors, and an `it` config the item renderer
+   consumes — rock tones, wood, foliage palette, plus a flavor:
+   "flat" | "real" | "autumn" | "winter". */
+const STYLES = [
+  { name: "Minimalist",
+    sand: "#f8ecdb", sand2: "#f0e2cc", sand3: "#f5edd3", ink: "#2c2a26",
+    accent: "#00859b", accent2: "#77b28c",
+    grooveLight: "rgba(255,255,255,0.6)", groove: "rgba(148,122,90,0.45)",
+    it: { flavor: "flat", rockA: ["#9a9a9e", "#6f6f74"], rockB: ["#b3b3b6", "#84848a"], rockC: ["#a8a49c", "#7d7a72"],
+          wood: "#8a5a33", trunk: "#5d4126", stone: "#84848a", cap: "#f8ecdb",
+          fol: ["#38a66f", "#77b28c", "#bce194"] } },
+  { name: "Riverstone", /* realistic */
+    sand: "#e9dfc9", sand2: "#ddd2b8", sand3: "#e4dac2", ink: "#3a352c",
+    accent: "#5b7065", accent2: "#7d9082",
+    grooveLight: "rgba(255,252,240,0.55)", groove: "rgba(122,105,82,0.5)",
+    it: { flavor: "real", rockA: ["#8d8478", "#5c554b"], rockB: ["#a39a8c", "#6e675c"], rockC: ["#96907f", "#655f52"],
+          wood: "#6e4f2e", trunk: "#4a3520", stone: "#7a746a", cap: "#e9dfc9",
+          fol: ["#3f6b4f", "#557d63", "#6f9179"] } },
+  { name: "Autumn", /* seasonal, realistic shading */
+    sand: "#f4e7d0", sand2: "#ecd9bb", sand3: "#f1e2c8", ink: "#4a2e1a",
+    accent: "#c25e2a", accent2: "#d9913c",
+    grooveLight: "rgba(255,248,235,0.55)", groove: "rgba(166,110,60,0.45)",
+    it: { flavor: "autumn", rockA: ["#9b8f80", "#6b6156"], rockB: ["#ac9f8e", "#7a6f61"], rockC: ["#a09484", "#70665a"],
+          wood: "#7a4a26", trunk: "#54331a", stone: "#8a7e6e", cap: "#f4e7d0",
+          fol: ["#c9572c", "#e0913a", "#a83a26"] } },
+  { name: "First Snow", /* seasonal */
+    sand: "#eef3f7", sand2: "#e1e9f0", sand3: "#e9eff5", ink: "#2b3a46",
+    accent: "#5b87a6", accent2: "#8fb0c6",
+    grooveLight: "rgba(255,255,255,0.85)", groove: "rgba(122,148,170,0.4)",
+    it: { flavor: "winter", rockA: ["#8b93a0", "#5d6570"], rockB: ["#a0a8b4", "#727a86"], rockC: ["#949ca8", "#666e7a"],
+          wood: "#5f4a38", trunk: "#43342a", stone: "#7d8590", cap: "#ffffff",
+          fol: ["#3d5a4a", "#4f6f5d", "#5f7f6d"] } },
+  { name: "Cottagecore",
+    sand: "#fdf5f0", sand2: "#f9ebe3", sand3: "#fde8e0", ink: "#4a3728",
+    accent: "#d67ba8", accent2: "#a08a7d",
+    grooveLight: "rgba(255,245,240,0.65)", groove: "rgba(176,120,120,0.4)",
+    it: { flavor: "flat", rockA: ["#c3b2ac", "#93827c"], rockB: ["#d0c1bb", "#a2918b"], rockC: ["#c8b7ae", "#98877e"],
+          wood: "#b89d7f", trunk: "#8a7057", stone: "#a89890", cap: "#fdf5f0",
+          fol: ["#7ab895", "#9ccb9f", "#c6dfae"] } },
+  { name: "Ink & Gold",
+    sand: "#14120e", sand2: "#1d1a15", sand3: "#12100c", ink: "#e7c96a",
+    accent: "#c9a961", accent2: "#8f7b45",
+    grooveLight: "rgba(231,201,106,0.22)", groove: "rgba(231,201,106,0.4)",
+    it: { flavor: "flat", rockA: ["#3a3a3a", "#222225"], rockB: ["#464646", "#2c2c2f"], rockC: ["#404039", "#282820"],
+          wood: "#4a3a22", trunk: "#33270f", stone: "#3c3c40", cap: "#e7c96a", rim: "rgba(231,201,106,0.8)",
+          fol: ["#5a5432", "#6e6740", "#847b4e"] } },
+  { name: "Neon",
+    sand: "#0c1030", sand2: "#111640", sand3: "#0e1338", ink: "#00e5c7",
+    accent: "#ff2d78", accent2: "#00c4e8",
+    grooveLight: "rgba(0,196,232,0.3)", groove: "rgba(255,45,120,0.35)",
+    it: { flavor: "flat", rockA: ["#2c2a52", "#1c1a3a"], rockB: ["#363364", "#242148"], rockC: ["#302d5a", "#201d42"],
+          wood: "#3d2c58", trunk: "#2a1d40", stone: "#34315e", cap: "#00e5c7", rim: "rgba(0,229,199,0.85)",
+          fol: ["#ff2d78", "#00c4e8", "#8f6bff"] } },
+  { name: "Sunset",
+    sand: "#ffe8d6", sand2: "#ffd9c4", sand3: "#ffe5cf", ink: "#3d2817",
+    accent: "#ff6b35", accent2: "#f7931e",
+    grooveLight: "rgba(255,255,255,0.6)", groove: "rgba(255,107,53,0.3)",
+    it: { flavor: "flat", rockA: ["#c9857a", "#96574e"], rockB: ["#d6968b", "#a4675d"], rockC: ["#cd8b7d", "#9a5d51"],
+          wood: "#8b4513", trunk: "#5f2e0c", stone: "#b3766a", cap: "#ffe8d6",
+          fol: ["#d64045", "#f7931e", "#ffb85c"] } },
+  { name: "Monochrome",
+    sand: "#f5f5f5", sand2: "#e8e8e8", sand3: "#f0f0f0", ink: "#2a2a2a",
+    accent: "#4a4a4a", accent2: "#6a6a6a",
+    grooveLight: "rgba(255,255,255,0.7)", groove: "rgba(74,74,74,0.32)",
+    it: { flavor: "flat", rockA: ["#7c7c7c", "#4e4e4e"], rockB: ["#909090", "#606060"], rockC: ["#868686", "#565656"],
+          wood: "#5a5a5a", trunk: "#3c3c3c", stone: "#6a6a6a", cap: "#f5f5f5",
+          fol: ["#3f3f3f", "#5c5c5c", "#7a7a7a"] } },
+  { name: "Desert",
+    sand: "#f5e6d3", sand2: "#e8d7c3", sand3: "#f2e3ce", ink: "#5a3a2a",
+    accent: "#c17817", accent2: "#d4a574",
+    grooveLight: "rgba(255,245,235,0.55)", groove: "rgba(193,120,23,0.32)",
+    it: { flavor: "real", rockA: ["#a08462", "#6f5a40"], rockB: ["#b09472", "#7f6a50"], rockC: ["#a88c6a", "#776248"],
+          wood: "#8a6034", trunk: "#5f4020", stone: "#96806a", cap: "#f5e6d3",
+          fol: ["#7d8f4a", "#96a45c", "#b3ba74"] } },
+];
+
+/* ============ ITEMS ============ */
+const ITEM_DEFS = [
+  { key: "rock_lg",  label: "Boulder", icon: "⬤" },
+  { key: "rock_sm",  label: "Stone",   icon: "●" },
+  { key: "rock_flat",label: "Flat",    icon: "▬" },
+  { key: "bonsai",   label: "Bonsai",  icon: "♣" },
+  { key: "bonsai_c", label: "Cascade", icon: "⌘" },
+  { key: "bonsai_p", label: "Pine",    icon: "♠" },
+  { key: "bonsai_w", label: "Windswept", icon: "⇝" },
+  { key: "maple",    label: "Maple",   icon: "✽" },
+  { key: "bamboo",   label: "Bamboo",  icon: "‖" },
+  { key: "lantern",  label: "Lantern", icon: "⌂" },
+  { key: "basin",    label: "Basin",   icon: "◍" },
+  { key: "moss",     label: "Moss",    icon: "◗" },
+  { key: "pagoda",   label: "Pagoda",  icon: "▲" },
+  { key: "torii",    label: "Torii",   icon: "⊓" },
+  { key: "bridge",   label: "Bridge",  icon: "⌒" },
+  { key: "hut",      label: "Hut",     icon: "⌂" },
+];
+const RADII = { rock_lg: 62, rock_sm: 34, rock_flat: 52, bonsai: 58, bonsai_c: 58, lantern: 42, moss: 40, pagoda: 46,
+                maple: 56, bamboo: 44, basin: 38, torii: 50, step: 20, bridge: 52, bonsai_p: 58, bonsai_w: 56,
+                hut: 64 };
+// Visual footprints: ellipses matching the DRAWN shape (rx, ry; cx/cy = center offset).
+// The distance field uses these so grooves hug the visible pixels; RADII stays for hit-testing.
+const FOOT = {
+  rock_lg:  { rx: 55, ry: 34, cx: 0,  cy: -6 },
+  rock_sm:  { rx: 32, ry: 20, cx: 0,  cy: -4 },
+  rock_flat:{ rx: 53, ry: 15, cx: 0,  cy: -2 },
+  bonsai:   { rx: 30, ry: 40, cx: -5, cy: -14 },
+  bonsai_c: { rx: 34, ry: 30, cx: 13, cy: -9 },
+  lantern:  { rx: 27, ry: 40, cx: 0,  cy: -14 },
+  moss:     { rx: 41, ry: 18, cx: 0,  cy: -6 },
+  pagoda:   { rx: 33, ry: 36, cx: 0,  cy: -13 },
+  maple:    { rx: 38, ry: 38, cx: 0,  cy: -16 },
+  bamboo:   { rx: 24, ry: 36, cx: 0,  cy: -16 },
+  basin:    { rx: 27, ry: 16, cx: 0,  cy: -4 },
+  torii:    { rx: 35, ry: 36, cx: 0,  cy: -16 },
+  step:     { rx: 16, ry: 11, cx: 0,  cy: -1 },
+  bridge:   { rx: 46, ry: 22, cx: 0,  cy: -8 },
+  bonsai_p: { rx: 32, ry: 42, cx: 0,  cy: -18 },
+  bonsai_w: { rx: 40, ry: 28, cx: 8,  cy: -10 },
+  hut:      { rx: 58, ry: 44, cx: 0,  cy: -18 },
+};
+
+/* ============ STATE ============ */
+let W = 800, H = 600, G = null, currentStyle = 0, tool = "rake", drag = null;
+let lastTap = { t: 0, x: 0, y: 0 }, ridges = [], phase = 0;
+let settleVel = null;
+
+/* Camera: world coords are the garden's own coordinates (G.w × G.h). The view
+   maps world → screen: sx = (wx - ox) * z. Pinch on touch, wheel on desktop,
+   round buttons everywhere. */
+const view = { z: 1, ox: 0, oy: 0 };
+const pointers = new Map();
+let pinch = null;
+let visItems = [], visSwirls = [], visRakes = [], visStreams = [];   // viewport-culled feature sets
+const undoStack = [];   // {t:'rake'} | {t:'item', id}
+
+/* Coalesce rapid redraw requests (drag/pan/pinch) into one draw per frame —
+   drawing synchronously on every pointermove floods the main thread and is
+   exactly what makes fast drags feel clunky. */
+let drawQueued = false;
+function scheduleDraw() {
+  if (drawQueued) return;
+  drawQueued = true;
+  requestAnimationFrame(() => { drawQueued = false; draw(); });
+}
+
+/* The world can be up to 8× the screen in each direction (G.size). */
+function worldW() { return W * ((G && G.size) || 1); }
+function worldH() { return H * ((G && G.size) || 1); }
+function fitZ() { return Math.min(W / worldW(), H / worldH()); }
+
+function clampView() {
+  view.z = Math.min(5, Math.max(1, view.z));   // 1x is the max zoom-out; explore by panning
+  const WW = worldW(), WH = worldH();
+  const vw = W / view.z, vh = H / view.z;
+  const mx = 0.15 * vw, my = 0.15 * vh;
+  const loX = -mx, hiX = WW + mx - vw;
+  view.ox = hiX < loX ? (WW - vw) / 2 : Math.min(hiX, Math.max(loX, view.ox));
+  const loY = -my, hiY = WH + my - vh;
+  view.oy = hiY < loY ? (WH - vh) / 2 : Math.min(hiY, Math.max(loY, view.oy));
+}
+function zoomAt(sx, sy, newZ) {
+  const wx = view.ox + sx / view.z, wy = view.oy + sy / view.z;
+  view.z = Math.min(5, Math.max(1, newZ));
+  view.ox = wx - sx / view.z;
+  view.oy = wy - sy / view.z;
+  clampView();
+  draw();
+}
+
+const canvas = document.getElementById("garden");
+let ctx = canvas.getContext("2d");
+
+function getStyle() { return STYLES[currentStyle % STYLES.length]; }
+function applyStyle() {
+  const s = getStyle();
+  const r = document.documentElement.style;
+  r.setProperty("--sand", s.sand); r.setProperty("--sand2", s.sand2); r.setProperty("--sand3", s.sand3);
+  r.setProperty("--ink", s.ink); r.setProperty("--accent", s.accent); r.setProperty("--accent2", s.accent2);
+}
+
+function defaults() {
+  return {
+    seed: Math.floor(Math.random() * 1e5), density: 10, wiggle: 8, reach: 60, autoN: 6, size: 1,
+    rakeMode: "classic", layMode: "drag",
+    w: W, h: H, items: [], swirls: [], rakes: [], streams: []
+  };
+}
+function store(fn) { try { return fn(); } catch (e) { return null; } }
+function load() {
+  const raw = store(() => localStorage.getItem("zen_pocket"));
+  let saved = null;
+  try { saved = raw ? JSON.parse(raw) : null; } catch (e) { saved = null; }   // corrupt storage → fresh start, not a blank screen
+  G = Object.assign(defaults(), saved || {});
+  // legacy 0–94 densities map into the new 0–20 scale (old 80 → 0, old 96 → 20)
+  let dv = Number(G.density) || 10;
+  if (dv > 20) dv = (dv - 80) / 0.8;
+  G.density = Math.max(0, Math.min(20, dv));
+  G.size = Math.min(8, Math.max(1, Number(G.size) || 1));
+  G.items = Array.isArray(G.items) ? G.items.filter((it) => it && typeof it.x === "number" && typeof it.y === "number") : [];
+  G.swirls = Array.isArray(G.swirls) ? G.swirls : [];
+  G.rakes = Array.isArray(G.rakes) ? G.rakes.filter((rk) => rk && Array.isArray(rk.pts) && rk.pts.length > 1) : [];
+  G.streams = Array.isArray(G.streams) ? G.streams.filter((st) => st && Array.isArray(st.pts) && st.pts.length > 1) : [];
+  currentStyle = STYLES.findIndex(s => s.name === "Riverstone"); if (currentStyle < 0) currentStyle = 0;
+  applyStyle();
+  if (!G.items.length && !saved) randomGarden(false);
+  rescale(G.w, G.h, W * G.size, H * G.size);
+}
+function save() {
+  G.w = worldW(); G.h = worldH();
+  store(() => localStorage.setItem("zen_pocket", JSON.stringify(G)));
+}
+function rescale(fromW, fromH, toW, toH) {
+  if (!fromW || !fromH || (fromW === toW && fromH === toH)) { G.w = toW; G.h = toH; return; }
+  const sx = toW / fromW, sy = toH / fromH;
+  G.items.forEach((it) => { it.x *= sx; it.y *= sy; });
+  G.swirls.forEach((s) => { s.x *= sx; s.y *= sy; });
+  G.rakes = (G.rakes || []).map((r) => ({ ...r, pts: r.pts.map((p) => [p[0] * sx, p[1] * sy]) }));
+  G.streams = (G.streams || []).map((r) => ({ ...r, pts: r.pts.map((p) => [p[0] * sx, p[1] * sy]) }));
+  G.w = toW; G.h = toH;
+}
+function itemR(it) { return (RADII[it.type] || 44) * (it.scale || 1); }
+
+/* ============ DISTANCE FIELD ============ */
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+function distToPolyline(x, y, pts) {
+  let best = Infinity;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const ax = pts[i][0], ay = pts[i][1];
+    const abx = pts[i + 1][0] - ax, aby = pts[i + 1][1] - ay;
+    const L2 = abx * abx + aby * aby || 1;
+    let t = ((x - ax) * abx + (y - ay) * aby) / L2;
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    const dx = x - (ax + abx * t), dy = y - (ay + aby * t);
+    const d = dx * dx + dy * dy;
+    if (d < best) best = d;
+  }
+  return best === Infinity ? Infinity : Math.sqrt(best);
+}
+
+function rakeFieldTerm(gs, x, y, pts, mode) {
+  // True distance to the stroke polyline (not to each point), so contours run
+  // PARALLEL along the stroke like tine lines, instead of bumpy rings around
+  // dots. Slightly negative inside the capsule (clamped -2) pins a contour
+  // right along each side of the stroke.
+  const dist = distToPolyline(x, y, pts);
+  if (dist === Infinity) return;
+  switch (mode) {
+    case "fine":   gs.push(Math.max(dist - 2.5, -2)); break;
+    case "wide":   gs.push(Math.max(dist - 16, -2)); break;
+    case "triple": // center groove plus a tine pinned at 15 units on each side
+      gs.push(Math.max(dist - 5, -2));
+      gs.push(Math.max(Math.abs(dist - 15) - 1.5, -2));
+      break;
+    default:       gs.push(Math.max(dist - 6, -2));   // classic
+  }
+}
+
+function bbOfPts(pts) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const q of pts) { if (q[0] < x0) x0 = q[0]; if (q[0] > x1) x1 = q[0]; if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; }
+  return [x0, y0, x1, y1];
+}
+
+/* Commit a drawn stream stroke, welding it onto any existing stream whose end
+   lies near either end of the new stroke — lifting your finger and continuing
+   extends the stream instead of stacking a second one on top. */
+function commitStreamStroke(rawPts) {
+  let pts = rawPts.filter((_, i) => i % 2 === 0 || i === rawPts.length - 1);
+  const SNAP = 60;
+  const near = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < SNAP;
+  G.streams = G.streams || [];
+  for (let i = G.streams.length - 1; i >= 0; i--) {   // weld at the start
+    const st = G.streams[i], h = st.pts[0], t2 = st.pts[st.pts.length - 1];
+    if (near(pts[0], t2)) { pts = st.pts.concat(pts); G.streams.splice(i, 1); break; }
+    if (near(pts[0], h)) { pts = st.pts.slice().reverse().concat(pts); G.streams.splice(i, 1); break; }
+  }
+  for (let i = G.streams.length - 1; i >= 0; i--) {   // weld at the end
+    const st = G.streams[i], h = st.pts[0], t2 = st.pts[st.pts.length - 1];
+    const tail = pts[pts.length - 1];
+    if (near(tail, h)) { pts = pts.concat(st.pts); G.streams.splice(i, 1); break; }
+    if (near(tail, t2)) { pts = pts.concat(st.pts.slice().reverse()); G.streams.splice(i, 1); break; }
+  }
+  if (pts.length > 500) pts = pts.filter((_, i) => i % 2 === 0 || i === pts.length - 1);
+  G.streams.push({ t: Date.now(), pts, bb: bbOfPts(pts) });
+  if (G.streams.length > 10) G.streams.shift();
+  undoStack.push({ t: "stream" });
+}
+
+function streamFieldTerm(gs, x, y, pts) {
+  // grooves hug the wet halo of the ribbon (~24 units half-width)
+  const use = pts.length > 120 ? pts.filter((_, i) => i % 2 === 0) : pts;
+  const dist = distToPolyline(x, y, use);
+  if (dist === Infinity) return;
+  gs.push(Math.max(dist - 24, -2));
+}
+
+function field(x, y) {
+  const K = 7;
+  const bias = Math.max(0, 140 - (G.reach || 60)) * 0.9;
+  const gs = [];
+  for (const rd of ridges) gs.push(Math.abs(y - (rd.y + Math.sin(x / rd.wav + rd.ph) * rd.amp)) + bias);
+  gs.push(Math.min(x, y, worldW() - x, worldH() - y) + bias * 0.7);
+  for (const it of visItems) {
+    // Accurate ellipse distance to the drawn footprint (iq's SDF approximation),
+    // so rings sit at true pixel distance in every direction — no wide bands on
+    // flat shapes. Slightly negative inside (clamped to -2) puts contour level 0
+    // exactly on the shape edge without adding deep interior levels.
+    const f = FOOT[it.type] || { rx: 44, ry: 30, cx: 0, cy: 0 };
+    const sc = it.scale || 1;
+    const rx = f.rx * sc, ry = f.ry * sc;
+    const dx = x - (it.x + (f.cx || 0) * sc), dy = y - (it.y + f.cy * sc);
+    const k0 = Math.sqrt((dx * dx) / (rx * rx) + (dy * dy) / (ry * ry));
+    const k1 = Math.sqrt((dx * dx) / (rx * rx * rx * rx) + (dy * dy) / (ry * ry * ry * ry));
+    const d = k1 > 1e-6 ? (k0 * (k0 - 1)) / k1 : -Math.min(rx, ry);
+    gs.push(Math.max(d, -2));
+  }
+  for (const s of visSwirls) {
+    const dx = x - s.x, dy = y - s.y;
+    gs.push(Math.max(0, Math.sqrt(dx * dx + dy * dy) - (10 + (s.sz || 1) * 16)));
+  }
+  for (const rk of visRakes) rakeFieldTerm(gs, x, y, rk.pts, rk.mode || "classic");
+  for (const st of visStreams) streamFieldTerm(gs, x, y, st.pts);
+  // Live stroke: the field must see the rake WHILE you drag, not after release
+  if (drag && drag.isRake && drag.pts.length > 1) rakeFieldTerm(gs, x, y, drag.pts, G.rakeMode || "classic");
+  if (drag && drag.isStream && drag.pts.length > 1) streamFieldTerm(gs, x, y, drag.pts);
+  let m = Infinity;
+  for (const g of gs) if (g < m) m = g;
+  let acc = 0;
+  for (const g of gs) { const e = (g - m) / K; if (e < 30) acc += Math.exp(-e); }
+  return m - K * Math.log(acc)
+    + Math.sin(x / 210 + y / 470 + phase * 6.28) * G.wiggle * 0.45
+    + Math.sin(x / 83 - y / 190 + phase * 12.6) * G.wiggle * 0.2;
+}
+
+function contours(spacing) {
+  const gsz = view.z < 0.4 ? 9 : 6;   // coarser sampling when zoomed way out — invisible at that scale, much faster
+  const nx = Math.floor(W / gsz) + 2, ny = Math.floor(H / gsz) + 2;
+  const F = new Float32Array(nx * ny);
+  let fmin = Infinity, fmax = -Infinity;
+  const iz = 1 / view.z;
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    const v = field(view.ox + i * gsz * iz, view.oy + j * gsz * iz);
+    F[j * nx + i] = v;
+    if (v < fmin) fmin = v; if (v > fmax) fmax = v;
+  }
+  const segs = [];
+  const lerp = (a, b, L) => (L - a) / (b - a);
+  for (let L = Math.ceil(fmin / spacing) * spacing; L <= fmax; L += spacing) {
+    for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+      const a = F[j * nx + i], b = F[j * nx + i + 1];
+      const c = F[(j + 1) * nx + i + 1], d = F[(j + 1) * nx + i];
+      let idx = 0;
+      if (a > L) idx |= 1; if (b > L) idx |= 2; if (c > L) idx |= 4; if (d > L) idx |= 8;
+      if (idx === 0 || idx === 15) continue;
+      const x0 = i * gsz, y0 = j * gsz;
+      const top = [x0 + gsz * lerp(a, b, L), y0], right = [x0 + gsz, y0 + gsz * lerp(b, c, L)];
+      const bot = [x0 + gsz * lerp(d, c, L), y0 + gsz], left = [x0, y0 + gsz * lerp(a, d, L)];
+      const put = (p, q) => segs.push(p[0], p[1], q[0], q[1]);
+      switch (idx) {
+        case 1: case 14: put(left, top); break;
+        case 2: case 13: put(top, right); break;
+        case 3: case 12: put(left, right); break;
+        case 4: case 11: put(right, bot); break;
+        case 6: case 9:  put(top, bot); break;
+        case 7: case 8:  put(left, bot); break;
+        case 5:  put(left, top); put(right, bot); break;
+        case 10: put(top, right); put(left, bot); break;
+      }
+    }
+  }
+  return segs;
+}
+
+/* ============ DRAW ============ */
+function draw() {
+  const s = getStyle();
+  const rand = rng(G.seed * 1000 + 17);
+  phase = rand();
+
+  // Viewport culling: on a big map only nearby features shape the visible sand.
+  // (An off-screen feature >300 world units away could in principle own a ring
+  // here, but the nearest feature dominates the field, so the error is invisible
+  // in practice — and it's what makes an 8× map render at interactive speed.)
+  const M = 300;
+  const vx0 = view.ox - M, vy0 = view.oy - M;
+  const vx1 = view.ox + W / view.z + M, vy1 = view.oy + H / view.z + M;
+  visItems = G.items.filter((it) => it.x > vx0 - 80 && it.x < vx1 + 80 && it.y > vy0 - 80 && it.y < vy1 + 80);
+  visSwirls = G.swirls.filter((sw) => sw.x > vx0 && sw.x < vx1 && sw.y > vy0 && sw.y < vy1);
+  visRakes = (G.rakes || []).filter((rk) => {
+    const bb = rk.bb || [rk.pts[0][0], rk.pts[0][1], rk.pts[0][0], rk.pts[0][1]];
+    return bb[2] > vx0 && bb[0] < vx1 && bb[3] > vy0 && bb[1] < vy1;
+  });
+  visStreams = (G.streams || []).filter((st) => {
+    const bb = st.bb || [st.pts[0][0], st.pts[0][1], st.pts[0][0], st.pts[0][1]];
+    return bb[2] > vx0 - 40 && bb[0] < vx1 + 40 && bb[3] > vy0 - 40 && bb[1] < vy1 + 40;
+  });
+
+  ridges = [];
+  const nR = Math.min(8, Math.round((2 + Math.floor(rand() * 2)) * Math.max(1, (G.size || 1) * 0.75)));
+  for (let i = 0; i < nR; i++) {
+    ridges.push({ y: worldH() * 0.05 + rand() * worldH() * 0.9, wav: 240 + rand() * 240, ph: rand() * 6.28, amp: 12 + G.wiggle * 2.2 });
+  }
+
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, s.sand);
+  grad.addColorStop(1, s.sand2);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = "rgba(160,140,110,0.08)";
+  const nSpeck = Math.round(W * H / 1600);
+  for (let i = 0; i < nSpeck; i++) ctx.fillRect(rand() * W, rand() * H, 1.6, 1.6);
+
+  // Grooves: map Lines slider (0-94) to spacing (60→3.7). While actively raking,
+  // floor the spacing so the drag stays fluid at high densities; the full-detail
+  // render snaps back the moment the finger lifts.
+  // Lines 0–20 spans what used to be 80–96: spacing 12.08 (0) down to 2.5 (20)
+  let spacing = 12.08 - G.density * 0.479;
+  if (drag && drag.isRake) spacing = Math.max(spacing, 6);
+  spacing = Math.max(spacing, 3.5 / view.z);   // never render lines tighter than ~3.5 screen px
+  const segs = contours(spacing);
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  for (const pass of [
+    { ox: -0.9, oy: -1.5, color: s.grooveLight, w: 2.1 },
+    { ox: 0,    oy: 0,    color: s.groove, w: 2.2 },
+  ]) {
+    ctx.beginPath();
+    for (let k = 0; k < segs.length; k += 4) {
+      ctx.moveTo(segs[k] + pass.ox, segs[k + 1] + pass.oy);
+      ctx.lineTo(segs[k + 2] + pass.ox, segs[k + 3] + pass.oy);
+    }
+    ctx.strokeStyle = pass.color; ctx.lineWidth = pass.w; ctx.stroke();
+  }
+
+  for (const st of visStreams) drawStream(st);
+  if (drag && drag.isStream && drag.pts.length > 1) drawStream({ pts: drag.pts, t: drag.t0 });
+  if (drag && drag.isTrace && drag.pts.length > 1) {
+    ctx.save();
+    ctx.setLineDash([7, 7]);
+    ctx.strokeStyle = s.accent; ctx.globalAlpha = 0.7; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo((drag.pts[0][0] - view.ox) * view.z, (drag.pts[0][1] - view.oy) * view.z);
+    for (let i = 1; i < drag.pts.length; i++)
+      ctx.lineTo((drag.pts[i][0] - view.ox) * view.z, (drag.pts[i][1] - view.oy) * view.z);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  visItems.forEach((it) => drawItem(it));
+}
+
+function drawStream(st) {
+  const s = getStyle(), cfg = s.it;
+  if (st.pts.length < 2) return;
+  const z = view.z;
+  let C = st.pts;
+  for (let pass = 0; pass < 2; pass++) {   // Chaikin smooth ×2
+    const out = [C[0]];
+    for (let i = 0; i < C.length - 1; i++) {
+      const a = C[i], b = C[i + 1];
+      out.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25],
+               [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75]);
+    }
+    out.push(C[C.length - 1]);
+    C = out;
+  }
+  const P = C.map((q) => [(q[0] - view.ox) * z, (q[1] - view.oy) * z]);
+  const N = P.length;
+  if (N < 3) return;
+  const rnd = rng((st.t || 1) % 1e9);
+  const phA = rnd() * 6.28, phB = rnd() * 6.28, phC = rnd() * 6.28, phD = rnd() * 6.28;
+  // Each bank wanders INDEPENDENTLY — parallel edges are what made it a tube.
+  const NX = [], NY = [], HL = [], HR = [], CURV = [];
+  let prevAng = null;
+  for (let i = 0; i < N; i++) {
+    const a = P[Math.max(0, i - 1)], b = P[Math.min(N - 1, i + 1)];
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    NX.push(-dy / len); NY.push(dx / len);
+    const ang = Math.atan2(dy, dx);
+    let dAng = prevAng === null ? 0 : ang - prevAng;
+    while (dAng > Math.PI) dAng -= Math.PI * 2;
+    while (dAng < -Math.PI) dAng += Math.PI * 2;
+    CURV.push(dAng); prevAng = ang;
+    const t = i / (N - 1);
+    const taper = Math.min(1, Math.min(t, 1 - t) * 5 + 0.08);
+    const base = 10.5 * z * taper;
+    HL.push(base * (1 + 0.3 * Math.sin(t * 11 + phA) + 0.15 * Math.sin(t * 29 + phB)));
+    HR.push(base * (1 + 0.3 * Math.sin(t * 13 + phC) + 0.15 * Math.sin(t * 31 + phD)));
+  }
+  const ribbon = (mul, fill, alpha) => {
+    ctx.beginPath();
+    ctx.moveTo(P[0][0], P[0][1]);
+    for (let i = 0; i < N; i++) ctx.lineTo(P[i][0] + NX[i] * HL[i] * mul, P[i][1] + NY[i] * HL[i] * mul);
+    for (let i = N - 1; i >= 0; i--) ctx.lineTo(P[i][0] - NX[i] * HR[i] * mul, P[i][1] - NY[i] * HR[i] * mul);
+    ctx.closePath();
+    ctx.globalAlpha = alpha; ctx.fillStyle = fill; ctx.fill(); ctx.globalAlpha = 1;
+  };
+  // OPAQUE sand base first: erases the grooves beneath, so water never sits on lines
+  ribbon(1.8, s.sand2, 1);
+  ribbon(1.8, "rgba(110,96,76,0.13)", 1);       // faint damp halo
+  ribbon(1.35, "rgba(172,158,134,0.5)", 1);     // gravel margin
+  ribbon(1.0, s.accent, 0.85);                  // water body, near-opaque
+  ribbon(0.45, "#ffffff", 0.14);                // shallows sheen
+  // thin water edges instead of a fat dark seam
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  for (const side of [1, -1]) {
+    ctx.beginPath();
+    for (let i = 0; i < N; i++) {
+      const H = side === 1 ? HL[i] : HR[i];
+      const x = P[i][0] + NX[i] * H * side, y = P[i][1] + NY[i] * H * side;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = "rgba(8,40,52,0.35)"; ctx.lineWidth = 1 * z; ctx.stroke();
+  }
+  // current line drifting off-center
+  ctx.beginPath();
+  for (let i = 0; i < N; i++) {
+    const off = (HL[i] - HR[i]) * 0.25;
+    const x = P[i][0] + NX[i] * off, y = P[i][1] + NY[i] * off;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = "rgba(255,255,255,0.28)"; ctx.lineWidth = 1.2 * z; ctx.stroke();
+  const PEBBLES = ["#8f8270", "#a99b85", "#c2b49c", "#7a6f5e", "#b5a78e"];
+  for (let i = 2; i < N - 2; i += 3) {
+    const density = 1 + Math.min(3, Math.abs(CURV[i]) * 30);
+    for (let k = 0; k < density; k++) {
+      if (rnd() > 0.7) continue;
+      const side = rnd() < 0.5 ? 1 : -1;
+      const H = side === 1 ? HL[i] : HR[i];
+      const off = H * (1.08 + rnd() * 0.45) * side;
+      const px = P[i][0] + NX[i] * off, py = P[i][1] + NY[i] * off;
+      const pr = (1 + rnd() * 1.6) * z;
+      ctx.beginPath();
+      ctx.ellipse(px, py, pr, pr * (0.6 + rnd() * 0.3), rnd() * 3, 0, Math.PI * 2);
+      ctx.fillStyle = PEBBLES[Math.floor(rnd() * PEBBLES.length)]; ctx.fill();
+    }
+    // an occasional larger stone breaking the waterline — kills the tube silhouette
+    if (rnd() < 0.14) {
+      const side = rnd() < 0.5 ? 1 : -1;
+      const H = side === 1 ? HL[i] : HR[i];
+      const px = P[i][0] + NX[i] * H * (0.9 + rnd() * 0.2) * side;
+      const py = P[i][1] + NY[i] * H * (0.9 + rnd() * 0.2) * side;
+      const pr = (2.6 + rnd() * 2) * z;
+      ctx.beginPath();
+      ctx.ellipse(px, py, pr, pr * 0.72, rnd() * 3, 0, Math.PI * 2);
+      ctx.fillStyle = PEBBLES[Math.floor(rnd() * PEBBLES.length)]; ctx.fill();
+      ctx.strokeStyle = "rgba(50,45,38,0.4)"; ctx.lineWidth = 0.8 * z; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(px - pr * 0.3, py - pr * 0.3, pr * 0.35, pr * 0.22, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.fill();
+    }
+    if (Math.abs(CURV[i]) > 0.02 && rnd() < 0.4) {   // moss on outer banks
+      const side = CURV[i] > 0 ? -1 : 1;
+      const H = side === 1 ? HL[i] : HR[i];
+      const off = H * (1.4 + rnd() * 0.4) * side;
+      const mx = P[i][0] + NX[i] * off, my = P[i][1] + NY[i] * off;
+      const mr = (3.5 + rnd() * 4.5) * z;
+      ctx.beginPath(); ctx.ellipse(mx, my + mr * 0.25, mr, mr * 0.55, rnd() * 3, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(20,45,28,0.28)"; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(mx, my, mr, mr * 0.6, rnd() * 3, 0, Math.PI * 2);
+      ctx.fillStyle = cfg.fol[Math.floor(rnd() * cfg.fol.length)];
+      ctx.globalAlpha = 0.88; ctx.fill(); ctx.globalAlpha = 1;
+    }
+    if (rnd() < 0.25) {   // glints
+      const off = (rnd() - 0.5) * Math.min(HL[i], HR[i]);
+      const gx = P[i][0] + NX[i] * off, gy = P[i][1] + NY[i] * off;
+      const gl = (4 + rnd() * 6) * z;
+      ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + NY[i] * gl, gy - NX[i] * gl);
+      ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 1 * z; ctx.stroke();
+    }
+  }
+}
+
+function drawItem(it) {
+  const s = getStyle();
+  const cfg = s.it;
+  const flavor = cfg.flavor || "flat";
+  const sc = it.scale || 1;
+  const itemSeed = rng(Math.floor(Math.abs(it.x * 7 + it.y * 13)) + 5);
+  ctx.save();
+  ctx.translate((it.x - view.ox) * view.z, (it.y - view.oy) * view.z);
+  ctx.scale(sc * view.z, sc * view.z);
+  if (it.rot) ctx.rotate(it.rot);
+
+  const shadow = () => { ctx.beginPath(); ctx.ellipse(4, 10, 48, 16, 0, 0, Math.PI * 2); ctx.fillStyle = "rgba(0,0,0,0.12)"; ctx.fill(); };
+  const rrect = (x, y, w, h, rad) => {
+    const r2 = Math.min(rad, w / 2, h / 2);
+    ctx.beginPath(); ctx.moveTo(x + r2, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r2); ctx.arcTo(x + w, y + h, x, y + h, r2);
+    ctx.arcTo(x, y + h, x, y, r2); ctx.arcTo(x, y, x + w, y, r2); ctx.closePath();
+  };
+  const outline = cfg.rim || "rgba(60,60,64,0.35)";
+
+  const rockBlob = (rx, ry, tone) => {
+    ctx.beginPath();
+    ctx.moveTo(-rx, 4);
+    ctx.bezierCurveTo(-rx * 1.05, -ry * 0.7, -rx * 0.3, -ry, rx * 0.25, -ry * 0.9);
+    ctx.bezierCurveTo(rx * 0.85, -ry * 0.75, rx * 1.05, -ry * 0.1, rx * 0.9, ry * 0.35);
+    ctx.bezierCurveTo(rx * 0.5, ry * 0.62, -rx * 0.6, ry * 0.62, -rx, 4);
+    ctx.closePath();
+    const rg = ctx.createLinearGradient(-rx, -ry, rx, ry);
+    if (flavor === "real" || flavor === "autumn" || flavor === "winter") {
+      // richer three-stop shading for realistic flavors
+      rg.addColorStop(0, tone[0]); rg.addColorStop(0.55, tone[0]); rg.addColorStop(1, tone[1]);
+    } else {
+      rg.addColorStop(0, tone[0]); rg.addColorStop(1, tone[1]);
+    }
+    ctx.fillStyle = rg; ctx.fill();
+    ctx.strokeStyle = outline; ctx.lineWidth = flavor === "real" ? 1.4 : 2; ctx.stroke();
+    ctx.save(); ctx.clip();
+    if (flavor === "real" || flavor === "autumn" || flavor === "winter") {
+      // mineral speckle
+      ctx.fillStyle = "rgba(255,255,255,0.14)";
+      for (let i = 0; i < 26; i++) ctx.fillRect(-rx + itemSeed() * rx * 2, -ry + itemSeed() * ry * 1.5, 1.4, 1.4);
+      ctx.fillStyle = "rgba(0,0,0,0.12)";
+      for (let i = 0; i < 20; i++) ctx.fillRect(-rx + itemSeed() * rx * 2, -ry + itemSeed() * ry * 1.5, 1.2, 1.2);
+    }
+    ctx.restore();
+    ctx.beginPath(); ctx.ellipse(-rx * 0.3, -ry * 0.45, rx * 0.34, ry * 0.2, -0.4, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.22)"; ctx.fill();
+    if (flavor === "winter") {
+      // snow cap draped along the top
+      ctx.beginPath();
+      ctx.moveTo(-rx * 0.85, -ry * 0.42);
+      ctx.bezierCurveTo(-rx * 0.5, -ry * 1.02, rx * 0.3, -ry * 0.98, rx * 0.72, -ry * 0.4);
+      ctx.bezierCurveTo(rx * 0.4, -ry * 0.52, -rx * 0.35, -ry * 0.5, -rx * 0.85, -ry * 0.42);
+      ctx.closePath();
+      ctx.fillStyle = cfg.cap; ctx.fill();
+      ctx.strokeStyle = "rgba(160,180,200,0.4)"; ctx.lineWidth = 1; ctx.stroke();
+    }
+  };
+
+  // Realistic foliage pad: layered ellipse with under-shadow, rim, highlight,
+  // and leaf ticks — reads as a pruned bonsai cloud, not a circle.
+  const pad = (cx, cy, prx, pry, tone) => {
+    ctx.beginPath(); ctx.ellipse(cx, cy + pry * 0.4, prx * 0.96, pry * 0.9, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(15,35,22,0.3)"; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx, cy, prx, pry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = tone; ctx.fill();
+    ctx.strokeStyle = "rgba(18,42,28,0.4)"; ctx.lineWidth = 1.1; ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(cx - prx * 0.28, cy - pry * 0.38, prx * 0.5, pry * 0.42, -0.2, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.13)"; ctx.fill();
+    ctx.strokeStyle = "rgba(18,42,28,0.35)"; ctx.lineWidth = 0.8;
+    for (let i = 0; i < 6; i++) {
+      const lx = cx + (itemSeed() - 0.5) * prx * 1.5, ly = cy + (itemSeed() - 0.5) * pry * 1.3;
+      ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + 2.5, ly - 2); ctx.stroke();
+    }
+    if (flavor === "winter") {
+      ctx.beginPath(); ctx.ellipse(cx, cy - pry * 0.5, prx * 0.8, pry * 0.38, 0, Math.PI, 0);
+      ctx.closePath(); ctx.fillStyle = cfg.cap; ctx.fill();
+    }
+  };
+
+  // Dense leaf cloud: hundreds of tiny leaf dabs filling an elliptical crown,
+  // dark base → mid → bright top, like real bonsai ramification (imgs 2 & 3).
+  const leafCloud = (cx, cy, rx2, ry2, tones, density) => {
+    // Build the crown from clumps of tiny leaves — no flat backing disc, so the
+    // outline is broken and organic. Dark clumps first (interior/shadow), then
+    // brighter leaves layered toward the top-outside for dappled light.
+    const clumps = Math.max(6, Math.round(rx2 * ry2 * 0.02));
+    for (let c = 0; c < clumps; c++) {
+      const ca = itemSeed() * Math.PI * 2, crr = Math.pow(itemSeed(), 0.7);
+      const ccx = cx + Math.cos(ca) * rx2 * crr;
+      const ccy = cy + Math.sin(ca) * ry2 * crr;
+      const up = (cy - ccy) / ry2;                       // -1 bottom .. +1 top
+      const clumpR = 3 + itemSeed() * 4;
+      const leaves = 5 + Math.floor(itemSeed() * 6);
+      for (let i = 0; i < leaves; i++) {
+        const a = itemSeed() * Math.PI * 2, rr = Math.sqrt(itemSeed());
+        const lx = ccx + Math.cos(a) * clumpR * rr;
+        const ly = ccy + Math.sin(a) * clumpR * rr;
+        const lup = (cy - ly) / ry2;
+        const ti = lup > 0.45 ? 2 : (lup > 0.0 ? 1 : 0);
+        const sz = 1.2 + itemSeed() * 1.3;
+        ctx.beginPath();
+        ctx.ellipse(lx, ly, sz, sz * 0.7, itemSeed() * 3, 0, Math.PI * 2);
+        ctx.fillStyle = tones[Math.min(2, ti + (itemSeed() < 0.22 ? 1 : 0))];
+        ctx.fill();
+      }
+    }
+    if (flavor === "winter") {
+      // snow settles on the upper clumps
+      for (let i = 0; i < clumps * 0.6; i++) {
+        const a = itemSeed() * Math.PI, r = itemSeed();
+        const sx = cx + Math.cos(a) * rx2 * r * (i % 2 ? 1 : -1);
+        const sy = cy - Math.abs(Math.sin(a)) * ry2 * r * 0.7;
+        ctx.beginPath(); ctx.ellipse(sx, sy, 3 + itemSeed() * 3, 2, 0, 0, Math.PI * 2);
+        ctx.fillStyle = cfg.cap; ctx.globalAlpha = 0.8; ctx.fill(); ctx.globalAlpha = 1;
+      }
+    }
+  };
+  // Ramified branch: recursive forking twigs, thinning as they go.
+  const branch = (x, y, ang, len, wid, depth, tone) => {
+    if (depth <= 0 || len < 3) return;
+    const ex = x + Math.cos(ang) * len, ey = y + Math.sin(ang) * len;
+    ctx.beginPath(); ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x + Math.cos(ang) * len * 0.5 + (itemSeed() - 0.5) * 4,
+                         y + Math.sin(ang) * len * 0.5 + (itemSeed() - 0.5) * 4, ex, ey);
+    ctx.strokeStyle = tone; ctx.lineWidth = wid; ctx.lineCap = "round"; ctx.stroke();
+    const forks = 2 + (itemSeed() < 0.4 ? 1 : 0);
+    for (let i = 0; i < forks; i++) {
+      const na = ang + (itemSeed() - 0.5) * 1.1 - 0.1;
+      branch(ex, ey, na, len * (0.62 + itemSeed() * 0.2), wid * 0.66, depth - 1, tone);
+    }
+  };
+  // Angular weathered rock with strata lines and a mossy cap (img 1).
+  const cragRock = (rx2, ry2, tone) => {
+    const facets = 7 + Math.floor(itemSeed() * 3);
+    const pR = [];
+    for (let i = 0; i < facets; i++) {
+      const a = (i / facets) * Math.PI * 2;
+      const jag = 0.72 + itemSeed() * 0.4;
+      pR.push([Math.cos(a) * rx2 * jag, -ry2 * 0.2 + Math.sin(a) * ry2 * jag]);
+    }
+    ctx.beginPath(); ctx.moveTo(pR[0][0], pR[0][1]);
+    for (let i = 1; i < pR.length; i++) {
+      const m = [(pR[i][0] + pR[i - 1][0]) / 2, (pR[i][1] + pR[i - 1][1]) / 2];
+      ctx.quadraticCurveTo(pR[i - 1][0], pR[i - 1][1], m[0], m[1]);
+    }
+    ctx.closePath();
+    const rg = ctx.createLinearGradient(-rx2, -ry2, rx2, ry2);
+    rg.addColorStop(0, tone[0]); rg.addColorStop(0.5, tone[0]); rg.addColorStop(1, tone[1]);
+    ctx.fillStyle = rg; ctx.fill();
+    ctx.strokeStyle = outline; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.save(); ctx.clip();
+    // strata lines
+    ctx.strokeStyle = "rgba(0,0,0,0.14)"; ctx.lineWidth = 1.3;
+    for (let s = 0; s < 4; s++) {
+      const yy = -ry2 * 0.5 + s * ry2 * 0.4 + itemSeed() * 6;
+      ctx.beginPath(); ctx.moveTo(-rx2, yy);
+      ctx.bezierCurveTo(-rx2 * 0.3, yy - 4, rx2 * 0.3, yy + 4, rx2, yy + itemSeed() * 5);
+      ctx.stroke();
+    }
+    // mineral speckle
+    for (let i = 0; i < 30; i++) {
+      ctx.fillStyle = itemSeed() < 0.5 ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)";
+      ctx.fillRect(-rx2 + itemSeed() * rx2 * 2, -ry2 + itemSeed() * ry2 * 2, 1.4, 1.4);
+    }
+    ctx.restore();
+    // highlight
+    ctx.beginPath(); ctx.ellipse(-rx2 * 0.3, -ry2 * 0.4, rx2 * 0.3, ry2 * 0.18, -0.4, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.fill();
+    // moss cap on top
+    if (flavor !== "winter") {
+      ctx.beginPath();
+      ctx.moveTo(-rx2 * 0.6, -ry2 * 0.5);
+      ctx.bezierCurveTo(-rx2 * 0.3, -ry2 * 0.85, rx2 * 0.4, -ry2 * 0.8, rx2 * 0.6, -ry2 * 0.45);
+      ctx.bezierCurveTo(rx2 * 0.3, -ry2 * 0.5, -rx2 * 0.3, -ry2 * 0.5, -rx2 * 0.6, -ry2 * 0.5);
+      ctx.closePath();
+      ctx.fillStyle = cfg.fol[1]; ctx.globalAlpha = 0.75; ctx.fill(); ctx.globalAlpha = 1;
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(-rx2 * 0.7, -ry2 * 0.45);
+      ctx.bezierCurveTo(-rx2 * 0.3, -ry2 * 0.9, rx2 * 0.4, -ry2 * 0.85, rx2 * 0.7, -ry2 * 0.4);
+      ctx.closePath(); ctx.fillStyle = cfg.cap; ctx.fill();
+    }
+  };
+
+  const folSet = (cfg.folSet) || [cfg.fol[0], cfg.fol[1] || cfg.fol[0], cfg.fol[2] || cfg.fol[1] || cfg.fol[0]];
+
+  const foliage = (cx, cy, r, tone) => {
+    for (const [ox, oy, rr] of [[0, 0, r], [-r * 0.8, r * 0.25, r * 0.7], [r * 0.8, r * 0.3, r * 0.65]]) {
+      ctx.beginPath(); ctx.arc(cx + ox, cy + oy, rr, 0, Math.PI * 2);
+      ctx.fillStyle = tone; ctx.fill();
+      ctx.strokeStyle = flavor === "flat" ? "rgba(30,70,50,0.35)" : "rgba(20,40,30,0.3)"; ctx.lineWidth = 1.5; ctx.stroke();
+      if (flavor === "real" || flavor === "autumn") {
+        // dappled highlight for depth
+        ctx.beginPath(); ctx.arc(cx + ox - rr * 0.3, cy + oy - rr * 0.35, rr * 0.45, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.fill();
+      }
+      if (flavor === "winter") {
+        ctx.beginPath(); ctx.ellipse(cx + ox, cy + oy - rr * 0.55, rr * 0.82, rr * 0.4, 0, Math.PI, 0);
+        ctx.closePath(); ctx.fillStyle = cfg.cap; ctx.fill();
+      }
+    }
+  };
+
+  const leafLitter = (cx, cy, spread) => {
+    if (flavor !== "autumn") return;
+    for (let i = 0; i < 7; i++) {
+      const a = itemSeed() * Math.PI * 2, d = spread * (0.5 + itemSeed() * 0.7);
+      ctx.beginPath();
+      ctx.ellipse(cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.45, 2.6, 1.5, a, 0, Math.PI * 2);
+      ctx.fillStyle = cfg.fol[Math.floor(itemSeed() * cfg.fol.length)];
+      ctx.globalAlpha = 0.85; ctx.fill(); ctx.globalAlpha = 1;
+    }
+  };
+
+  switch (it.type) {
+    case "rock_lg": shadow(); rockBlob(52, 46, cfg.rockA); break;
+    case "rock_sm": shadow(); rockBlob(30, 26, cfg.rockB); break;
+    case "rock_flat": shadow(); rockBlob(50, 20, cfg.rockC); break;
+    case "bonsai": {   // broad-canopy elm (imgs 2 & 3): thick nebari, ramified crown
+      shadow();
+      rrect(-20, 8, 40, 17, 8); ctx.fillStyle = cfg.wood; ctx.fill();
+      rrect(-20, 8, 40, 5, 3); ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, 9, 22, 5, 0, 0, Math.PI * 2); ctx.fillStyle = cfg.trunk; ctx.fill();
+      // tapered trunk with surface roots
+      ctx.strokeStyle = cfg.trunk; ctx.lineCap = "round";
+      ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(-3, 9); ctx.bezierCurveTo(-2, -4, 3, -12, 1, -22); ctx.stroke();
+      ctx.lineWidth = 3; for (const rx3 of [-8, -3, 5]) { ctx.beginPath(); ctx.moveTo(rx3*0.4, 8); ctx.lineTo(rx3, 11); ctx.stroke(); }
+      // ramified branches then dense leaf cloud
+      branch(1, -20, -Math.PI/2 - 0.15, 13, 4, 3, cfg.trunk);
+      branch(0, -14, -Math.PI/2 - 1.0, 11, 3.5, 3, cfg.trunk);
+      branch(2, -14, -Math.PI/2 + 1.0, 11, 3.5, 3, cfg.trunk);
+      leafCloud(0, -34, 30, 17, folSet);
+      leafLitter(0, 22, 36);
+      break;
+    }
+    case "bonsai_c": {
+      shadow();
+      rrect(-14, -6, 28, 26, 9); ctx.fillStyle = cfg.wood; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, -5, 16, 4.5, 0, 0, Math.PI * 2); ctx.fillStyle = cfg.trunk; ctx.fill();
+      ctx.strokeStyle = cfg.trunk; ctx.lineWidth = 6; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(0, -6); ctx.bezierCurveTo(6, -22, 26, -20, 34, -2); ctx.stroke();
+      branch(0, -6, -Math.PI/2 + 0.3, 12, 4, 3, cfg.trunk);
+      branch(30, -2, 0.4, 10, 3.5, 3, cfg.trunk);
+      leafCloud(2, -24, 15, 10, folSet); leafCloud(34, -2, 15, 10, folSet); leafCloud(20, -14, 10, 7, folSet);
+      leafLitter(16, 16, 30);
+      break;
+    }
+    case "lantern": {
+      shadow();
+      ctx.beginPath(); ctx.ellipse(0, 16, 20, 7, 0, 0, Math.PI * 2); ctx.fillStyle = cfg.stone; ctx.fill();
+      rrect(-8, -6, 16, 22, 6); ctx.fillStyle = cfg.stone; ctx.fill();
+      rrect(-16, -28, 32, 18, 8); ctx.fillStyle = cfg.stone; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, -19, 9, 6.5, 0, 0, Math.PI * 2); ctx.fillStyle = cfg.cap; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, -28, 24, 8, 0, Math.PI, 0);
+      ctx.lineTo(24, -28); ctx.quadraticCurveTo(12, -46, 0, -47);
+      ctx.quadraticCurveTo(-12, -46, -24, -28); ctx.closePath();
+      const roofTone = ctx.createLinearGradient(0, -47, 0, -28);
+      roofTone.addColorStop(0, cfg.rockA[0]); roofTone.addColorStop(1, cfg.rockA[1]);
+      ctx.fillStyle = roofTone; ctx.fill();
+      ctx.beginPath(); ctx.arc(0, -49, 4, 0, Math.PI * 2); ctx.fillStyle = cfg.stone; ctx.fill();
+      if (flavor === "winter") {
+        ctx.beginPath(); ctx.ellipse(0, -44, 17, 5, 0, Math.PI, 0); ctx.closePath();
+        ctx.fillStyle = cfg.cap; ctx.fill();
+      }
+      break;
+    }
+    case "moss": {
+      shadow();
+      ctx.beginPath(); ctx.ellipse(0, -2, 38, 24, 0, Math.PI, 0);
+      ctx.quadraticCurveTo(0, 6, -38, -2); ctx.closePath();
+      ctx.fillStyle = cfg.fol[1]; ctx.fill();
+      ctx.strokeStyle = "rgba(30,70,50,0.3)"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.18)";
+      ctx.beginPath(); ctx.ellipse(-12, -14, 12, 6, -0.3, 0, Math.PI * 2); ctx.fill();
+      if (flavor === "real" || flavor === "autumn") {
+        ctx.fillStyle = "rgba(0,0,0,0.1)";
+        for (let i = 0; i < 16; i++) {
+          const a = itemSeed() * Math.PI, d = itemSeed() * 32;
+          ctx.fillRect(Math.cos(a) * d - 16, -4 - itemSeed() * 16, 1.4, 1.4);
+        }
+      }
+      if (flavor === "winter") {
+        ctx.beginPath(); ctx.ellipse(0, -16, 30, 8, 0, Math.PI, 0); ctx.closePath();
+        ctx.fillStyle = cfg.cap; ctx.fill();
+      }
+      leafLitter(0, 6, 40);
+      break;
+    }
+    case "pagoda": {
+      shadow();
+      const roof = (w, yB) => {
+        ctx.beginPath();
+        ctx.moveTo(-w, yB);
+        ctx.quadraticCurveTo(-w * 0.5, yB - 14, 0, yB - 15);
+        ctx.quadraticCurveTo(w * 0.5, yB - 14, w, yB);
+        ctx.quadraticCurveTo(w * 0.55, yB + 3, 0, yB + 3);
+        ctx.quadraticCurveTo(-w * 0.55, yB + 3, -w, yB);
+        ctx.closePath();
+        const rt = ctx.createLinearGradient(0, yB - 15, 0, yB + 3);
+        rt.addColorStop(0, cfg.rockA[0]); rt.addColorStop(1, cfg.rockA[1]);
+        ctx.fillStyle = rt; ctx.fill();
+        if (flavor === "winter") {
+          ctx.beginPath(); ctx.ellipse(0, yB - 12, w * 0.7, 3.5, 0, Math.PI, 0); ctx.closePath();
+          ctx.fillStyle = cfg.cap; ctx.fill();
+        }
+      };
+      rrect(-7, 4, 14, 15, 6); ctx.fillStyle = cfg.stone; ctx.fill(); roof(30, 4);
+      rrect(-5.5, -12, 11, 8, 4.5); ctx.fillStyle = cfg.stone; ctx.fill(); roof(22, -12);
+      rrect(-4.5, -26, 9, 7, 4); ctx.fillStyle = cfg.stone; ctx.fill(); roof(14, -26);
+      ctx.beginPath(); ctx.arc(0, -44, 3.5, 0, Math.PI * 2); ctx.fillStyle = cfg.stone; ctx.fill();
+      break;
+    }
+    case "maple": {   // Japanese maple — dense mounded palmate canopy (imgs 4 & 5)
+      shadow();
+      const momiji = (cx2, cy2, r2, rot2, tone) => {
+        // Five palmate lobes, each a filled leaf-blade (not a spike): a rounded
+        // lobe that tapers to a point, with shallow notches between — a maple leaf.
+        ctx.save(); ctx.translate(cx2, cy2); ctx.rotate(rot2);
+        ctx.beginPath();
+        ctx.moveTo(0, r2 * 0.15);
+        for (let i = 0; i < 5; i++) {
+          const a = -Math.PI / 2 + (i - 2) * 0.62;       // fan the 5 lobes upward
+          const lobeLen = r2 * (i === 2 ? 1 : (i === 1 || i === 3 ? 0.82 : 0.55));
+          const wx = Math.cos(a) * lobeLen, wy = Math.sin(a) * lobeLen;
+          const perp = a + Math.PI / 2;
+          const halfW = lobeLen * 0.28;
+          // out along one side of the lobe, to the tip, back along the other side
+          ctx.quadraticCurveTo(Math.cos(a) * lobeLen * 0.5 + Math.cos(perp) * halfW,
+                               Math.sin(a) * lobeLen * 0.5 + Math.sin(perp) * halfW, wx, wy);
+          ctx.quadraticCurveTo(Math.cos(a) * lobeLen * 0.5 - Math.cos(perp) * halfW,
+                               Math.sin(a) * lobeLen * 0.5 - Math.sin(perp) * halfW, 0, r2 * 0.15);
+        }
+        ctx.closePath();
+        ctx.fillStyle = tone; ctx.fill();
+        ctx.restore();
+      };
+      // trunk + a few main branches reaching up into the mound
+      ctx.strokeStyle = cfg.trunk; ctx.lineCap = "round";
+      ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(0, 18); ctx.bezierCurveTo(-3, 4, 3, -6, 0, -18); ctx.stroke();
+      ctx.lineWidth = 3;
+      branch(0, -14, -Math.PI/2 - 0.5, 14, 3, 3, cfg.trunk);
+      branch(0, -16, -Math.PI/2 + 0.5, 14, 3, 3, cfg.trunk);
+      branch(0, -18, -Math.PI/2, 15, 3, 3, cfg.trunk);
+      // Japanese maple palette — reds & purples (a property of the tree, not the
+      // season). Autumn burns to orange; otherwise deep purple-red.
+      const mapleTones = flavor === "autumn"
+        ? ["#7a1f12", "#c8341a", "#e8801e"]
+        : ["#5a1226", "#9c2743", "#c9445c"];
+      const RXc = 46, RYc = 35, CYc = -34;
+      // NO solid base — leaves alone form the crown, clustered so it reads full
+      // but its edge is broken and you can see through to branches in gaps.
+      const clumps = 34;
+      for (let c = 0; c < clumps; c++) {
+        const ca = itemSeed() * Math.PI * 2, crr = Math.pow(itemSeed(), 0.6);
+        const ccx = Math.cos(ca) * RXc * crr;
+        const ccy = CYc + Math.sin(ca) * RYc * crr;
+        if (ccx * ccx / (RXc * RXc) + (ccy - CYc) * (ccy - CYc) / (RYc * RYc) > 1) continue;
+        const clumpR = 5 + itemSeed() * 5;
+        const up = (CYc - ccy) / RYc;
+        const leaves = 7 + Math.floor(itemSeed() * 6);
+        for (let i = 0; i < leaves; i++) {
+          const a = itemSeed() * Math.PI * 2, rr = Math.sqrt(itemSeed());
+          const lx = ccx + Math.cos(a) * clumpR * rr;
+          const ly = ccy + Math.sin(a) * clumpR * rr;
+          const lup = (CYc - ly) / RYc;
+          const ti = lup > 0.25 ? 2 : (lup > -0.25 ? 1 : 0);
+          momiji(lx, ly, 4 + itemSeed() * 2.4, itemSeed() * Math.PI * 2,
+                 mapleTones[Math.min(2, ti + (itemSeed() < 0.25 ? 1 : 0))]);
+        }
+      }
+      if (flavor === "winter") {
+        for (let i = 0; i < 18; i++) {
+          const a = itemSeed() * Math.PI;
+          ctx.beginPath();
+          ctx.ellipse(Math.cos(a) * RXc * 0.8 * (i%2?1:-1), CYc - Math.abs(Math.sin(a)) * RYc * 0.7,
+                      3 + itemSeed() * 3, 2, 0, 0, Math.PI * 2);
+          ctx.fillStyle = cfg.cap; ctx.globalAlpha = 0.8; ctx.fill(); ctx.globalAlpha = 1;
+        }
+      }
+      leafLitter(0, 18, 44, mapleTones);
+      break;
+    }
+    case "bonsai_p": {   // formal upright pine: straight tapered trunk, stacked pads
+      shadow();
+      rrect(-16, 8, 32, 15, 7); ctx.fillStyle = cfg.wood; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, 9, 19, 4.5, 0, 0, Math.PI * 2); ctx.fillStyle = cfg.trunk; ctx.fill();
+      ctx.strokeStyle = cfg.trunk; ctx.lineCap = "round";
+      ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(0, 10); ctx.lineTo(1, -14); ctx.stroke();
+      ctx.lineWidth = 4.5;
+      ctx.beginPath(); ctx.moveTo(1, -14); ctx.lineTo(0, -40); ctx.stroke();
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(0, -6); ctx.quadraticCurveTo(-12, -10, -20, -12); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(1, -20); ctx.quadraticCurveTo(12, -24, 19, -25); ctx.stroke();
+      leafCloud(-19, -16, 15, 7, folSet, 60);
+      leafCloud(19, -28, 14, 6.5, folSet, 55);
+      leafCloud(0, -46, 17, 8, folSet, 80);
+      leafCloud(-8, -33, 11, 5.5, folSet, 40);
+      leafLitter(0, 20, 32);
+      break;
+    }
+    case "bonsai_w": {   // windswept: trunk leaning hard, all pads streaming one way
+      shadow();
+      rrect(-14, 6, 28, 14, 7); ctx.fillStyle = cfg.wood; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, 7, 16, 4, 0, 0, Math.PI * 2); ctx.fillStyle = cfg.trunk; ctx.fill();
+      ctx.strokeStyle = cfg.trunk; ctx.lineCap = "round";
+      ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(-2, 8); ctx.bezierCurveTo(-6, -6, 6, -12, 20, -18); ctx.stroke();
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(8, -13); ctx.quadraticCurveTo(20, -14, 32, -12); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(16, -17); ctx.quadraticCurveTo(28, -24, 38, -24); ctx.stroke();
+      branch(20, -18, -0.3, 12, 3.5, 3, cfg.trunk);
+      leafCloud(28, -20, 17, 8, folSet); leafCloud(38, -12, 11, 6, folSet); leafCloud(14, -13, 9, 5, folSet);
+      leafLitter(18, 16, 30);
+      break;
+    }
+    case "bamboo": {   // three culms with node rings and sparse leaves
+      shadow();
+      const culm = (x0, h, w2) => {
+        rrect(x0 - w2 / 2, -h, w2, h + 14, w2 / 2);
+        ctx.fillStyle = cfg.fol[2]; ctx.fill();
+        ctx.strokeStyle = "rgba(30,50,30,0.35)"; ctx.lineWidth = 1.2; ctx.stroke();
+        for (let yy = -h + 9; yy < 12; yy += 13) {
+          ctx.beginPath(); ctx.moveTo(x0 - w2 / 2, yy); ctx.lineTo(x0 + w2 / 2, yy);
+          ctx.strokeStyle = "rgba(30,50,30,0.4)"; ctx.lineWidth = 1.4; ctx.stroke();
+        }
+        if (flavor === "winter") {
+          ctx.beginPath(); ctx.ellipse(x0, -h, w2 * 0.9, 2.5, 0, Math.PI, 0); ctx.closePath();
+          ctx.fillStyle = cfg.cap; ctx.fill();
+        }
+      };
+      culm(-12, 42, 6); culm(2, 52, 7); culm(15, 36, 5.5);
+      ctx.strokeStyle = cfg.fol[0]; ctx.lineWidth = 2; ctx.lineCap = "round";
+      for (const [lx, ly, a] of [[2, -52, -0.5], [2, -48, 0.6], [-12, -40, -0.7], [15, -34, 0.5], [2, -44, -0.2]]) {
+        ctx.beginPath(); ctx.moveTo(lx, ly);
+        ctx.quadraticCurveTo(lx + Math.cos(a) * 8, ly + Math.sin(a) * 4 - 2, lx + Math.cos(a) * 15, ly + Math.sin(a) * 7);
+        ctx.stroke();
+      }
+      break;
+    }
+    case "basin": {   // tsukubai water basin — stone bowl with still water
+      shadow();
+      ctx.beginPath(); ctx.ellipse(0, 2, 26, 14, 0, 0, Math.PI * 2);
+      const bg = ctx.createLinearGradient(-26, -12, 26, 16);
+      bg.addColorStop(0, cfg.rockB[0]); bg.addColorStop(1, cfg.rockB[1]);
+      ctx.fillStyle = bg; ctx.fill();
+      ctx.strokeStyle = outline; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, -3, 18, 8, 0, 0, Math.PI * 2);
+      ctx.fillStyle = s.accent; ctx.globalAlpha = 0.55; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.ellipse(-5, -5, 6, 2.4, -0.3, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fill();
+      if (flavor === "winter") {
+        ctx.beginPath(); ctx.ellipse(0, -3, 18, 8, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(240,248,255,0.75)"; ctx.fill();   // frozen over
+      }
+      break;
+    }
+    case "torii": {   // gate — pillars, curved double lintel, in the style's accent
+      shadow();
+      const red = s.accent;
+      ctx.strokeStyle = red; ctx.lineCap = "round";
+      ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(-22, 16); ctx.lineTo(-19, -30); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(22, 16); ctx.lineTo(19, -30); ctx.stroke();
+      ctx.lineWidth = 4.5;
+      ctx.beginPath(); ctx.moveTo(-26, -24); ctx.lineTo(26, -24); ctx.stroke();   // nuki
+      ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(-32, -36); ctx.quadraticCurveTo(0, -42, 32, -36); ctx.stroke();   // kasagi
+      ctx.strokeStyle = cfg.trunk; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(0, -24); ctx.lineTo(0, -37); ctx.stroke();   // gakuzuka
+      if (flavor === "winter") {
+        ctx.strokeStyle = cfg.cap; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(-31, -38.5); ctx.quadraticCurveTo(0, -44.5, 31, -38.5); ctx.stroke();
+      }
+      break;
+    }
+    case "hut": {   // Japanese tea hut — timber posts, thatched hip roof, shoji panels
+      shadow();
+      // raised wooden platform
+      rrect(-46, 6, 92, 12, 3); ctx.fillStyle = cfg.wood; ctx.fill();
+      ctx.strokeStyle = "rgba(40,25,12,0.4)"; ctx.lineWidth = 1; ctx.stroke();
+      for (const px2 of [-40, -20, 20, 40]) { ctx.beginPath(); ctx.moveTo(px2, 18); ctx.lineTo(px2, 26); ctx.lineWidth = 3; ctx.strokeStyle = cfg.trunk; ctx.stroke(); }
+      // wall with shoji panels
+      rrect(-38, -26, 76, 34, 2); ctx.fillStyle = "rgba(238,230,210,0.95)"; ctx.fill();
+      ctx.strokeStyle = cfg.trunk; ctx.lineWidth = 2.4; ctx.stroke();
+      ctx.lineWidth = 1.4; ctx.strokeStyle = "rgba(90,70,45,0.6)";
+      for (const gx2 of [-19, 0, 19]) { ctx.beginPath(); ctx.moveTo(gx2, -26); ctx.lineTo(gx2, 8); ctx.stroke(); }
+      for (const gy2 of [-15, -4]) { ctx.beginPath(); ctx.moveTo(-38, gy2); ctx.lineTo(38, gy2); ctx.stroke(); }
+      // dark doorway
+      rrect(-8, -14, 16, 22, 1); ctx.fillStyle = "rgba(35,28,20,0.85)"; ctx.fill();
+      // thatched hip roof with deep eaves
+      ctx.beginPath();
+      ctx.moveTo(-54, -24);
+      ctx.quadraticCurveTo(-30, -30, 0, -54);
+      ctx.quadraticCurveTo(30, -30, 54, -24);
+      ctx.quadraticCurveTo(30, -18, 0, -20);
+      ctx.quadraticCurveTo(-30, -18, -54, -24);
+      ctx.closePath();
+      const rg = ctx.createLinearGradient(0, -54, 0, -18);
+      rg.addColorStop(0, "#6b5535"); rg.addColorStop(1, "#4a3a22");
+      ctx.fillStyle = rg; ctx.fill();
+      ctx.strokeStyle = "rgba(35,25,12,0.5)"; ctx.lineWidth = 1.6; ctx.stroke();
+      // thatch texture strokes
+      ctx.strokeStyle = "rgba(30,22,10,0.25)"; ctx.lineWidth = 1;
+      for (let i = -48; i <= 48; i += 7) { ctx.beginPath(); ctx.moveTo(i, -22); ctx.lineTo(i * 0.55, -44); ctx.stroke(); }
+      // ridge cap
+      rrect(-10, -55, 20, 5, 2); ctx.fillStyle = cfg.trunk; ctx.fill();
+      if (flavor === "winter") {
+        ctx.beginPath(); ctx.moveTo(-52, -25); ctx.quadraticCurveTo(0, -52, 52, -25);
+        ctx.quadraticCurveTo(0, -46, -52, -25); ctx.closePath();
+        ctx.fillStyle = cfg.cap; ctx.fill();
+      }
+      break;
+    }
+    case "step": {   // one stepping stone of the walking path
+      ctx.beginPath(); ctx.ellipse(2, 5, 15, 6, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.1)"; ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-15, 2);
+      ctx.bezierCurveTo(-16, -7, -6, -11, 3, -10);
+      ctx.bezierCurveTo(12, -9.5, 16, -4, 14, 3);
+      ctx.bezierCurveTo(10, 8, -9, 8, -15, 2);
+      ctx.closePath();
+      const sg = ctx.createLinearGradient(-15, -10, 15, 8);
+      sg.addColorStop(0, cfg.rockC[0]); sg.addColorStop(1, cfg.rockC[1]);
+      ctx.fillStyle = sg; ctx.fill();
+      ctx.strokeStyle = outline; ctx.lineWidth = 1.3; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(-4, -4, 5, 2.2, -0.3, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.22)"; ctx.fill();
+      if (flavor === "winter") {
+        ctx.beginPath(); ctx.ellipse(0, -6, 10, 3, 0, Math.PI, 0); ctx.closePath();
+        ctx.fillStyle = cfg.cap; ctx.fill();
+      }
+      break;
+    }
+    case "bridge": {   // arched wooden footbridge — place it across a stream
+      shadow();
+      // deck: arched plank surface
+      ctx.beginPath();
+      ctx.moveTo(-42, 6);
+      ctx.quadraticCurveTo(0, -20, 42, 6);
+      ctx.lineTo(42, 12);
+      ctx.quadraticCurveTo(0, -13, -42, 12);
+      ctx.closePath();
+      const bgrad = ctx.createLinearGradient(0, -20, 0, 12);
+      bgrad.addColorStop(0, cfg.wood); bgrad.addColorStop(1, cfg.trunk);
+      ctx.fillStyle = bgrad; ctx.fill();
+      ctx.strokeStyle = "rgba(40,25,12,0.4)"; ctx.lineWidth = 1.4; ctx.stroke();
+      // plank lines across the deck
+      ctx.strokeStyle = "rgba(40,25,12,0.35)"; ctx.lineWidth = 1;
+      for (let px2 = -36; px2 <= 36; px2 += 8) {
+        const arc = -20 * (1 - (px2 / 42) * (px2 / 42)) + 6;
+        ctx.beginPath(); ctx.moveTo(px2, arc); ctx.lineTo(px2, arc + 6); ctx.stroke();
+      }
+      // rails
+      ctx.strokeStyle = cfg.trunk; ctx.lineCap = "round"; ctx.lineWidth = 2.6;
+      ctx.beginPath(); ctx.moveTo(-40, -4); ctx.quadraticCurveTo(0, -30, 40, -4); ctx.stroke();
+      for (const rx2 of [-34, -17, 0, 17, 34]) {
+        const deckY = -20 * (1 - (rx2 / 42) * (rx2 / 42)) + 6;
+        const railY = -26 * (1 - (rx2 / 40) * (rx2 / 40)) - 4;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(rx2, railY); ctx.lineTo(rx2, deckY); ctx.stroke();
+      }
+      if (flavor === "winter") {
+        ctx.strokeStyle = cfg.cap; ctx.lineWidth = 2.4;
+        ctx.beginPath(); ctx.moveTo(-39, -5.5); ctx.quadraticCurveTo(0, -31.5, 39, -5.5); ctx.stroke();
+      }
+      break;
+    }
+  }
+  ctx.restore();
+}
+
+/* ============================================================================
+   GARDEN COMPOSER — candidate-scored procedural layout
+   Implements: Poisson-disc spacing, rule-of-thirds focal points, visual-weight
+   balancing, negative-space targeting, scale hierarchy, odd clusters, spline
+   streams/paths, contextual orientation, hard placement constraints, and
+   multi-candidate scoring.
+   ========================================================================== */
+
+/* Per-type visual weight from size, darkness, and complexity (0..1 each). */
+const VISUAL_WEIGHT = {
+  hut:{size:1.0,dark:0.6,cplx:0.9},
+  rock_lg:{size:1.0,dark:0.7,cplx:0.3}, rock_sm:{size:0.4,dark:0.6,cplx:0.2},
+  rock_flat:{size:0.6,dark:0.6,cplx:0.2}, bonsai:{size:0.7,dark:0.5,cplx:0.7},
+  bonsai_c:{size:0.7,dark:0.5,cplx:0.7}, bonsai_p:{size:0.75,dark:0.5,cplx:0.8},
+  bonsai_w:{size:0.75,dark:0.5,cplx:0.8}, maple:{size:0.85,dark:0.4,cplx:0.9},
+  bamboo:{size:0.6,dark:0.4,cplx:0.6}, lantern:{size:0.6,dark:0.7,cplx:0.6},
+  basin:{size:0.45,dark:0.6,cplx:0.4}, moss:{size:0.35,dark:0.5,cplx:0.2},
+  pagoda:{size:0.7,dark:0.7,cplx:0.8}, torii:{size:0.8,dark:0.65,cplx:0.6},
+};
+function visualWeight(type, scale) {
+  const w = VISUAL_WEIGHT[type] || { size: 0.5, dark: 0.5, cplx: 0.4 };
+  return (w.size * 0.5 + w.dark * 0.3 + w.cplx * 0.2) * (scale || 1);
+}
+const FOCAL_TYPES   = ["rock_lg", "maple", "pagoda", "torii", "bonsai_p", "bonsai_w", "hut"];
+const SUPPORT_TYPES = ["rock_sm", "rock_flat", "bonsai", "bonsai_c", "bamboo", "lantern", "basin"];
+const ACCENT_TYPES  = ["moss", "rock_sm", "basin"];
+
+/* Low-frequency value noise for *subtle* variation only. */
+function makeNoise(seed) {
+  const g = rng(seed);
+  const grid = [];
+  for (let i = 0; i < 64; i++) grid.push(g());
+  return (x, y) => {
+    const s = (Math.sin(x * 0.9) + Math.cos(y * 0.7)) * 0.5;
+    const idx = Math.abs(Math.floor((x * 3 + y * 5 + s * 7))) % 64;
+    return grid[idx];
+  };
+}
+
+/* Poisson-disc sampling (Bridson) within [pad, W-pad]×[pad, H-pad], honoring a
+   rejection predicate (e.g. keep off water). */
+function poisson(WW, WH, pad, minDist, reject, k, rand) {
+  const cell = minDist / Math.SQRT2;
+  const gw = Math.ceil(WW / cell), gh = Math.ceil(WH / cell);
+  const grid = new Array(gw * gh).fill(-1);
+  const pts = [], active = [];
+  const gi = (x, y) => Math.floor(y / cell) * gw + Math.floor(x / cell);
+  const fits = (x, y) => {
+    if (x < pad || y < pad || x > WW - pad || y > WH - pad) return false;
+    if (reject && reject(x, y)) return false;
+    const cx = Math.floor(x / cell), cy = Math.floor(y / cell);
+    for (let yy = Math.max(0, cy - 2); yy <= Math.min(gh - 1, cy + 2); yy++)
+      for (let xx = Math.max(0, cx - 2); xx <= Math.min(gw - 1, cx + 2); xx++) {
+        const idx = grid[yy * gw + xx];
+        if (idx >= 0 && Math.hypot(pts[idx][0] - x, pts[idx][1] - y) < minDist) return false;
+      }
+    return true;
+  };
+  const add = (x, y) => { const id = pts.length; pts.push([x, y]); grid[gi(x, y)] = id; active.push(id); };
+  for (let tries = 0; tries < 40; tries++) {
+    const x = pad + rand() * (WW - pad * 2), y = pad + rand() * (WH - pad * 2);
+    if (fits(x, y)) { add(x, y); break; }
+  }
+  while (active.length) {
+    const ai = Math.floor(rand() * active.length);
+    const [px, py] = pts[active[ai]];
+    let placed = false;
+    for (let s = 0; s < k; s++) {
+      const a = rand() * Math.PI * 2, r = minDist * (1 + rand());
+      const nx = px + Math.cos(a) * r, ny = py + Math.sin(a) * r;
+      if (fits(nx, ny)) { add(nx, ny); placed = true; break; }
+    }
+    if (!placed) active.splice(ai, 1);
+  }
+  return pts;
+}
+
+/* Smooth spline course between two points (random-walked curvature toward target). */
+function genCourse(x, y, tx, ty, step, rand) {
+  const pts = [];
+  let heading = Math.atan2(ty - y, tx - x), curv = 0;
+  const maxSteps = Math.ceil(Math.hypot(tx - x, ty - y) / step * 2.4);
+  for (let i = 0; i < maxSteps; i++) {
+    pts.push([x, y]);
+    const want = Math.atan2(ty - y, tx - x);
+    let dh = want - heading;
+    while (dh > Math.PI) dh -= Math.PI * 2;
+    while (dh < -Math.PI) dh += Math.PI * 2;
+    curv = curv * 0.92 + ((rand ? rand() : Math.random()) - 0.5) * 0.13;
+    heading += dh * 0.08 + curv;
+    x += Math.cos(heading) * step; y += Math.sin(heading) * step;
+    if (Math.hypot(tx - x, ty - y) < step * 1.6) { pts.push([tx, ty]); break; }
+  }
+  return pts;
+}
+/* A long wandering route with waypoints: threads through several interior
+   points with big lazy curves, so it doubles back and sweeps rather than
+   heading straight. ~5x the length of a naive A→B course. */
+function genWindingRoute(waypoints, step, rand, wanderAmp) {
+  let pts = [];
+  for (let w = 0; w < waypoints.length - 1; w++) {
+    const [ax, ay] = waypoints[w], [bx, by] = waypoints[w + 1];
+    const dist = Math.hypot(bx - ax, by - ay);
+    // insert 2-3 offset sub-waypoints per leg so it curves off the straight line
+    const subs = [[ax, ay]];
+    const nSub = 2 + Math.floor(rand() * 2);
+    const px = -(by - ay) / (dist || 1), py = (bx - ax) / (dist || 1);
+    for (let s = 1; s <= nSub; s++) {
+      const t = s / (nSub + 1);
+      const swing = (rand() - 0.5) * 2 * (wanderAmp || dist * 0.45);
+      subs.push([ax + (bx - ax) * t + px * swing, ay + (by - ay) * t + py * swing]);
+    }
+    subs.push([bx, by]);
+    for (let s = 0; s < subs.length - 1; s++) {
+      const leg = genCourse(subs[s][0], subs[s][1], subs[s + 1][0], subs[s + 1][1], step, rand);
+      pts = pts.concat(w === 0 && s === 0 ? leg : leg.slice(1));
+    }
+  }
+  return chaikin(pts, 2);
+}
+
+/* Edge points and interior waypoints for anchoring routes to sensible places. */
+function edgePoint(WW, WH, margin, rand, side) {
+  const s = side !== undefined ? side : Math.floor(rand() * 4);
+  if (s === 0) return [margin + rand() * (WW - margin * 2), margin * 0.7];        // top
+  if (s === 1) return [WW - margin * 0.7, margin + rand() * (WH - margin * 2)];   // right
+  if (s === 2) return [margin + rand() * (WW - margin * 2), WH - margin * 0.7];   // bottom
+  return [margin * 0.7, margin + rand() * (WH - margin * 2)];                     // left
+}
+
+function chaikin(pts, passes) {
+  for (let p = 0; p < passes; p++) {
+    const out = [pts[0]];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      out.push([a[0]*0.75+b[0]*0.25, a[1]*0.75+b[1]*0.25], [a[0]*0.25+b[0]*0.75, a[1]*0.25+b[1]*0.75]);
+    }
+    out.push(pts[pts.length - 1]);
+    pts = out;
+  }
+  return pts;
+}
+
+/* Does a polyline cross itself? (segments that aren't adjacent intersecting) */
+function segsCross(a, b, c, d) {
+  const ccw = (p, q, r) => (r[1]-p[1])*(q[0]-p[0]) > (q[1]-p[1])*(r[0]-p[0]);
+  return ccw(a,c,d) !== ccw(b,c,d) && ccw(a,b,c) !== ccw(a,b,d);
+}
+function selfIntersects(pts, skip) {
+  const s = skip || 4;
+  for (let i = 0; i < pts.length - 1; i++)
+    for (let j = i + s; j < pts.length - 1; j++)
+      if (segsCross(pts[i], pts[i+1], pts[j], pts[j+1])) return true;
+  return false;
+}
+function polylinesCross(p, q) {
+  for (let i = 0; i < p.length - 1; i++)
+    for (let j = 0; j < q.length - 1; j++)
+      if (segsCross(p[i], p[i+1], q[j], q[j+1])) return true;
+  return false;
+}
+/* A single gentle watercourse edge→edge: one smooth arc bowing to one side,
+   never folding back on itself. */
+function genGentleStream(WW, WH, margin, rand) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    // pick two DIFFERENT edges
+    let sa = Math.floor(rand()*4), sb = (sa + 1 + Math.floor(rand()*3)) % 4;
+    const A = edgePoint(WW, WH, margin, rand, sa);
+    const B = edgePoint(WW, WH, margin, rand, sb);
+    const mx = (A[0]+B[0])/2, my = (A[1]+B[1])/2;
+    const dx = B[0]-A[0], dy = B[1]-A[1], L = Math.hypot(dx,dy)||1;
+    const px = -dy/L, py = dx/L;
+    // one bow, plus a smaller counter-bow → a lazy S, still non-crossing
+    const bow = (rand()-0.5) * L * 0.35;
+    const c1 = [A[0]+dx*0.33 + px*bow, A[1]+dy*0.33 + py*bow];
+    const c2 = [A[0]+dx*0.66 + px*bow*0.4, A[1]+dy*0.66 + py*bow*0.4];
+    const pts = chaikin([A, c1, c2, B], 3);
+    if (!selfIntersects(pts)) return pts;
+  }
+  // fallback: straight-ish
+  return chaikin([edgePoint(WW,WH,margin,rand,0), [WW/2,WH/2], edgePoint(WW,WH,margin,rand,2)], 3);
+}
+
+/* Build ONE candidate layout. */
+function buildCandidate(WW, WH, seed) {
+  const rand = rng(seed);
+  const margin = Math.min(W, H) * 0.13;
+  const noise = makeNoise(seed * 31 + 7);
+  const uid = () => "z" + (seed % 1e6).toString(36) + Math.floor(rand() * 1e6).toString(36);
+
+  // --- stream: one gentle watercourse, edge to edge, never crossing itself ---
+  const streams = [];
+  const mainPts = genGentleStream(WW, WH, margin, rand);
+  streams.push({ t: seed, pts: mainPts, bb: bbOfPts(mainPts) });
+  const distStreams = (x, y) => Math.min(...streams.map((st) => distToPolyline(x, y, st.pts)));
+
+  // --- 1..3 focal points near rule-of-thirds, off the water ---
+  const thirds = [[1/3,1/3],[2/3,1/3],[1/3,2/3],[2/3,2/3]].sort(() => rand() - 0.5);
+  const nFocal = 1 + Math.floor(rand() * 3);
+  const focals = [];
+  for (const [fx, fy] of thirds) {
+    if (focals.length >= nFocal) break;
+    const x = fx*WW + (rand()-0.5)*WW*0.08, y = fy*WH + (rand()-0.5)*WH*0.08;
+    if (x<margin||x>WW-margin||y<margin||y>WH-margin) continue;
+    if (distStreams(x, y) < 120) continue;
+    if (focals.some((f) => Math.hypot(f.x-x, f.y-y) < Math.min(WW,WH)*0.32)) continue;
+    focals.push({ x, y, primary: focals.length === 0 });
+  }
+  if (!focals.length) focals.push({ x: WW/3, y: WH/3, primary: true });
+
+  const items = [];
+  const place = (type, x, y, scale, extra) => {
+    const it = Object.assign({ id: uid(), type, x, y, scale }, extra || {});
+    items.push(it); return it;
+  };
+  const clears = (x, y, rad, type) => {
+    if (x < margin || x > WW - margin || y < margin || y > WH - margin) return false;
+    // hard rule: nothing but a bridge may touch the stream; keep clear of the
+    // full water+bank width plus the item's own radius
+    const waterGap = 34 + (type ? (RADII[type]||44) * 0.6 : rad);
+    if (distStreams(x, y) < waterGap) return false;
+    return items.every((it) => Math.hypot(it.x-x, it.y-y) > rad + itemR(it) * 0.5);
+  };
+
+  // --- scale hierarchy at each focal: 1 large + odd cluster of medium + small accents ---
+  focals.forEach((f, fi) => {
+    const bigType = FOCAL_TYPES[Math.floor(rand()*FOCAL_TYPES.length)];
+    const bigScale = (f.primary ? 1.3 : 1.05) + rand()*0.2;
+    // nudge the focal off the water if it landed too close
+    let fx = f.x, fy = f.y, guard = 0;
+    while (distStreams(fx, fy) < 40 + (RADII[bigType]||44)*0.6 && guard++ < 8) {
+      fx += (fx < WW/2 ? -30 : 30); fy += (fy < WH/2 ? -20 : 20);
+    }
+    f.x = Math.max(margin, Math.min(WW-margin, fx)); f.y = Math.max(margin, Math.min(WH-margin, fy));
+    place(bigType, f.x, f.y, bigScale, orientFor(bigType, f.x, f.y, streams));   // focal anchor always placed
+    // odd cluster (3/5/7) of supporting medium elements around the focal
+    const clusterN = [3,5,7][Math.floor(rand()* (f.primary?3:2))];
+    const baseA = rand()*Math.PI*2;
+    for (let k=1;k<clusterN;k++){
+      const ang = baseA + k*(Math.PI*2/clusterN) + (noise(f.x*0.01+k, f.y*0.01)-0.5)*0.6;
+      const d = 78 + rand()*64;
+      const x = f.x + Math.cos(ang)*d, y = f.y + Math.sin(ang)*d;
+      if (!clears(x, y, 42)) continue;
+      const type = SUPPORT_TYPES[Math.floor(rand()*SUPPORT_TYPES.length)];
+      place(type, x, y, 0.6 + rand()*0.35, orientFor(type, x, y, streams));
+    }
+  });
+
+  // --- small accents spread by Poisson, away from focals, filling without crowding ---
+  const accentPts = poisson(WW, WH, margin, Math.min(WW,WH)*0.16,
+    (x,y) => distStreams(x,y) < 66 || focals.some(f=>Math.hypot(f.x-x,f.y-y) < 120), 18, rand);
+  const nAccent = Math.min(accentPts.length, 5 + Math.floor(rand()*4) + Math.round((G.size||1)*2));
+  for (let i=0;i<nAccent;i++){
+    const [x,y] = accentPts[i];
+    const type = ACCENT_TYPES[Math.floor(rand()*ACCENT_TYPES.length)];
+    if (!clears(x, y, 30, type)) continue;
+    place(type, x, y, 0.4 + rand()*0.3, orientFor(type, x, y, streams));
+  }
+
+  // --- moss on the banks ---
+  for (let k=0;k<3;k++){
+    const st = streams[0];
+    const i = 1 + Math.floor(rand()*(st.pts.length-2));
+    const a = st.pts[i-1], b = st.pts[i+1];
+    const fl = Math.atan2(b[1]-a[1], b[0]-a[0]);
+    const side = rand()<0.5?1:-1;
+    const x = st.pts[i][0]-Math.sin(fl)*62*side, y = st.pts[i][1]+Math.cos(fl)*62*side;
+    if (clears(x,y,20)) place("moss", x, y, 0.45+rand()*0.3);
+  }
+
+  // --- stepping-stone path: a single flowing course, edge to edge, that reads
+  //     as a walkable line. It may sweep past focal areas but never folds over
+  //     itself, and crosses the stream only at a bridge. ---
+  {
+    // build a non-self-crossing course; retry until clean
+    let mainCourse = null;
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const A = edgePoint(WW, WH, margin, rand);
+      const B = edgePoint(WW, WH, margin, rand);
+      if (Math.hypot(B[0]-A[0], B[1]-A[1]) < Math.min(WW,WH)*0.7) continue;   // demand a long span
+      // 2-3 interior sweep points visiting focal areas, kept in bounds
+      const via = [A];
+      const nMid = 2 + Math.floor(rand()*2);
+      for (let m2=0;m2<nMid;m2++){
+        const f = focals[m2 % focals.length];
+        let vx = f.x + (rand()-0.5)*200, vy = f.y + (rand()-0.5)*200;
+        vx = Math.max(margin, Math.min(WW-margin, vx)); vy = Math.max(margin, Math.min(WH-margin, vy));
+        via.push([vx, vy]);
+      }
+      via.push(B);
+      const course = genWindingRoute(via, 22, rand, Math.min(WW,WH)*0.16);
+      if (!selfIntersects(course)) { mainCourse = course; break; }
+    }
+    if (!mainCourse)
+      mainCourse = chaikin([edgePoint(WW,WH,margin,rand,3), [WW*0.5,WH*0.5], edgePoint(WW,WH,margin,rand,1)], 3);
+
+    // find the ONE stream crossing (if any) → that's where a bridge goes; the
+    // path stones skip a gap there so stones never sit in the water.
+    let crossIdx = -1, crossPt = null;
+    for (let i=1;i<mainCourse.length-1;i++){
+      if (distToPolyline(mainCourse[i][0], mainCourse[i][1], mainPts) < 26) {
+        crossIdx = i; crossPt = nearestOnStreamsList(mainCourse[i][0], mainCourse[i][1], streams); break;
+      }
+    }
+    if (crossPt) place("bridge", crossPt.x, crossPt.y, 1.1, { rot: crossPt.ang + Math.PI/2 });
+
+    // lay evenly-spaced stones ALONG the course (a path, not a cluster); leave a
+    // clear gap around the bridge, and never place a stone on the water.
+    let acc = 999, prev = mainCourse[0];
+    for (let i=0;i<mainCourse.length;i++){
+      const q = mainCourse[i];
+      acc += Math.hypot(q[0]-prev[0], q[1]-prev[1]);
+      const nearBridge = crossPt && Math.hypot(q[0]-crossPt.x, q[1]-crossPt.y) < 42;
+      const onWater = distToPolyline(q[0], q[1], mainPts) < 30;
+      if (acc >= 40 && !nearBridge && !onWater &&
+          q[0]>margin*0.5 && q[0]<WW-margin*0.5 && q[1]>margin*0.5 && q[1]<WH-margin*0.5) {
+        const a = i<mainCourse.length-1 ? mainCourse[i+1] : q;
+        place("step", q[0], q[1], 0.78+rand()*0.22,
+              { rot: Math.atan2(a[1]-prev[1], a[0]-prev[0]) + Math.PI/2 + (rand()-0.5)*0.25 });
+        acc = 0;
+      } else if (acc >= 40 && (nearBridge || onWater)) {
+        acc = 0;   // reset stride across the gap so stones resume evenly on the far side
+      }
+      prev = q;
+    }
+  }  return { items, streams, swirls: [] };
+}
+
+/* Orientation helpers used at build time. */
+function nearestOnStreamsList(x, y, streams) {
+  let best = null;
+  for (const st of streams) for (let i=0;i<st.pts.length-1;i++){
+    const ax=st.pts[i][0], ay=st.pts[i][1], abx=st.pts[i+1][0]-ax, aby=st.pts[i+1][1]-ay;
+    const L2=abx*abx+aby*aby||1; let t=((x-ax)*abx+(y-ay)*aby)/L2; t=t<0?0:t>1?1:t;
+    const px=ax+abx*t, py=ay+aby*t, d=Math.hypot(x-px,y-py);
+    if (!best||d<best.d) best={d,x:px,y:py,ang:Math.atan2(aby,abx)};
+  }
+  return best;
+}
+function orientFor(type, x, y, streams) {
+  // rocks align with nearby flow; trees face open space (rot toward map center-away)
+  if (type.startsWith("rock")) {
+    const ns = nearestOnStreamsList(x, y, streams);
+    if (ns && ns.d < 160) return { rot: ns.ang };
+  }
+  return {};
+}
+
+/* Score a candidate on the six axes; higher is better. */
+function scoreCandidate(cand, WW, WH) {
+  const its = cand.items;
+  if (!its.length) return -1e9;
+  // spacing: reward larger nearest-neighbor distances, penalize collisions
+  let collisions = 0, nnSum = 0;
+  for (let i=0;i<its.length;i++){
+    let nn = Infinity;
+    for (let j=0;j<its.length;j++) if (i!==j){
+      const d = Math.hypot(its[i].x-its[j].x, its[i].y-its[j].y);
+      if (d < nn) nn = d;
+      if (d < (itemR(its[i]) + itemR(its[j])) * 0.5) collisions++;
+    }
+    nnSum += Math.min(nn, 300);
+  }
+  const spacing = nnSum / its.length;                       // ~higher better
+  // balance: visual mass on left vs right, top vs bottom — want asymmetric but not lopsided
+  let mL=0,mR=0,mT=0,mB=0, mass=0;
+  for (const it of its){ const w=visualWeight(it.type,it.scale); mass+=w;
+    (it.x<WW/2?mL:mR); if(it.x<WW/2)mL+=w;else mR+=w; if(it.y<WH/2)mT+=w;else mB+=w; }
+  const balH = 1 - Math.abs(mL-mR)/(mL+mR||1);              // 1=even
+  const balV = 1 - Math.abs(mT-mB)/(mT+mB||1);
+  const balance = (balH+balV)/2;
+  // negative space: fraction of a coarse grid with no item nearby (target 0.4–0.6)
+  const gx=8, gy=12; let empty=0;
+  for (let j=0;j<gy;j++) for (let i=0;i<gx;i++){
+    const cx=(i+0.5)/gx*WW, cy=(j+0.5)/gy*WH;
+    if (its.every((it)=>Math.hypot(it.x-cx, it.y-cy) > 90)) empty++;
+  }
+  const openFrac = empty/(gx*gy);
+  const negSpace = openFrac < 0.4 || openFrac > 0.6 ? 0.3 + (1-Math.abs(openFrac-0.5)/0.5)*0.4 : 1;   // strong reward for 40-60%
+  // focal hierarchy: want a clear spread of visual weights (few big, many small)
+  const weights = its.map((it)=>visualWeight(it.type,it.scale)).sort((a,b)=>b-a);
+  const top = weights.slice(0, Math.max(1,Math.floor(weights.length*0.2)));
+  const rest = weights.slice(top.length);
+  const hierarchy = rest.length ? Math.min(1, (avg(top)-avg(rest))*2.2) : 0.5;
+  // path continuity: reward a decent run of stepping stones
+  const steps = its.filter((it)=>it.type==="step").length;
+  const pathCont = Math.min(1, steps/12);
+  const heaviest = Math.max(...weights);
+  const median = weights[Math.floor(weights.length/2)] || 0.01;
+  const dominance = Math.min(1, (heaviest - median) * 1.6);   // one element clearly dominant
+  const collPenalty = collisions * 0.5;
+  return spacing*0.02 + balance*2.0 + negSpace*2.8 + hierarchy*1.8 + dominance*1.6 + pathCont*1.0 - collPenalty;
+}
+function avg(a){ return a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+
+function randomGarden(redraw = true) {
+  const WW = worldW(), WH = worldH();
+  let best = null, bestScore = -Infinity, bestSeed = 0;
+  const N = 12;   // candidate layouts
+  for (let c=0;c<N;c++){
+    const seed = Math.floor(Math.random()*1e9);
+    const cand = buildCandidate(WW, WH, seed);
+    const sc = scoreCandidate(cand, WW, WH);
+    if (sc > bestScore) { bestScore = sc; best = cand; bestSeed = seed; }
+  }
+  // final guard: no non-bridge item may sit on the water
+  best.items = best.items.filter((it) => {
+    if (it.type === "bridge") return true;
+    const gap = it.type === "moss" ? 26 : 30 + (RADII[it.type]||44) * 0.5 * (it.scale||1);
+    return Math.min(...best.streams.map((st) => distToPolyline(it.x, it.y, st.pts))) > gap;
+  });
+  G.items = best.items; G.streams = best.streams; G.swirls = best.swirls; G.rakes = [];
+  G.seed = Math.floor(Math.random()*1e5);
+  if (redraw) { clampView(); draw(); save(); }
+}
+
+/* ============ WEB AUDIO ============ */
+/* iPhone notes: (1) audio can only start from a user gesture — we unlock on the
+   first touch anywhere; (2) the hardware silent/mute switch silences Web Audio
+   entirely — nothing JS can do about that, so the Sound button's toast says so. */
+let audioCtx = null;
+let sndOn = store(() => localStorage.getItem("zen_sound")) !== "0";
+let scrapeNodes = null;
+
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+document.addEventListener("pointerdown", function unlock() {
+  const ac = ensureAudio();
+  const b = ac.createBuffer(1, 1, 22050);
+  const s = ac.createBufferSource();
+  s.buffer = b; s.connect(ac.destination); s.start(0);
+  if (musicOn) startMusic();   // browsers only allow audio after a gesture
+}, { once: true });
+
+function ensureScrape() {
+  const ac = ensureAudio();
+  if (scrapeNodes) return scrapeNodes;
+  // one looping second of noise; gain stays at 0 until the rake moves
+  const buf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+  const ch = buf.getChannelData(0);
+  for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
+  const src = ac.createBufferSource();
+  src.buffer = buf; src.loop = true;
+  const filter = ac.createBiquadFilter();
+  filter.type = "bandpass"; filter.frequency.value = 2400; filter.Q.value = 0.9;
+  const gain = ac.createGain(); gain.gain.value = 0;
+  src.connect(filter); filter.connect(gain); gain.connect(sfxBus(ac));
+  src.start();
+  scrapeNodes = { src, filter, gain };
+  return scrapeNodes;
+}
+
+/* Continuous sand scrape: volume and brightness track drag speed, fading in and
+   out smoothly — one sustained sshhh that follows your finger, not blips. */
+function scrapeMove(speed, wet) {
+  if (!sndOn) return;
+  const ac = ensureAudio();
+  const n = ensureScrape();
+  const now = ac.currentTime;
+  n.gain.gain.setTargetAtTime(Math.min(0.22, 0.05 + speed * 0.006), now, 0.04);
+  // wet = stream carving: darker, burblier band; dry = sand scrape
+  const base = wet ? 620 : 1800, span = wet ? 500 : 2600, k = wet ? 18 : 60;
+  n.filter.frequency.setTargetAtTime(base + Math.min(span, speed * k), now, 0.05);
+}
+function scrapeEnd() {
+  if (!scrapeNodes || !audioCtx) return;
+  scrapeNodes.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.07);
+}
+
+function playClick() {
+  // tactile UI click: tight pitched tick with a whisper of noise
+  if (!sndOn) return;
+  const ac = ensureAudio();
+  const now = ac.currentTime;
+  thump(ac, now, 2100, 950, 0.03, 0.1);
+  noiseBurst(ac, now, 0.014, "highpass", 4500, 1, 0.05);
+}
+
+function playRockTap() {
+  if (!sndOn) return;
+  const ac = ensureAudio();
+  const now = ac.currentTime;
+  const osc = ac.createOscillator();
+  osc.frequency.setValueAtTime(320, now);
+  osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0.1, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+  osc.connect(gain); gain.connect(sfxBus(ac));
+  osc.start(now); osc.stop(now + 0.12);
+}
+
+/* ---- Haptics: Android Chrome supports navigator.vibrate; iOS Safari exposes
+   no web vibration API at all, so this degrades silently there. ---- */
+let sfxGain = null;
+function sfxBus(ac) {
+  if (!sfxGain) { sfxGain = ac.createGain(); sfxGain.gain.value = 0.55; sfxGain.connect(ac.destination); }
+  return sfxGain;
+}
+
+let lastBuzz = 0;
+function buzz(ms) {
+  try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
+}
+function rakeBuzz() {
+  const now = Date.now();
+  if (now - lastBuzz > 70) { buzz(5); lastBuzz = now; }
+}
+
+/* ---- Per-object placement sounds: each material gets its own voice. ---- */
+function noiseBurst(ac, now, dur, filterType, freq, q, level) {
+  const src = ac.createBufferSource();
+  const buf = ac.createBuffer(1, Math.ceil(ac.sampleRate * dur), ac.sampleRate);
+  const ch = buf.getChannelData(0);
+  for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
+  src.buffer = buf;
+  const f = ac.createBiquadFilter();
+  f.type = filterType; f.frequency.value = freq; f.Q.value = q;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(level, now);
+  g.gain.exponentialRampToValueAtTime(0.005, now + dur);
+  src.connect(f); f.connect(g); g.connect(sfxBus(ac));
+  src.start(now); src.stop(now + dur);
+}
+function thump(ac, now, f0, f1, dur, level) {
+  const o = ac.createOscillator();
+  o.frequency.setValueAtTime(f0, now);
+  o.frequency.exponentialRampToValueAtTime(f1, now + dur);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(level, now);
+  g.gain.exponentialRampToValueAtTime(0.005, now + dur);
+  o.connect(g); g.connect(sfxBus(ac));
+  o.start(now); o.stop(now + dur);
+}
+/* Movie-foley gravel layer: an object set down in gravel is not one noise —
+   it is several discrete micro-crunches (stones shifting) over ~100–250 ms,
+   heavier objects adding a low displacement rumble and trailing settle ticks. */
+function gravelCrunch(ac, now, intensity, heavy) {
+  const nTicks = heavy ? 7 : 4 + Math.floor(Math.random() * 2);
+  let t = 0;
+  for (let i = 0; i < nTicks; i++) {
+    const dur = 0.018 + Math.random() * 0.02;
+    const src2 = ac.createBufferSource();
+    const buf = ac.createBuffer(1, Math.ceil(ac.sampleRate * dur), ac.sampleRate);
+    const ch = buf.getChannelData(0);
+    for (let k = 0; k < ch.length; k++) ch[k] = Math.random() * 2 - 1;
+    src2.buffer = buf;
+    const f = ac.createBiquadFilter();
+    f.type = "bandpass";
+    f.frequency.value = 2600 - i * 220 + Math.random() * 400;   // crunches darken as stones settle
+    f.Q.value = 1.1;
+    const g = ac.createGain();
+    const lvl = intensity * Math.pow(0.82, i);
+    g.gain.setValueAtTime(lvl, now + t);
+    g.gain.exponentialRampToValueAtTime(0.004, now + t + dur);
+    src2.connect(f); f.connect(g); g.connect(sfxBus(ac));
+    src2.start(now + t); src2.stop(now + t + dur);
+    t += 0.016 + Math.random() * 0.028;
+  }
+  if (heavy) {
+    // low displacement rumble + a sub thud you feel more than hear
+    noiseBurst(ac, now, 0.3, "lowpass", 240, 0.6, intensity * 0.9);
+    thump(ac, now + 0.01, 70, 36, 0.22, intensity * 1.1);
+    // debris settling afterward
+    for (const dt of [0.22, 0.31]) {
+      noiseBurst(ac, now + dt, 0.03, "bandpass", 1900 + Math.random() * 500, 1.2, intensity * 0.25);
+    }
+  }
+}
+
+function playPlaceSound(type, scale) {
+  if (!sndOn) return;
+  const ac = ensureAudio();
+  const now = ac.currentTime;
+  const k = 1.15 - (scale || 1) * 0.25;   // bigger item → deeper voice
+  switch (type) {
+    case "rock_lg":                       // boulder: full-weight set-down
+      gravelCrunch(ac, now, 0.13, true);
+      thump(ac, now + 0.015, 150 * k, 38 * k, 0.24, 0.15);
+      break;
+    case "rock_sm":                       // stone: crisp set with light crunch
+      gravelCrunch(ac, now, 0.09, false);
+      thump(ac, now + 0.01, 320 * k, 72 * k, 0.1, 0.1);
+      break;
+    case "rock_flat":                     // flat rock: broad slap into the bed
+      gravelCrunch(ac, now, 0.11, false);
+      thump(ac, now + 0.01, 240 * k, 52 * k, 0.14, 0.11);
+      noiseBurst(ac, now + 0.02, 0.06, "lowpass", 750, 0.7, 0.05);
+      break;
+    case "bonsai": case "bonsai_c": case "bonsai_p": case "bonsai_w": case "maple":   // pot seats in gravel under a leaf rustle
+      gravelCrunch(ac, now + 0.02, 0.07, false);
+      noiseBurst(ac, now, 0.2, "bandpass", 4200, 1.6, 0.08);
+      thump(ac, now + 0.03, 200 * k, 92 * k, 0.09, 0.06);
+      break;
+    case "bamboo": case "torii":          // hollow wood knock, light crunch
+      gravelCrunch(ac, now + 0.02, 0.08, false);
+      thump(ac, now, 470 * k, 205 * k, 0.09, 0.09);
+      thump(ac, now + 0.045, 315 * k, 155 * k, 0.07, 0.05);
+      break;
+    case "bridge":                        // heavy timber set across the banks
+      gravelCrunch(ac, now + 0.02, 0.11, true);
+      thump(ac, now, 185 * k, 88 * k, 0.13, 0.11);
+      thump(ac, now + 0.07, 140 * k, 68 * k, 0.11, 0.07);
+      break;
+    case "lantern": case "pagoda": {      // stone-on-gravel seat, then the clink
+      gravelCrunch(ac, now, 0.1, false);
+      for (const [f, d, l] of [[930 * k, 0.07, 0.05], [1410 * k, 0.05, 0.035]]) {
+        const o = ac.createOscillator();
+        o.frequency.value = f;
+        const g = ac.createGain();
+        g.gain.setValueAtTime(l, now + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.004, now + 0.03 + d);
+        o.connect(g); g.connect(sfxBus(ac));
+        o.start(now + 0.03); o.stop(now + 0.03 + d);
+      }
+      thump(ac, now + 0.05, 250 * k, 105 * k, 0.08, 0.05);
+      break;
+    }
+    case "basin": {                       // stone seat, then a water plink
+      gravelCrunch(ac, now, 0.1, false);
+      const o = ac.createOscillator();
+      o.frequency.setValueAtTime(900, now + 0.06);
+      o.frequency.exponentialRampToValueAtTime(1500, now + 0.11);
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0.05, now + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.004, now + 0.24);
+      o.connect(g); g.connect(sfxBus(ac));
+      o.start(now + 0.06); o.stop(now + 0.26);
+      break;
+    }
+    case "moss":                          // soft press, barely disturbing the bed
+      gravelCrunch(ac, now, 0.045, false);
+      noiseBurst(ac, now, 0.13, "lowpass", 260, 0.7, 0.09);
+      break;
+    case "step":                          // footpath stone: neat single set
+      gravelCrunch(ac, now, 0.08, false);
+      thump(ac, now + 0.02, 420 * k, 150 * k, 0.06, 0.07);
+      break;
+    default:
+      gravelCrunch(ac, now, 0.08, false);
+      playRockTap();
+  }
+}
+
+/* ---- Ambient: spa bed — a warm breathing chord pad with the binaural pair
+   woven inside it, soft swelled melody tones on a major pentatonic, and warm
+   Tibetan bowls as rare accents. The binaural tones sit 8 Hz apart
+   (136.1 L / 144.1 R — alpha band, relaxed calm); buried in the pad they read
+   as warmth, not a bare hum. Headphones required for the binaural effect. */
+let musicOn = store(() => localStorage.getItem("zen_music")) !== "0";
+let music = null;
+
+const SPA_SCALE = [220.0, 246.94, 277.18, 329.63, 369.99, 440.0];   // A major pentatonic
+const BOWLS = [110, 82.41];   // A2 and E2 — in key with the pad
+
+function bowlStrike(ac, dest, f0, when, level) {
+  // warm voicing: gentle shimmer (±0.5 Hz pairs), high partials kept quiet
+  const partials = [
+    [1.0, 1.0, 13],
+    [2.72, 0.3, 9],
+    [5.18, 0.1, 6],
+  ];
+  for (const [ratio, rel, dec] of partials) {
+    for (const det of [-0.5, 0.5]) {
+      const o = ac.createOscillator();
+      o.frequency.value = f0 * ratio + det;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0, when);
+      g.gain.linearRampToValueAtTime(level * rel * 0.5, when + 0.12);   // soft mallet
+      g.gain.exponentialRampToValueAtTime(0.0004, when + dec);
+      o.connect(g); g.connect(dest);
+      o.start(when); o.stop(when + dec + 0.3);
+    }
+  }
+}
+
+function swellTone(ac, dest, freq, when, level) {
+  // spa melody voice: slow-attack sine that blooms and fades, nothing plucked
+  const f = ac.createBiquadFilter();
+  f.type = "lowpass"; f.frequency.value = 1500; f.Q.value = 0.4;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(level, when + 1.6);
+  g.gain.setTargetAtTime(0, when + 2.4, 1.4);
+  for (const det of [0, 3]) {
+    const o = ac.createOscillator();
+    o.type = "sine"; o.frequency.value = freq; o.detune.value = det;
+    o.connect(f);
+    o.start(when); o.stop(when + 9);
+  }
+  f.connect(g); g.connect(dest);
+}
+
+function startMusic() {
+  const ac = ensureAudio();
+  if (music) return;
+  const master = ac.createGain();
+  master.gain.value = 0;
+  master.connect(ac.destination);
+  master.gain.setTargetAtTime(0.12, ac.currentTime, 1.5);   // slow fade in
+
+  // warm pad: open fifth + octave (A2 E3 A3), detuned, breathing slowly
+  const padFilter = ac.createBiquadFilter();
+  padFilter.type = "lowpass"; padFilter.frequency.value = 820; padFilter.Q.value = 0.3;
+  const padGain = ac.createGain(); padGain.gain.value = 0.14;
+  const breathe = ac.createOscillator(); breathe.frequency.value = 0.035;
+  const breatheG = ac.createGain(); breatheG.gain.value = 0.05;
+  breathe.connect(breatheG); breatheG.connect(padGain.gain);
+  const padOscs = [];
+  for (const [freq, lvl] of [[110, 1], [164.81, 0.6], [220, 0.45]]) {
+    for (const det of [-3, 3]) {
+      const o = ac.createOscillator();
+      o.type = "triangle"; o.frequency.value = freq; o.detune.value = det;
+      const g = ac.createGain(); g.gain.value = lvl * 0.5;
+      o.connect(g); g.connect(padFilter);
+      o.start(); padOscs.push(o);
+    }
+  }
+  padFilter.connect(padGain); padGain.connect(master);
+  breathe.start(); padOscs.push(breathe);
+
+  // binaural pair, woven quietly under the pad
+  const merger = ac.createChannelMerger(2);
+  const mkEar = (freq, chn) => {
+    const o = ac.createOscillator();
+    o.type = "sine"; o.frequency.value = freq;
+    const g = ac.createGain(); g.gain.value = 0.02;
+    o.connect(g); g.connect(merger, 0, chn);
+    o.start();
+    return o;
+  };
+  // pair centered ON A2 so the perceived pitch sits in key; still 8 Hz apart
+  const earL = mkEar(106.1, 0);
+  const earR = mkEar(114.1, 1);
+  merger.connect(master);
+
+  // trickling stream: two narrowband noise voices with independent flutter
+  const trickle = ac.createGain(); trickle.gain.value = 0.045;
+  const trickleNodes = [];
+  for (const [freq, q, lvl, rate] of [[2900, 7, 1, 2.1], [4400, 9, 0.55, 3.4]]) {
+    const tb = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+    const tch = tb.getChannelData(0);
+    for (let i = 0; i < tch.length; i++) tch[i] = Math.random() * 2 - 1;
+    const nsrc = ac.createBufferSource(); nsrc.buffer = tb; nsrc.loop = true;
+    const f = ac.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = freq; f.Q.value = q;
+    const g2 = ac.createGain(); g2.gain.value = lvl * 0.5;
+    const flut = ac.createOscillator(); flut.frequency.value = rate;
+    const flutG = ac.createGain(); flutG.gain.value = lvl * 0.32;
+    flut.connect(flutG); flutG.connect(g2.gain);
+    const wander = ac.createOscillator(); wander.frequency.value = 0.13;
+    const wanderG = ac.createGain(); wanderG.gain.value = freq * 0.06;
+    wander.connect(wanderG); wanderG.connect(f.frequency);
+    nsrc.connect(f); f.connect(g2); g2.connect(trickle);
+    nsrc.start(); flut.start(); wander.start();
+    trickleNodes.push(nsrc, flut, wander);
+  }
+  trickle.connect(master);
+
+  // gentle melody: a swelled tone every 5–9 s, sometimes echoed an octave up
+  const scheduleTone = () => {
+    if (!music) return;
+    const now = ac.currentTime;
+    const f = SPA_SCALE[Math.floor(Math.random() * SPA_SCALE.length)];
+    swellTone(ac, master, f, now, 0.16);
+    if (Math.random() < 0.25) swellTone(ac, master, f * 2, now + 1.2, 0.07);
+    music.timer = setTimeout(scheduleTone, 5000 + Math.random() * 4000);
+  };
+  // bowls: rare warm accents, one every 22–40 s
+  const scheduleBowl = () => {
+    if (!music) return;
+    bowlStrike(ac, master, BOWLS[Math.floor(Math.random() * BOWLS.length)], ac.currentTime, 0.32);
+    music.bowlTimer = setTimeout(scheduleBowl, 22000 + Math.random() * 18000);
+  };
+  music = { master, earL, earR, padOscs: padOscs.concat(trickleNodes), timer: null, bowlTimer: null };
+  music.timer = setTimeout(scheduleTone, 1200);
+  music.bowlTimer = setTimeout(scheduleBowl, 7000);
+}
+
+function stopMusic() {
+  if (!music) return;
+  const m = music;
+  music = null;
+  clearTimeout(m.timer);
+  clearTimeout(m.bowlTimer);
+  if (audioCtx) {
+    m.master.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
+    setTimeout(() => {
+      try {
+        m.earL.stop(); m.earR.stop();
+        m.padOscs.forEach((o) => o.stop());
+        m.master.disconnect();
+      } catch (e) {}
+    }, 2000);
+  }
+}
+
+/* ============ SELECTION & RESIZE ============ */
+let selectedItem = null;
+const sizechip = () => document.getElementById("sizechip");
+function showSizeChip(it) {
+  const chip = sizechip();
+  const sx = (it.x - view.ox) * view.z, sy = (it.y - view.oy) * view.z;
+  const r = (RADII[it.type] || 44) * (it.scale || 1) * view.z;
+  chip.style.left = Math.max(8, Math.min(W - 130, sx - 60)) + "px";
+  chip.style.top = Math.max(8, sy - r - 46) + "px";
+  document.getElementById("szLabel").textContent = Math.round((it.scale || 1) * 100) + "%";
+  chip.classList.add("show");
+}
+function hideSizeChip() { selectedItem = null; sizechip().classList.remove("show"); }
+function resizeSelected(mult) {
+  if (!selectedItem) return;
+  selectedItem.scale = Math.max(0.35, Math.min(2.4, (selectedItem.scale || 1) * mult));
+  showSizeChip(selectedItem);
+  draw(); save();
+}
+document.getElementById("szUp").addEventListener("click", () => resizeSelected(1.12));
+document.getElementById("szDown").addEventListener("click", () => resizeSelected(1 / 1.12));
+
+/* ============ INTERACTIONS ============ */
+function pt(e) {
+  const r = canvas.getBoundingClientRect();
+  const sx = (e.clientX - r.left) * (W / r.width), sy = (e.clientY - r.top) * (H / r.height);
+  return { x: view.ox + sx / view.z, y: view.oy + sy / view.z, sx, sy };
+}
+
+function hitItem(p) {
+  for (let i = G.items.length - 1; i >= 0; i--) {
+    if (Math.hypot(p.x - G.items[i].x, p.y - G.items[i].y) < itemR(G.items[i])) return G.items[i];
+  }
+  return null;
+}
+
+/* Lay one stepping stone of a walking path. Real paths set stones with their
+   long axis ACROSS the walking direction, each turned a touch differently. */
+/* Nearest point + flow direction on any stream. */
+function nearestOnStreams(x, y) {
+  let best = null;
+  for (const st of (G.streams || [])) {
+    const pts = st.pts;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const ax = pts[i][0], ay = pts[i][1];
+      const abx = pts[i + 1][0] - ax, aby = pts[i + 1][1] - ay;
+      const L2 = abx * abx + aby * aby || 1;
+      let t = ((x - ax) * abx + (y - ay) * aby) / L2;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const px = ax + abx * t, py = ay + aby * t;
+      const d = Math.hypot(x - px, y - py);
+      if (!best || d < best.d) best = { d, x: px, y: py, ang: Math.atan2(aby, abx) };
+    }
+  }
+  return best;
+}
+
+/* Bridges orient themselves: near water they snap onto the stream, deck
+   perpendicular to the flow; on a stone path they align with the walking
+   direction of the nearest stones. */
+function orientBridge(it) {
+  const ns = nearestOnStreams(it.x, it.y);
+  if (ns && ns.d < 70) {
+    it.x = ns.x; it.y = ns.y;
+    it.rot = ns.ang + Math.PI / 2;
+    return;
+  }
+  const steps = G.items
+    .filter((s2) => s2.type === "step" && s2 !== it)
+    .map((s2) => ({ s2, d: Math.hypot(s2.x - it.x, s2.y - it.y) }))
+    .sort((a, b) => a.d - b.d);
+  if (steps.length >= 2 && steps[0].d < 60) {
+    it.rot = Math.atan2(steps[1].s2.y - steps[0].s2.y, steps[1].s2.x - steps[0].s2.x);
+  }
+}
+
+function layStone(x, y, pathAngle, d) {
+  const stone = {
+    id: "z" + Date.now().toString(36) + Math.floor(Math.random() * 1e4),
+    type: "step", x, y,
+    scale: 0.85 + Math.random() * 0.35,
+    rot: pathAngle + Math.PI / 2 + (Math.random() - 0.5) * 0.45,
+  };
+  G.items.push(stone);
+  d.ids.push(stone.id);
+  playPlaceSound("step", stone.scale);
+  buzz(6);
+}
+
+canvas.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 2) {
+    // second finger: abandon any live stroke/drag, start pinch-zoom
+    drag = null; scrapeEnd();
+    const [a, b] = [...pointers.values()];
+    const r = canvas.getBoundingClientRect();
+    const mid = { x: (a.x + b.x) / 2 - r.left, y: (a.y + b.y) / 2 - r.top };
+    pinch = {
+      d0: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+      z0: view.z,
+      wx: view.ox + mid.x / view.z,
+      wy: view.oy + mid.y / view.z,
+    };
+    return;
+  }
+  if (pointers.size > 1) return;
+  const p = pt(e);
+  const now = Date.now();
+  const isDbl = (now - lastTap.t < 320) && Math.hypot(p.x - lastTap.x, p.y - lastTap.y) < 28 / view.z;
+  lastTap = { t: now, x: p.x, y: p.y };
+
+  if (isDbl) {
+    const it = hitItem(p);
+    if (it) { G.items = G.items.filter((x) => x !== it); if (selectedItem === it) hideSizeChip(); draw(); save(); playRockTap(); return; }
+  }
+
+  if (tool === "move") {
+    const it = hitItem(p);
+    if (it) {
+      drag = { it, ox: p.x - it.x, oy: p.y - it.y, moved: false, vx: 0, vy: 0 };
+      selectedItem = it; showSizeChip(it);
+    } else {
+      drag = { isPan: true, sx: p.sx, sy: p.sy, ox0: view.ox, oy0: view.oy };
+      hideSizeChip();
+    }
+    canvas.setPointerCapture(e.pointerId);
+    return;
+  }
+
+  if (tool === "rake") {
+    drag = { isRake: true, pts: [[p.x, p.y]], lastPt: [p.x, p.y] };
+    canvas.setPointerCapture(e.pointerId);
+    scrapeMove(8);
+    draw();
+    return;
+  }
+
+  if (tool === "path") {
+    if (G.layMode === "trace") {
+      drag = { isTrace: true, target: "path", pts: [[p.x, p.y]], lastPt: [p.x, p.y] };
+      canvas.setPointerCapture(e.pointerId);
+      draw();
+      return;
+    }
+    drag = { isPath: true, last: [p.x, p.y], ids: [] };
+    canvas.setPointerCapture(e.pointerId);
+    layStone(p.x, p.y, Math.random() * Math.PI, drag);
+    draw();
+    return;
+  }
+
+  if (tool === "stream") {
+    if (G.layMode === "trace") {
+      drag = { isTrace: true, target: "stream", pts: [[p.x, p.y]], lastPt: [p.x, p.y] };
+      canvas.setPointerCapture(e.pointerId);
+      draw();
+      return;
+    }
+    // starting at an existing stream's end continues that stream
+    let seed = [[p.x, p.y]];
+    for (let i = (G.streams || []).length - 1; i >= 0; i--) {
+      const st = G.streams[i];
+      const head = st.pts[0], tail = st.pts[st.pts.length - 1];
+      if (Math.hypot(p.x - tail[0], p.y - tail[1]) < 60) { seed = st.pts.slice(); G.streams.splice(i, 1); break; }
+      if (Math.hypot(p.x - head[0], p.y - head[1]) < 60) { seed = st.pts.slice().reverse(); G.streams.splice(i, 1); break; }
+    }
+    drag = { isStream: true, pts: seed, lastPt: seed[seed.length - 1].slice(), t0: Date.now() };
+    canvas.setPointerCapture(e.pointerId);
+    scrapeMove(8, true);
+    draw();
+    return;
+  }
+
+  const newItem = { id: "z" + Date.now().toString(36), type: tool, x: p.x, y: p.y, scale: 0.8 + Math.random() * 0.5 };
+  if (newItem.type === "bridge") orientBridge(newItem);
+  G.items.push(newItem);
+  undoStack.push({ t: "item", id: newItem.id });
+  draw(); save();
+  playPlaceSound(newItem.type, newItem.scale);
+  buzz(12);
+});
+
+canvas.addEventListener("pointermove", (e) => {
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (pinch && pointers.size >= 2) {
+    const [a, b] = [...pointers.values()];
+    const r = canvas.getBoundingClientRect();
+    const mid = { x: (a.x + b.x) / 2 - r.left, y: (a.y + b.y) / 2 - r.top };
+    const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    view.z = Math.min(5, Math.max(1, pinch.z0 * (d / pinch.d0)));
+    // keep the world point that started under the fingers under them still
+    view.ox = pinch.wx - mid.x / view.z;
+    view.oy = pinch.wy - mid.y / view.z;
+    clampView();
+    scheduleDraw();
+    return;
+  }
+
+  if (!drag) return;
+  const p = pt(e);
+
+  if (drag.isPan) {
+    view.ox = drag.ox0 - (p.sx - drag.sx) / view.z;
+    view.oy = drag.oy0 - (p.sy - drag.sy) / view.z;
+    clampView();
+    scheduleDraw();
+    return;
+  }
+
+  if (drag.isPath) {
+    const dx = p.x - drag.last[0], dy = p.y - drag.last[1];
+    const dist = Math.hypot(dx, dy);
+    if (dist >= 40) {   // realistic stride spacing in world units
+      layStone(p.x, p.y, Math.atan2(dy, dx), drag);
+      drag.last = [p.x, p.y];
+      scheduleDraw();
+    }
+    return;
+  }
+
+  if (drag.isTrace) {
+    const dist = Math.hypot(p.x - drag.lastPt[0], p.y - drag.lastPt[1]);
+    if (dist > 8 / view.z && drag.pts.length < 220) {
+      drag.pts.push([p.x, p.y]);
+      drag.lastPt = [p.x, p.y];
+      scheduleDraw();
+    }
+    return;
+  }
+
+  if (drag.isStream) {
+    const dist = Math.hypot(p.x - drag.lastPt[0], p.y - drag.lastPt[1]);
+    if (dist > 10 / view.z && drag.pts.length < 160) {
+      drag.pts.push([p.x, p.y]);
+      drag.lastPt = [p.x, p.y];
+      scrapeMove(dist * view.z, true);   // watery variant
+      rakeBuzz();
+      scheduleDraw();
+    }
+    return;
+  }
+
+  if (drag.isRake) {
+    const dist = Math.hypot(p.x - drag.lastPt[0], p.y - drag.lastPt[1]);
+    if (dist > 6 / view.z && drag.pts.length < 200) {
+      drag.pts.push([p.x, p.y]);
+      drag.lastPt = [p.x, p.y];
+      scrapeMove(dist * view.z);   // loudness/brightness follow on-screen speed
+      rakeBuzz();
+      scheduleDraw();
+    }
+  } else {
+    const dx = p.x - drag.ox, dy = p.y - drag.oy;
+    drag.it.x = dx; drag.it.y = dy; drag.moved = true;
+    drag.vx = p.x - (drag.lastX || p.x); drag.vy = p.y - (drag.lastY || p.y);
+    drag.lastX = p.x; drag.lastY = p.y;
+    if (selectedItem === drag.it) showSizeChip(drag.it);
+    scheduleDraw();
+  }
+});
+
+const endDrag = (e) => {
+  if (e && pointers.has(e.pointerId)) pointers.delete(e.pointerId);
+  if (pinch && pointers.size < 2) pinch = null;
+  scrapeEnd();
+  if (drag) {
+    if (drag.isRake) {
+      if (drag.pts.length > 1) {
+        G.rakes = G.rakes || [];
+        // downsample for field perf, keep the stroke's shape
+        const kept = drag.pts.filter((_, i) => i % 2 === 0 || i === drag.pts.length - 1);
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const q of kept) { if (q[0] < x0) x0 = q[0]; if (q[0] > x1) x1 = q[0]; if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; }
+        G.rakes.push({ t: Date.now(), pts: kept, mode: G.rakeMode || "classic", bb: [x0, y0, x1, y1] });
+        if (G.rakes.length > 60) G.rakes.shift();   // generous budget; viewport culling keeps it fast
+        undoStack.push({ t: "rake" });
+        save();
+      }
+      const wasRake = drag; drag = null;
+      if (wasRake.pts.length > 1) draw();
+    } else if (drag.isPan) {
+      drag = null;
+    } else if (drag.isPath) {
+      if (drag.ids.length) { undoStack.push({ t: "path", ids: drag.ids }); save(); }
+      drag = null;
+      draw();
+    } else if (drag.isTrace) {
+      const tr = drag; drag = null;
+      if (tr.pts.length > 2) {
+        if (tr.target === "path") {
+          // set stones along the traced course at stride spacing
+          const d2 = { ids: [] };
+          let acc = 0, prev = tr.pts[0];
+          layStone(prev[0], prev[1], Math.atan2(tr.pts[1][1] - prev[1], tr.pts[1][0] - prev[0]), d2);
+          for (let i = 1; i < tr.pts.length; i++) {
+            const q = tr.pts[i];
+            const seg = Math.hypot(q[0] - prev[0], q[1] - prev[1]);
+            acc += seg;
+            if (acc >= 40) {
+              layStone(q[0], q[1], Math.atan2(q[1] - prev[1], q[0] - prev[0]), d2);
+              acc = 0;
+            }
+            prev = q;
+          }
+          undoStack.push({ t: "path", ids: d2.ids });
+        } else {
+          // set a stream along the traced course (welds onto existing ends)
+          commitStreamStroke(tr.pts);
+          scrapeMove(20, true); setTimeout(scrapeEnd, 350);
+        }
+        save();
+      }
+      draw();
+    } else if (drag.isStream) {
+      if (drag.pts.length > 2) {
+        commitStreamStroke(drag.pts);
+        save();
+      }
+      drag = null;
+      draw();
+    } else {
+      if (drag.moved) {
+        if (drag.it && drag.it.type === "bridge") { orientBridge(drag.it); draw(); }
+        save();
+        settleVel = { vx: drag.vx * 0.5, vy: drag.vy * 0.5, item: drag.it, startTime: Date.now() };
+        requestAnimationFrame(animateSettling);
+      }
+      drag = null;
+    }
+  }
+};
+canvas.addEventListener("pointerup", endDrag);
+canvas.addEventListener("pointercancel", endDrag);
+
+// Desktop: wheel zooms around the cursor
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  zoomAt(e.clientX - r.left, e.clientY - r.top, view.z * Math.exp(-e.deltaY * 0.0015));
+}, { passive: false });
+
+function refreshChip() { if (selectedItem) showSizeChip(selectedItem); }
+document.getElementById("zin").addEventListener("click", () => { zoomAt(W / 2, H / 2, view.z * 1.25); refreshChip(); });
+document.getElementById("zout").addEventListener("click", () => { zoomAt(W / 2, H / 2, view.z / 1.25); refreshChip(); });
+document.getElementById("zreset").addEventListener("click", () => {
+  // return to 1x, centered on the map
+  view.z = 1;
+  view.ox = (worldW() - W) / 2;
+  view.oy = (worldH() - H) / 2;
+  clampView();
+  draw();
+});
+
+function sizeChanged() {
+  const WW = worldW(), WH = worldH();
+  // shrinking: pull stranded items/swirls back inside; drop fully out-of-bounds strokes
+  G.items.forEach((it) => { it.x = Math.min(WW - 60, it.x); it.y = Math.min(WH - 60, it.y); });
+  G.swirls.forEach((sw) => { sw.x = Math.min(WW - 30, sw.x); sw.y = Math.min(WH - 30, sw.y); });
+  G.rakes = (G.rakes || []).filter((rk) => rk.pts.some((q) => q[0] < WW && q[1] < WH));
+  G.streams = (G.streams || []).filter((st) => st.pts.some((q) => q[0] < WW && q[1] < WH));
+  clampView();
+  draw();
+}
+
+function animateSettling() {
+  if (!settleVel) return;
+  const elapsed = Date.now() - settleVel.startTime;
+  if (elapsed > 400) { settleVel = null; return; }
+  const decay = 1 - (elapsed / 400);
+  settleVel.item.x += settleVel.vx * decay * 0.02;
+  settleVel.item.y += settleVel.vy * decay * 0.02;
+  draw();
+  requestAnimationFrame(animateSettling);
+}
+
+/* ============ TOOLBAR ============ */
+function selectTool(key) {
+  if (key !== "move") hideSizeChip();
+  tool = key;
+  document.querySelectorAll("[data-tool]").forEach((b) => b.classList.toggle("on", b.dataset.tool === key));
+  document.getElementById("rakeopts").classList.toggle("show", key === "rake");
+  document.getElementById("layopts").classList.toggle("show", key === "path" || key === "stream");
+}
+
+document.querySelectorAll("#layopts [data-lay]").forEach((b) => {
+  b.addEventListener("click", () => {
+    G.layMode = b.dataset.lay;
+    document.querySelectorAll("#layopts [data-lay]").forEach((x) => x.classList.toggle("on", x === b));
+    save();
+  });
+});
+
+// Rake patterns
+document.querySelectorAll("#rakeopts [data-rake]").forEach((b) => {
+  b.addEventListener("click", () => {
+    G.rakeMode = b.dataset.rake;
+    document.querySelectorAll("#rakeopts [data-rake]").forEach((x) => x.classList.toggle("on", x === b));
+    save();
+  });
+});
+
+// Undo: last rake stroke or last placed item
+document.getElementById("undoBtn").addEventListener("click", () => {
+  const a = undoStack.pop();
+  if (!a) { toast("Nothing to undo"); return; }
+  if (a.t === "rake") {
+    G.rakes.pop();
+    toast("Stroke undone");
+  } else if (a.t === "path") {
+    const gone = new Set(a.ids);
+    G.items = G.items.filter((it) => !gone.has(it.id));
+    toast("Path undone");
+  } else if (a.t === "stream") {
+    G.streams.pop();
+    toast("Stream undone");
+  } else if (a.t === "item") {
+    G.items = G.items.filter((it) => it.id !== a.id);
+    toast("Placement undone");
+  }
+  draw(); save();
+});
+// Main-row tools (Rake, Move) — this is what was broken before: these buttons
+// had no click handlers, so once you left the rake you could never come back.
+document.querySelectorAll("#sheet > .row [data-tool]").forEach((b) => {
+  b.addEventListener("click", () => { selectTool(b.dataset.tool); draw(); });
+});
+
+// Settings gear shows/hides the full sheet; ＋ shows the object pictures
+document.getElementById("settingsBtn").addEventListener("click", (e) => {
+  const sh = document.getElementById("sheet");
+  sh.classList.toggle("show");
+  e.currentTarget.classList.toggle("on", sh.classList.contains("show"));
+  resize();
+});
+document.getElementById("addBtn").addEventListener("click", (e) => {
+  const ob = document.getElementById("objbar");
+  ob.classList.toggle("show");
+  e.currentTarget.classList.toggle("on", ob.classList.contains("show"));
+});
+// corner Rake / Move
+document.querySelectorAll("#corner [data-tool]").forEach((b) => {
+  b.addEventListener("click", () => { selectTool(b.dataset.tool); draw(); });
+});
+
+const toolrow = document.getElementById("objbar");
+const iconCanvases = {};
+ITEM_DEFS.forEach((d) => {
+  const b = document.createElement("button");
+  b.className = "objbtn";
+  b.title = `Place a ${d.label.toLowerCase()}`;
+  b.dataset.tool = d.key;
+  const c2 = document.createElement("canvas");
+  c2.width = 80; c2.height = 80;
+  iconCanvases[d.key] = c2;
+  b.appendChild(c2);
+  b.addEventListener("click", () => { selectTool(d.key); draw(); });
+  toolrow.appendChild(b);
+});
+
+/* Render each object's actual artwork into its button — the icon IS the item. */
+function rebuildToolIcons() {
+  const keepView = { z: view.z, ox: view.ox, oy: view.oy };
+  const keepCtx = ctx;
+  for (const d of ITEM_DEFS) {
+    const c2 = iconCanvases[d.key];
+    const g2 = c2.getContext("2d");
+    g2.clearRect(0, 0, 80, 80);
+    ctx = g2;
+    view.z = 0.62;
+    view.ox = -40 / 0.62;         // item at world (0,0) lands at canvas (40, 52)
+    view.oy = -52 / 0.62;
+    try { drawItem({ id: "icon", type: d.key, x: 0, y: 0, scale: 1 }); } catch (e) {}
+  }
+  ctx = keepCtx;
+  view.z = keepView.z; view.ox = keepView.ox; view.oy = keepView.oy;
+}
+
+function togglePanel(btnId, panelId) {
+  const btn = document.getElementById(btnId);
+  btn.addEventListener("click", () => {
+    const panel = document.getElementById(panelId);
+    const opening = !panel.classList.contains("open");
+    // close the others so the sheet stays compact
+    ["tune"].forEach((id) => {
+      document.getElementById(id).classList.toggle("open", id === panelId && opening);
+    });
+    ["tuneBtn"].forEach((id) => {
+      document.getElementById(id).classList.toggle("on", id === btnId && opening);
+    });
+    resize();
+  });
+}
+togglePanel("tuneBtn", "tune");
+
+document.getElementById("random").addEventListener("click", () => { randomGarden(); playClick(); buzz(8); });
+
+const soundBtn = document.getElementById("soundBtn");
+soundBtn.classList.toggle("on", sndOn);
+
+const musicBtn = document.getElementById("musicBtn");
+musicBtn.classList.toggle("on", musicOn);
+musicBtn.addEventListener("click", () => {
+  musicOn = !musicOn;
+  musicBtn.classList.toggle("on", musicOn);
+  store(() => localStorage.setItem("zen_music", musicOn ? "1" : "0"));
+  if (musicOn) { startMusic(); toast("Music on"); }
+  else { stopMusic(); toast("Music off"); }
+});
+soundBtn.addEventListener("click", () => {
+  sndOn = !sndOn;
+  soundBtn.classList.toggle("on", sndOn);
+  store(() => localStorage.setItem("zen_sound", sndOn ? "1" : "0"));
+  if (sndOn) {
+    playRockTap();   // audible confirmation
+    toast("Sound on — heard nothing? Flip your phone's silent switch & raise volume.");
+  } else {
+    scrapeEnd();
+    toast("Sound off");
+  }
+});
+
+
+function bindSlider(id, key, after) {
+  const inp = document.getElementById("s-" + id), out = document.getElementById("o-" + id);
+  inp.value = G[key]; out.value = inp.value;
+  inp.addEventListener("input", () => { G[key] = Number(inp.value); out.value = inp.value; if (after) after(); });
+  inp.addEventListener("change", () => save());
+}
+
+/* ============ SAVE / SHARE ============ */
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function gardenBlob() {
+  return new Promise((res) => {
+    // export the whole map regardless of current zoom
+    const keep = { z: view.z, ox: view.ox, oy: view.oy };
+    view.z = fitZ();
+    view.ox = (worldW() - W / view.z) / 2;
+    view.oy = (worldH() - H / view.z) / 2;
+    draw();
+    canvas.toBlob((b) => {
+      view.z = keep.z; view.ox = keep.ox; view.oy = keep.oy;
+      draw();
+      res(b);
+    }, "image/png");
+  });
+}
+
+document.getElementById("save").addEventListener("click", async () => {
+  const blob = await gardenBlob();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "zen-garden.png";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast("Saved zen-garden.png");
+});
+
+document.getElementById("share").addEventListener("click", async () => {
+  const blob = await gardenBlob();
+  const file = new File([blob], "zen-garden.png", { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: "Zen Garden" }); return; } catch (e) {}
+  }
+  document.getElementById("save").click();
+});
+
+/* ============ SIZING ============ */
+function resize() {
+  const stage = document.getElementById("stage");
+  const cssW = stage.clientWidth, cssH = stage.clientHeight;
+  if (!cssW || !cssH) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (G) rescale(G.w, G.h, cssW * (G.size || 1), cssH * (G.size || 1));
+  W = cssW; H = cssH;
+  canvas.width = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (G) { draw(); save(); }
+}
+
+let rsT = null;
+window.addEventListener("resize", () => { clearTimeout(rsT); rsT = setTimeout(resize, 150); });
+window.addEventListener("orientationchange", () => { clearTimeout(rsT); rsT = setTimeout(resize, 300); });
+
+/* ============ BOOT ============ */
+resize();
+load();
+document.getElementById("wordmark").textContent = "Zen · v" + BUILD;
+document.querySelectorAll("#rakeopts [data-rake]").forEach((b) => b.classList.toggle("on", b.dataset.rake === (G.rakeMode || "classic")));
+document.querySelectorAll("#layopts [data-lay]").forEach((b) => b.classList.toggle("on", b.dataset.lay === (G.layMode || "drag")));
+rebuildToolIcons();
+document.getElementById("rakeopts").classList.toggle("show", tool === "rake");
+bindSlider("size", "size", sizeChanged);
+bindSlider("items", "autoN");
+bindSlider("density", "density", draw);
+bindSlider("wiggle", "wiggle", draw);
+bindSlider("reach", "reach", draw);
+draw();
+</script>
+</body>
+</html>

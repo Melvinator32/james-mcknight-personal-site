@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tuned In — a five-minute walkthrough</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sage:#77b28c; --teal:#00859b; --cyan:#00bfb8; --green:#38a66f; --lime:#bce194;
+    --pale:#cce7eb; --offw:#ebf2e6; --cream:#f8ecdb; --lgray:#d9d9d6; --mgray:#b3b3b3;
+    --ink:#2c2a26; --oak:#a97a44; --oak2:#96683a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+       color:var(--ink);background:#f5f4f1;line-height:1.6;padding-bottom:60px}
+  .wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+  header{background:linear-gradient(var(--oak),var(--oak2));border-bottom:3px solid #5e421f;
+         padding:30px 0 26px;margin-bottom:30px}
+  header .wrap{display:flex;align-items:center;gap:18px}
+  .chip{width:56px;height:56px;flex-shrink:0}
+  h1{font-family:"Fraunces",Georgia,serif;font-size:29px;font-weight:700;letter-spacing:-.5px;
+     color:var(--cream);text-shadow:0 1px 3px rgba(40,26,10,.45)}
+  .tagline{font-size:13px;font-style:italic;color:#ecd9b8;margin-top:3px;text-shadow:0 1px 2px rgba(40,26,10,.4)}
+
+  h2{font-family:"Fraunces",Georgia,serif;font-size:21px;font-weight:700;letter-spacing:-.3px;
+     margin:34px 0 6px;padding-top:16px;border-top:1px solid var(--lgray)}
+  h2:first-of-type{border-top:none;padding-top:0}
+  h3{font-size:15px;font-weight:800;margin:18px 0 4px}
+  p{margin:9px 0;font-size:14.5px}
+  ul,ol{margin:9px 0 9px 22px;font-size:14.5px}
+  li{margin:5px 0}
+  strong{font-weight:700}
+  em{color:#5d6b64}
+  a{color:var(--teal)}
+  kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:#fff;
+      border:1px solid var(--lgray);border-bottom-width:2px;border-radius:5px;padding:1px 6px}
+
+  .lede{font-size:16.5px;color:#5d6b64;line-height:1.6}
+  .card{background:#fff;border:1px solid var(--lgray);border-radius:13px;padding:17px 21px;margin:15px 0}
+  .card.try{border-left:5px solid var(--teal);background:#fff}
+  .card.note{background:var(--offw);border-color:#d5e2cc}
+  .card.warn{border-left:5px solid #c0782a;background:var(--cream)}
+  .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+           color:var(--teal);margin-bottom:5px}
+  .eyebrow.amber{color:#8a6a12}
+
+  .stops{counter-reset:s;list-style:none;margin-left:0}
+  .stops>li{counter-increment:s;position:relative;padding-left:46px;margin:26px 0}
+  .stops>li::before{content:counter(s);position:absolute;left:0;top:-2px;width:30px;height:30px;
+    background:var(--teal);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:14px;font-weight:800}
+  .stops h3{margin-top:0}
+  .where{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
+    color:#0d5a66;background:var(--pale);border-radius:10px;padding:2px 9px;margin-left:8px;vertical-align:2px}
+
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--lgray);vertical-align:top}
+  th{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#8a978f;background:var(--offw)}
+  td:first-child{font-weight:700;white-space:nowrap;color:var(--teal)}
+  .pill{display:inline-block;font-size:11px;font-weight:800;color:#fff;border-radius:11px;padding:2px 10px;margin-right:3px}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--lgray);font-size:12.5px;color:#8a978f}
+  @media(max-width:620px){header .wrap{flex-direction:column;text-align:center}}
+</style>
+<link rel="icon" type="image/png" href="/bonsai-logo.png">
+<link rel="apple-touch-icon" href="/bonsai-logo.png">
+<style>.app-bonsai{width:48px;height:48px;object-fit:contain;flex-shrink:0;vertical-align:middle;background:#E1E2D8;border-radius:10px;padding:4px}</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <img class="app-bonsai" src="/bonsai-logo.png" alt="Bonsai logo" width="48" height="48">
+    <div>
+      <h1>Tuned In</h1>
+      <div class="tagline">A five-minute walkthrough of the demo</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <p class="lede">Tuned In is a personal productivity system &mdash; a task board that knows what
+  the work is <em>for</em>. It tracks tasks, but it also tracks the goals those tasks serve, the skills
+  you're building, and what the work actually feels like day to day.</p>
+
+  <p>The demo is the real application running entirely inside your browser. Every button works. Nothing
+  is saved anywhere, and nothing is sent anywhere &mdash; refresh the page and it returns to how it started,
+  so click freely.</p>
+
+  <div class="card note">
+    <div class="eyebrow">In one sentence</div>
+    <p style="margin:0">Most to-do apps optimise for <strong>throughput</strong> &mdash; capture everything,
+    finish everything. This one optimises for <strong>direction</strong>: whether the work you finished
+    added up to anything.</p>
+  </div>
+
+  <h2>The one idea to understand first</h2>
+
+  <p>In most apps, you decide which list a task belongs in. Here, <strong>you set a status and the app
+  files the task for you.</strong> The board's groups aren't folders you maintain &mdash; they're the
+  visible result of rules you control.</p>
+
+  <table>
+    <thead><tr><th>Set the status to&hellip;</th><th>&hellip;and the task</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill" style="background:#00bfb8">Working On It</span></td><td>appears in <strong>All Active Tasks</strong></td></tr>
+      <tr><td><span class="pill" style="background:#b3b3b3">Not Started</span></td><td>appears in <strong>All Active Tasks</strong></td></tr>
+      <tr><td><span class="pill" style="background:#0052bd">Waiting for Feedback</span></td><td>moves to <strong>Waiting for Feedback</strong></td></tr>
+      <tr><td><span class="pill" style="background:#8a00bd">In Someone Else' Court</span></td><td>moves to <strong>Someone Else' Court</strong></td></tr>
+      <tr><td><span class="pill" style="background:#e2725b">Holding Pattern</span></td><td>moves to <strong>Holding Pattern / Pending</strong></td></tr>
+      <tr><td><span class="pill" style="background:#38a66f">Done</span></td><td>moves to <strong>Done</strong> and stamps today's date</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card try">
+    <div class="eyebrow">Try this first &mdash; it takes ten seconds</div>
+    <p>On the <strong>Table</strong> tab, find the task called
+    <em>&ldquo;Try changing a Status &mdash; watch the task move groups.&rdquo;</em>
+    Click its Status cell and choose <strong>Holding Pattern</strong>.</p>
+    <p>The task disappears from All Active Tasks and reappears further down under Holding Pattern /
+    Pending. Set it back to <strong>Working On It</strong> and it returns. Nothing was dragged.</p>
+    <p style="margin-bottom:0">The rules driving that live under <strong>Edit &rarr; Automations</strong>,
+    and they're fully editable.</p>
+  </div>
+
+  <h2>A guided tour</h2>
+  <p>Ten tabs is a lot to meet at once. These six are the spine, in the order that makes sense.</p>
+
+  <ol class="stops">
+    <li>
+      <h3>The board <span class="where">Table</span></h3>
+      <p>Eight groups, and every column is user-defined &mdash; text, status, person, date, number,
+      priority, checkbox. Click any cell to edit it in place.</p>
+      <p>Two columns are worth noticing. <strong>Pillar</strong> and <strong>Goal</strong> connect a task
+      to what it's for; tag a goal and the pillar fills itself in. At the far right, <strong>Win</strong>
+      and <strong>Loss</strong> close out an outcome &mdash; marking a Loss files that task and its goals
+      into an Improvements list, so misses land somewhere instead of evaporating.</p>
+      <p>Open <em>Build the pricing scenario model</em> with the arrow on its left to see subtasks; finished
+      ones collapse out of the way and can be brought back.</p>
+    </li>
+
+    <li>
+      <h3>Deciding what matters <span class="where">Matrix</span></h3>
+      <p>The Eisenhower square: urgent versus important. Drag tasks between <strong>Do First</strong>,
+      <strong>Schedule</strong>, <strong>Delegate</strong> and <strong>Eliminate</strong>, and give each a
+      time estimate in fifteen-minute steps. Each quadrant totals its own time.</p>
+    </li>
+
+    <li>
+      <h3>Making the day <span class="where">Today</span></h3>
+      <p>Three meetings are already on the schedule. Press <strong>&#9889; Auto-plan day</strong>.</p>
+      <p>It fills the gaps <em>around</em> those meetings using the Matrix order &mdash; Do First, then
+      Schedule, then Delegate, with Eliminate skipped &mdash; and gives each task the time you estimated.
+      Auto-planned blocks are marked, so re-running replaces them instead of stacking, and
+      <strong>Clear auto-plan</strong> removes only those, leaving meetings alone.</p>
+    </li>
+
+    <li>
+      <h3>What the work is for <span class="where">Goals</span></h3>
+      <p>Goals live inside <strong>Sections</strong>, and each goal is measured by the share of its tagged
+      tasks that are done &mdash; you never update a goal by hand.</p>
+      <p>The strip along the top is the part worth pausing on: <strong>completed work counted against role
+      expectations</strong>, from Analyst up to VP. It answers &ldquo;am I already operating a level
+      up?&rdquo; using tasks you actually finished. Click a role to filter. The <strong>Personal</strong>
+      filter separates life goals from career ones.</p>
+      <p>Open any goal to see its plan, its progress, and the tasks advancing it &mdash; and there's a
+      search box to tag more tasks to it without leaving the page.</p>
+    </li>
+
+    <li>
+      <h3>Everything that isn't a task <span class="where">Notebook</span></h3>
+      <p>Five surfaces share this tab, because they're all writing rather than doing:</p>
+      <ul>
+        <li><strong>Notes</strong> &mdash; rich text with bold, italic, lists and photos. Try the pinned note.</li>
+        <li><strong>Ideas</strong> &mdash; sparks with a brainstorm log, before they're projects.</li>
+        <li><strong>Prompt Studio</strong> &mdash; reusable AI prompts with fill-in fields.</li>
+        <li><strong>Vibe Coding</strong> &mdash; side projects with their own to-do lists.</li>
+        <li><strong>Career Notes</strong> &mdash; the most unusual one; see below.</li>
+      </ul>
+    </li>
+
+    <li>
+      <h3>What the work feels like <span class="where">Notebook &rarr; Career Notes</span></h3>
+      <p>A log of the job itself rather than the tasks in it. You capture one line at a time &mdash;
+      <em>&ldquo;four interruptions before lunch; the deep work never started&rdquo;</em> &mdash; file it
+      under one of twelve dimensions, and mark it Thrive, Neutral or Drain.</p>
+      <p>Over time the <strong>Dimensions</strong> tab shows where the energy actually goes, and the
+      <strong>Ikigai</strong> tab synthesises it into four circles with the overlaps derived automatically.</p>
+      <p>The <strong>Baseline</strong> tab is deliberately locked until enough has been logged &mdash;
+      reading your own stated preferences while you're still recording observations biases what you notice.
+      That lock is the feature, not a limitation.</p>
+    </li>
+  </ol>
+
+  <h3>The rest, briefly</h3>
+  <ul>
+    <li><strong>Kanban</strong> &mdash; the same tasks as columns by status.</li>
+    <li><strong>PARA</strong> &mdash; Projects, Areas, Resources, Archives. A project can point at a board
+      group and show live progress. Archiving never deletes.</li>
+    <li><strong>Skill Lab</strong> &mdash; what you're learning, with reading progress, a
+      &ldquo;1% better today&rdquo; streak, and a Today-I-Learned log.</li>
+    <li><strong>Zen Garden</strong> &mdash; a rake-the-sand break. Build one and set it as the app's
+      wallpaper. The sand patterns are generated, not drawn.</li>
+    <li><strong>Rewards</strong> &mdash; points for finished work, spent on things you choose.</li>
+  </ul>
+
+  <h2>If you're looking at how it's built</h2>
+  <div class="card">
+    <p style="margin-top:0">Tuned In is Flask and SQLite with a vanilla-JavaScript front end &mdash;
+    no framework, no build step, about fourteen thousand lines. It runs locally; there's no account and
+    no server to talk to.</p>
+    <p><strong>This demo has no backend at all.</strong> A portfolio page is static, so the Flask API is
+    replaced by an in-memory implementation in the browser that answers the same routes. The interface
+    code is unchanged &mdash; only its server is different.</p>
+    <p style="margin-bottom:0">The automation engine was <em>ported</em> rather than faked, which is why
+    the status change in the first exercise behaves exactly as it does in the real application, including
+    copying tasks between groups and collapsing duplicates when something is completed.</p>
+  </div>
+
+  <div class="card warn">
+    <div class="eyebrow amber">Worth repeating</div>
+    <p style="margin:0">Nothing you do here is saved, and nothing leaves your browser. Refresh to reset it.</p>
+  </div>
+
+  <footer>
+    Tuned In &mdash; a personal productivity system. This walkthrough accompanies the interactive demo.
+  </footer>
+</div>
+
+<script>
+  var t = document.getElementById("ticks"), r = document.getElementById("rays"), i, e;
+  if (!t || !r) return;
+  for (i = 0; i < 12; i++) {
+    e = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    e.setAttribute("x", "-7.5"); e.setAttribute("y", "-98");
+    e.setAttribute("width", "15"); e.setAttribute("height", "17"); e.setAttribute("rx", "3.5");
+    e.setAttribute("fill", "#f3e7d3"); e.setAttribute("transform", "rotate(" + (i * 30) + ")");
+    t.appendChild(e);
+  }
+  for (i = 0; i < 16; i++) {
+    e = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    e.setAttribute("d", "M -3.4 -38 L -7.5 -72 L 7.5 -72 L 3.4 -38 Z");
+    e.setAttribute("fill", "#efe2c9");
+    e.setAttribute("transform", "rotate(" + (i * 22.5 + 11.25) + ")");
+    r.appendChild(e);
+  }
+</script>
+</body>
+</html>

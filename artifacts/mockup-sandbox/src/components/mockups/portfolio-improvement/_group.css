@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&display=swap');
+
+:root {
+  --color-background: #E1E2D8;
+  --color-foreground: #292D28;
+  --color-muted: #A69C89;
+  --color-muted-foreground: #535958;
+  --color-border: #A69C89;
+  --color-primary: #292D28;
+  --color-primary-foreground: #E1E2D8;
+  --color-secondary: #A69C89;
+  --color-secondary-foreground: #292D28;
+  --color-accent: #6F8F7A;
+  --color-accent-foreground: #E1E2D8;
+  --color-destructive: #59251F;
+  --color-destructive-foreground: #E1E2D8;
+  --color-card: #E1E2D8;
+  --color-card-foreground: #292D28;
+  --color-popover: #E1E2D8;
+  --color-popover-foreground: #292D28;
+  --color-input: #A69C89;
+  --color-ring: #6F8F7A;
+  --color-oxblood: #59251F;
+  --color-seaweed: #77785A;
+  --color-storm: #535958;
+  --color-kelp: #806A27;
+  --color-shell: #E1E2D8;
+  --color-driftwood: #A69C89;
+  --color-jade: #6F8F7A;
+  --color-clay: #B5523C;
+  --color-slate: #292D28;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --font-family-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-serif: 'Cormorant Garamond', serif;
+  --text-display: 4rem;
+  --text-display--line-height: 0.95;
+  --text-hero: 3.5rem;
+  --text-hero--line-height: 1;
+  --text-section: 3rem;
+  --text-section--line-height: 1;
+  --text-large: 1.5rem;
+  --text-large--line-height: 1.3;
+  --text-body: 1.125rem;
+  --text-body--line-height: 1.5;
+  --text-small: 1rem;
+  --text-small--line-height: 1.4;
+  --text-tiny: 0.75rem;
+  --text-tiny--line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  :root { --text-display: 5rem; --text-hero: 4.5rem; --text-section: 3.75rem; --text-large: 1.75rem; --text-body: 1.375rem; --text-small: 1.125rem; --text-tiny: 0.875rem; }
+}
+@media (min-width: 1024px) {
+  :root { --text-display: 6rem; --text-hero: 5rem; --text-section: 4.5rem; --text-large: 2rem; --text-body: 1.625rem; --text-small: 1.25rem; --text-tiny: 0.875rem; }
+}
+
+body { background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-family-serif); font-size: var(--text-body); line-height: var(--text-body--line-height); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html { scroll-behavior: smooth; }
+.text-display { font-size: var(--text-display); line-height: var(--text-display--line-height); font-weight: 300; font-family: var(--font-family-serif); }
+.text-hero { font-size: var(--text-hero); line-height: var(--text-hero--line-height); font-weight: 300; font-family: var(--font-family-serif); }
+.text-section { font-size: var(--text-section); line-height: var(--text-section--line-height); font-weight: 400; font-family: var(--font-family-serif); }
+.text-large { font-size: var(--text-large); line-height: var(--text-large--line-height); font-weight: 500; font-family: var(--font-family-serif); }
+.text-body { font-size: var(--text-body); line-height: var(--text-body--line-height); font-weight: 300; font-family: var(--font-family-sans); }
+.text-small { font-size: var(--text-small); line-height: var(--text-small--line-height); font-weight: 400; font-family: var(--font-family-serif); }
+.text-tiny { font-size: var(--text-tiny); line-height: var(--text-tiny--line-height); font-weight: 400; font-family: var(--font-family-sans); text-transform: uppercase; letter-spacing: 0.05em; }
+.max-w-reading { max-width: 42rem; }

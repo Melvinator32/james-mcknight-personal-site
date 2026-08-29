@@ -1,0 +1,47 @@
+:root {
+  --prof-bg: #ffffff; --prof-surface: #f8fafc; --prof-text: #0f172a; --prof-muted: #64748b; --prof-border: #e2e8f0; --prof-accent: #2563eb;
+  /* Muted red base sampled from the supplied swatch; forest-green inset cards. */
+  --pers-bg: #E1E2D8; --pers-surface: #1b3226; --pers-text: #f3efe4; --pers-text-2: #dbe6dc; --pers-text-3: #b9c8bb;
+  --pers-muted: #93a896; --pers-muted-2: #6c8272; --pers-border: #2f4a3a; --pers-border-strong: #3d5c48;
+  --pers-accent: #c2551f; --pers-accent-strong: #a8451a; --pers-accent-foreground: #fff6ee;
+}
+.portfolio-home { font-family: 'Plus Jakarta Sans', sans-serif; }
+.portfolio-home h1, .portfolio-home h2, .portfolio-home h3, .portfolio-home h4 { font-family: 'Playfair Display', serif; }
+.prof-theme { background-color: var(--prof-bg); color: var(--prof-text); }
+.pers-theme { background-color: var(--pers-bg); color: var(--pers-text); }
+.nav-link { color: var(--prof-muted); position: relative; transition: all .2s ease; }
+.nav-link:hover { color: var(--prof-text); }
+.nav-link.active { font-weight: 600; }
+.pers-theme .nav-link { color: var(--pers-muted); }
+.pers-theme .nav-link:hover { color: var(--pers-text); }
+.timeline-item { position: relative; padding-left: 2rem; }
+.timeline-line { position: absolute; left: .5rem; top: .5rem; bottom: -2rem; width: 2px; background-color: var(--prof-border); }
+.timeline-item:last-child .timeline-line { display: none; }
+.timeline-dot { position: absolute; left: 0; top: .35rem; width: 1rem; height: 1rem; border-radius: 50%; background-color: var(--prof-accent); border: 3px solid var(--prof-bg); }
+.stat-card { transition: transform .3s ease, box-shadow .3s ease; }
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1); }
+.demo-preview-link:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+.monogram-bg { background: linear-gradient(135deg, #1b3226 0%, #0e1c15 100%); }
+.photo-placeholder { background-size: cover; background-position: center; position: relative; overflow: hidden; }
+.pattern-1 { background: radial-gradient(circle at 0% 0%, #3d5c48 0%, transparent 50%), linear-gradient(135deg, #927370 0%, #1b3226 100%); }
+.pattern-2 { background: linear-gradient(45deg, #1b3226 25%, transparent 25%, transparent 75%, #1b3226 75%, #1b3226), linear-gradient(45deg, #1b3226 25%, transparent 25%, transparent 75%, #1b3226 75%, #1b3226) 20px 20px, #927370; background-size: 40px 40px; }
+.pattern-3 { background: repeating-linear-gradient(45deg, #1b3226, #1b3226 10px, #927370 10px, #927370 20px); }
+.pattern-4 { background: radial-gradient(circle, #3d5c48 10%, transparent 10%), radial-gradient(circle, #3d5c48 10%, transparent 10%) 20px 20px, #927370; background-size: 40px 40px; }
+.pattern-5 { background: linear-gradient(135deg, #2f4a3a 25%, transparent 25%), linear-gradient(225deg, #2f4a3a 25%, transparent 25%), linear-gradient(45deg, #2f4a3a 25%, transparent 25%), linear-gradient(315deg, #2f4a3a 25%, #927370 25%); background-position: 20px 0, 20px 0, 0 0, 0 0; background-size: 40px 40px; }
+.pattern-6 { background: repeating-radial-gradient(circle, #1b3226, #1b3226 10px, #927370 10px, #927370 20px); }
+/* Light outer shell, olive interests card, and readable contrasting text. */
+.pers-theme > div > div:first-child h2, #photos h2 { color: #263b30; }
+#interests {
+  --pers-surface: #77785A;
+  --pers-text: #ffffff;
+  --pers-text-2: #ffffff;
+  --pers-text-3: #ffffff;
+  --pers-muted: #ffffff;
+  --pers-muted-2: #ffffff;
+  --pers-border: #9b9c82;
+  --pers-border-strong: #d3d3be;
+  --pers-accent: #ffffff;
+  color: var(--pers-text);
+}
+#interests button:hover { text-decoration: underline; }
+#interests button:focus-visible { outline: 2px solid white; outline-offset: 4px; }

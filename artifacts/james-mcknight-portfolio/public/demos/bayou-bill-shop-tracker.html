@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bayou Bill Shop Data Tracker — Demo</title>
+<link rel="icon" type="image/png" href="/bonsai-logo.png">
+<link rel="apple-touch-icon" href="/bonsai-logo.png">
+<style>
+  :root{
+    --sage:#77b28c;
+    --dteal:#00859b;
+    --cteal:#00bfb8;
+    --mgreen:#38a66f;
+    --lygreen:#bce194;
+    --pteal:#cce7eb;
+    --owgreen:#ebf2e6;
+    --cream:#f8ecdb;
+    --lgray:#d9d9d6;
+    --mgray:#b3b3b3;
+
+    --ink:#203330;
+    --ink-muted:#5b6b64;
+    --ink-faint:#8a978f;
+    --surface:#fcfcfb;
+    --card:#ffffff;
+    --border:#e3e6df;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--owgreen);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px;}
+
+  /* header */
+  .header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+  .header h1{
+    font-size:24px;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .header .sub{
+    color:var(--ink-muted);
+    font-size:13.5px;
+  }
+  .demo-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--cream);
+    border:1px solid #ecd9b8;
+    color:#8a6a2f;
+    font-size:12px;
+    font-weight:600;
+    padding:5px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .demo-badge .dot{width:6px;height:6px;border-radius:50%;background:#c99a3f;}
+  .range-pill{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px 14px;
+    font-size:13px;
+    color:var(--ink-muted);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .range-pill strong{color:var(--ink);font-weight:600;}
+
+  /* kpi row */
+  .kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:12px;
+    margin-bottom:20px;
+  }
+  @media (max-width:980px){ .kpi-grid{grid-template-columns:repeat(3,1fr);} }
+  @media (max-width:600px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} }
+  .kpi{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 14px 12px;
+  }
+  .kpi .label{
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--ink-faint);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .kpi .value{
+    font-size:22px;
+    font-weight:700;
+    color:var(--ink);
+    line-height:1.1;
+  }
+  .kpi .delta{
+    margin-top:6px;
+    font-size:12px;
+    color:var(--ink-muted);
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .kpi .delta svg{width:10px;height:10px;}
+  .kpi .delta.up svg{fill:var(--mgreen);}
+  .kpi .delta.down svg{fill:var(--ink-faint);}
+  .kpi .spark{margin-top:8px;height:26px;}
+
+  /* card layout */
+  .row{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:16px;
+    margin-bottom:16px;
+  }
+  @media (max-width:900px){ .row{grid-template-columns:1fr;} }
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:16px;
+  }
+  @media (max-width:900px){ .row2{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 18px 14px;
+    position:relative;
+  }
+  .card h3{
+    margin:0 0 2px;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .card .card-sub{
+    font-size:12px;
+    color:var(--ink-faint);
+    margin-bottom:12px;
+  }
+
+  /* line chart */
+  .chart-wrap{position:relative;}
+  #lineChart{width:100%;height:auto;display:block;overflow:visible;}
+  .gridline{stroke:var(--border);stroke-width:1;}
+  .axis-label{fill:var(--ink-faint);font-size:10px;font-family:inherit;}
+  .area-fill{fill:url(#revGradient);}
+  .rev-line{fill:none;stroke:var(--dteal);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+  .hover-dot{fill:var(--dteal);stroke:#fff;stroke-width:2;opacity:0;}
+  .crosshair{stroke:var(--mgray);stroke-width:1;stroke-dasharray:3,3;opacity:0;}
+  .tooltip{
+    position:absolute;
+    pointer-events:none;
+    background:var(--ink);
+    color:#fff;
+    font-size:11.5px;
+    padding:7px 10px;
+    border-radius:8px;
+    line-height:1.4;
+    opacity:0;
+    transform:translate(-50%,-100%);
+    white-space:nowrap;
+    z-index:5;
+    transition:opacity .08s ease;
+  }
+  .tooltip b{font-weight:700;}
+  .tooltip .t-label{color:var(--pteal);font-weight:600;}
+
+  /* bar chart (products) */
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .bar-row:last-child{margin-bottom:0;}
+  .bar-name{
+    width:150px;
+    flex:0 0 150px;
+    font-size:12.5px;
+    color:var(--ink);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .bar-track{
+    flex:1;
+    background:var(--owgreen);
+    border-radius:6px;
+    height:20px;
+    position:relative;
+    overflow:visible;
+  }
+  .bar-fill{
+    height:100%;
+    border-radius:6px;
+    background:linear-gradient(90deg,var(--mgreen),var(--sage));
+    display:flex;
+    align-items:center;
+    transition:filter .1s ease;
+    cursor:default;
+  }
+  .bar-fill:hover{filter:brightness(1.05);}
+  .bar-value{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    margin-left:8px;
+    white-space:nowrap;
+  }
+
+  /* donut */
+  .donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  #donutChart{flex:0 0 150px;}
+  .donut-seg{cursor:default;transition:opacity .1s ease;transform-origin:75px 75px;}
+  .donut-seg:hover{opacity:.82;}
+  .donut-center-num{font-size:22px;font-weight:700;fill:var(--ink);}
+  .donut-center-lbl{font-size:9.5px;fill:var(--ink-faint);}
+  .legend{flex:1;min-width:160px;}
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12.5px;
+    padding:6px 0;
+    border-bottom:1px dashed var(--border);
+  }
+  .legend-item:last-child{border-bottom:none;}
+  .legend-swatch{width:10px;height:10px;border-radius:3px;flex:0 0 10px;}
+  .legend-label{flex:1;color:var(--ink);}
+  .legend-count{font-weight:700;color:var(--ink);}
+  .legend-pct{color:var(--ink-faint);font-size:11px;width:38px;text-align:right;}
+
+  /* traffic bars */
+  #trafficChart{width:100%;height:150px;display:block;overflow:visible;}
+  .traffic-bar{fill:var(--dteal);cursor:default;}
+  .traffic-bar:hover{fill:var(--cteal);}
+  .traffic-label{fill:var(--ink-muted);font-size:11px;}
+  .traffic-value{fill:var(--ink);font-size:11.5px;font-weight:700;}
+
+  /* health tiles */
+  .health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  @media (max-width:900px){ .health-grid{grid-template-columns:repeat(2,1fr);} }
+  .health-tile{
+    background:var(--owgreen);
+    border-radius:10px;
+    padding:12px;
+  }
+  .health-tile .h-label{font-size:11px;color:var(--ink-faint);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .health-tile .h-value{font-size:19px;font-weight:700;margin-top:4px;}
+  .health-tile .h-delta{font-size:11.5px;color:var(--ink-muted);margin-top:3px;}
+
+  /* orders table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--ink-faint);
+    font-weight:600;
+    padding:0 10px 8px;
+    border-bottom:1px solid var(--border);
+  }
+  td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--border);
+    color:var(--ink);
+  }
+  tr:last-child td{border-bottom:none;}
+  .order-id{color:var(--ink-muted);font-variant-numeric:tabular-nums;}
+  .status-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:11.5px;
+    font-weight:600;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .status-dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px;}
+  .status-delivered{background:#eaf5ee;color:#2f7a52;}
+  .status-delivered .status-dot{background:var(--mgreen);}
+  .status-shipped{background:#e3f7f6;color:#046b73;}
+  .status-shipped .status-dot{background:var(--cteal);}
+  .status-production{background:#e2f0f3;color:#00647a;}
+  .status-production .status-dot{background:var(--dteal);}
+  .status-pending{background:#f0f0ef;color:#6b6b68;}
+  .status-pending .status-dot{background:var(--mgray);}
+  .amt{font-weight:700;text-align:right;}
+  th.amt-h{text-align:right;}
+
+  .foot-note{
+    margin-top:24px;
+    font-size:11.5px;
+    color:var(--ink-faint);
+    text-align:center;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <img src="/bonsai-logo.png" alt="Bonsai logo" width="48" height="48" style="flex-shrink:0;object-fit:contain;background:#E1E2D8;border-radius:10px;padding:4px;">
+      <div>
+        <h1>Bayou Bill Shop Data Tracker</h1>
+        <div class="sub">Print-on-demand Etsy shop &middot; fulfilled via Printify</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <span class="demo-badge"><span class="dot"></span>Demo &mdash; illustrative numbers</span>
+      <div class="range-pill">Aug 1&ndash;28, 2026 &nbsp;&middot;&nbsp; vs. prior 28 days <strong>&uarr;</strong></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="row">
+    <div class="card">
+      <h3>Revenue, last 28 days</h3>
+      <div class="card-sub">Daily gross revenue &middot; hover for detail</div>
+      <div class="chart-wrap">
+        <svg id="lineChart" viewBox="0 0 700 220" preserveAspectRatio="none"></svg>
+        <div class="tooltip" id="lineTooltip"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Order Fulfillment Status</h3>
+      <div class="card-sub">214 orders in range</div>
+      <div class="donut-wrap">
+        <svg id="donutChart" viewBox="0 0 150 150"></svg>
+        <div class="legend" id="donutLegend"></div>
+      </div>
+      <div class="tooltip" id="donutTooltip"></div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="card">
+      <h3>Top Products by Revenue</h3>
+      <div class="card-sub">Top 6 listings, last 28 days</div>
+      <div id="barChart"></div>
+    </div>
+    <div class="card">
+      <h3>Traffic Sources</h3>
+      <div class="card-sub">6,240 shop sessions, last 28 days</div>
+      <div class="chart-wrap">
+        <svg id="trafficChart" viewBox="0 0 380 150" preserveAspectRatio="none"></svg>
+        <div class="tooltip" id="trafficTooltip"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <h3>Shop Health</h3>
+    <div class="card-sub">Etsy listing performance, last 28 days</div>
+    <div class="health-grid" id="healthGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3>Recent Orders</h3>
+    <div class="card-sub">Most recent 10 orders</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Order</th><th>Product</th><th>Date</th><th>Status</th><th class="amt-h">Amount</th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody"></tbody>
+    </table>
+  </div>
+
+  <div class="foot-note">
+    All figures on this page are fabricated for demonstration purposes and do not reflect actual Bayou Bill shop performance.
+  </div>
+
+</div>
+
+<script>
+/* ---------------- made-up demo data ---------------- */
+
+const fmtUSD = n => '$' + n.toLocaleString('en-US', {minimumFractionDigits: n % 1 === 0 ? 0 : 2, maximumFractionDigits: 2});
+const fmtUSD0 = n => '$' + Math.round(n).toLocaleString('en-US');
+
+// KPI tiles
+const kpis = [
+  { label:'Total Revenue', value: fmtUSD0(8412), delta:'+12.4%', dir:'up', spark:[3,4,3,5,6,5,7,6,8,7,9,10,9,11] },
+  { label:'Orders', value:'214', delta:'+9.7%', dir:'up', spark:[4,5,4,6,5,7,6,7,8,7,9,8,10,9] },
+  { label:'Avg Order Value', value:'$39.31', delta:'+2.5%', dir:'up', spark:[5,5,6,5,6,6,7,6,7,7,7,8,7,8] },
+  { label:'Ad Spend', value:'$612', delta:'+4.1%', dir:'up', spark:[3,4,4,5,4,5,5,6,5,6,6,7,6,7] },
+  { label:'ROAS', value:'4.1x', delta:'-0.3x', dir:'down', spark:[8,7,8,7,6,7,6,6,5,6,5,6,5,5] },
+  { label:'Net Profit (46% mgn)', value:'$3,890', delta:'+15.8%', dir:'up', spark:[3,3,4,4,5,5,6,6,7,7,8,9,9,10] },
+];
+
+// Revenue trend, 28 days
+const revenueDays = [
+  210,265,190,240,310,380,355,225,200,275,330,410,390,260,
+  235,290,345,420,405,270,250,300,360,440,470,315,285,340
+];
+const revDates = (()=>{
+  const arr=[]; const start=new Date(Date.UTC(2026,7,1));
+  for(let i=0;i<28;i++){ const d=new Date(start); d.setUTCDate(start.getUTCDate()+i); arr.push(d); }
+  return arr;
+})();
+
+// Top products
+const products = [
+  { name:'Louisiana Heron Wetlands Tee', value:1840 },
+  { name:'Bayou Sunset Enamel Mug', value:1210 },
+  { name:'Cajun Spice Market Tote', value:980 },
+  { name:'Crawfish Boil Poster', value:760 },
+  { name:'Magnolia State Hoodie', value:690 },
+  { name:'Pelican Dad Cap', value:540 },
+];
+
+// Fulfillment status
+const statuses = [
+  { label:'Delivered', count:152, color:'var(--mgreen)', hex:'#38a66f' },
+  { label:'Shipped', count:41, color:'var(--cteal)', hex:'#00bfb8' },
+  { label:'In Production', count:15, color:'var(--dteal)', hex:'#00859b' },
+  { label:'Pending', count:6, color:'var(--mgray)', hex:'#b3b3b3' },
+];
+
+// Traffic sources
+const traffic = [
+  { label:'Etsy Search', value:3740 },
+  { label:'Etsy Ads', value:1120 },
+  { label:'Social', value:890 },
+  { label:'Direct/Other', value:490 },
+];
+
+// Shop health
+const health = [
+  { label:'Listing Views', value:'9,850', delta:'+8.2% vs prior 28d' },
+  { label:'Favorites', value:'612', delta:'+5.1% vs prior 28d' },
+  { label:'Conversion Rate', value:'2.17%', delta:'+0.14pt vs prior 28d' },
+  { label:'Avg Review Rating', value:'4.9 ★', delta:'312 reviews total' },
+];
+
+// Recent orders
+const orders = [
+  { id:'BB-10492', product:'Bayou Sunset Enamel Mug', date:'Aug 27', status:'delivered', amount:18.50 },
+  { id:'BB-10491', product:'Louisiana Heron Wetlands Tee', date:'Aug 27', status:'shipped', amount:26.00 },
+  { id:'BB-10490', product:'Crawfish Boil Poster', date:'Aug 27', status:'delivered', amount:22.00 },
+  { id:'BB-10489', product:'Magnolia State Hoodie', date:'Aug 26', status:'production', amount:42.00 },
+  { id:'BB-10488', product:'Cajun Spice Market Tote', date:'Aug 26', status:'delivered', amount:28.50 },
+  { id:'BB-10487', product:'Pelican Dad Cap', date:'Aug 26', status:'shipped', amount:21.00 },
+  { id:'BB-10486', product:'Louisiana Heron Wetlands Tee', date:'Aug 25', status:'delivered', amount:26.00 },
+  { id:'BB-10485', product:'Bayou Sunset Enamel Mug', date:'Aug 25', status:'pending', amount:18.50 },
+  { id:'BB-10484', product:'Crawfish Boil Poster', date:'Aug 25', status:'delivered', amount:22.00 },
+  { id:'BB-10483', product:'Cajun Spice Market Tote', date:'Aug 24', status:'delivered', amount:28.50 },
+];
+
+/* ---------------- render: KPI tiles ---------------- */
+const kpiGrid = document.getElementById('kpiGrid');
+kpis.forEach(k=>{
+  const el = document.createElement('div');
+  el.className = 'kpi';
+  const arrow = k.dir==='up'
+    ? '<svg viewBox="0 0 10 10"><path d="M5 0L10 6H0Z"/></svg>'
+    : '<svg viewBox="0 0 10 10"><path d="M5 10L0 4H10Z"/></svg>';
+  const max = Math.max(...k.spark), min = Math.min(...k.spark);
+  const pts = k.spark.map((v,i)=>{
+    const x = (i/(k.spark.length-1))*100;
+    const y = 24 - ((v-min)/(max-min||1))*22 - 1;
+    return `${x},${y}`;
+  }).join(' ');
+  el.innerHTML = `
+    <div class="label">${k.label}</div>
+    <div class="value">${k.value}</div>
+    <div class="delta ${k.dir}">${arrow}<span>${k.delta}</span></div>
+    <svg class="spark" viewBox="0 0 100 26" preserveAspectRatio="none">
+      <polyline points="${pts}" fill="none" stroke="${k.dir==='up' ? '#38a66f' : '#8a978f'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
+  kpiGrid.appendChild(el);
+});
+
+/* ---------------- render: revenue line chart ---------------- */
+(function(){
+  const svg = document.getElementById('lineChart');
+  const tooltip = document.getElementById('lineTooltip');
+  const W=700,H=220,padL=44,padR=10,padT=14,padB=24;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const max = Math.ceil(Math.max(...revenueDays)/50)*50;
+  const min = 0;
+
+  const xFor = i => padL + (i/(revenueDays.length-1))*plotW;
+  const yFor = v => padT + plotH - ((v-min)/(max-min))*plotH;
+
+  let svgHTML = `<defs>
+    <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00bfb8" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#00bfb8" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>`;
+
+  // gridlines + y labels
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const v = min + (max-min)*(s/steps);
+    const y = yFor(v);
+    svgHTML += `<line class="gridline" x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}"/>`;
+    svgHTML += `<text class="axis-label" x="${padL-8}" y="${y+3}" text-anchor="end">$${Math.round(v)}</text>`;
+  }
+
+  // x labels (every 7 days)
+  revDates.forEach((d,i)=>{
+    if(i%7===0 || i===revDates.length-1){
+      const x = xFor(i);
+      const label = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      svgHTML += `<text class="axis-label" x="${x}" y="${H-6}" text-anchor="middle">${label}</text>`;
+    }
+  });
+
+  // area path
+  let areaPath = `M ${xFor(0)} ${yFor(0)} `;
+  revenueDays.forEach((v,i)=> areaPath += `L ${xFor(i)} ${yFor(v)} `);
+  areaPath += `L ${xFor(revenueDays.length-1)} ${yFor(0)} Z`;
+  svgHTML += `<path class="area-fill" d="${areaPath}"/>`;
+
+  // line path
+  let linePath = '';
+  revenueDays.forEach((v,i)=> linePath += (i===0?'M':'L') + ` ${xFor(i)} ${yFor(v)} `);
+  svgHTML += `<path class="rev-line" d="${linePath}"/>`;
+
+  svgHTML += `<line class="crosshair" id="lcCross" x1="0" y1="${padT}" x2="0" y2="${H-padB}"/>`;
+  svgHTML += `<circle class="hover-dot" id="lcDot" r="4.5"/>`;
+  svgHTML += `<rect id="lcCapture" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent"/>`;
+
+  svg.innerHTML = svgHTML;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const cross = document.getElementById('lcCross');
+  const dot = document.getElementById('lcDot');
+  const capture = document.getElementById('lcCapture');
+  const wrap = svg.parentElement;
+
+  function showAt(i){
+    const x = xFor(i), y = yFor(revenueDays[i]);
+    cross.setAttribute('x1',x); cross.setAttribute('x2',x);
+    cross.style.opacity = 1;
+    dot.setAttribute('cx',x); dot.setAttribute('cy',y);
+    dot.style.opacity = 1;
+    const rect = svg.getBoundingClientRect();
+    const scaleX = rect.width / W, scaleY = rect.height / H;
+    tooltip.style.left = (x*scaleX) + 'px';
+    tooltip.style.top = (y*scaleY - 10) + 'px';
+    tooltip.style.opacity = 1;
+    const label = revDates[i].toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    tooltip.innerHTML = `<span class="t-label">${label}</span><br><b>${fmtUSD0(revenueDays[i])}</b> revenue`;
+  }
+  function hide(){
+    cross.style.opacity = 0; dot.style.opacity = 0; tooltip.style.opacity = 0;
+  }
+  capture.addEventListener('mousemove', e=>{
+    const rect = svg.getBoundingClientRect();
+    const relX = ((e.clientX-rect.left)/rect.width)*W;
+    let i = Math.round(((relX-padL)/plotW)*(revenueDays.length-1));
+    i = Math.max(0, Math.min(revenueDays.length-1, i));
+    showAt(i);
+  });
+  capture.addEventListener('mouseleave', hide);
+})();
+
+/* ---------------- render: top products bar chart ---------------- */
+(function(){
+  const el = document.getElementById('barChart');
+  const max = Math.max(...products.map(p=>p.value));
+  products.forEach(p=>{
+    const pct = (p.value/max)*100;
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-name" title="${p.name}">${p.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="bar-value">${fmtUSD0(p.value)}</div>
+    `;
+    el.appendChild(row);
+  });
+})();
+
+/* ---------------- render: fulfillment donut ---------------- */
+(function(){
+  const svg = document.getElementById('donutChart');
+  const legend = document.getElementById('donutLegend');
+  const tooltip = document.getElementById('donutTooltip');
+  const total = statuses.reduce((a,s)=>a+s.count,0);
+  const cx=75, cy=75, r=52, rInner=32;
+
+  let angle = -90;
+  let svgHTML = '';
+  statuses.forEach((s,idx)=>{
+    const frac = s.count/total;
+    const sweep = frac*360;
+    const startAngle = angle;
+    const endAngle = angle + sweep;
+    const path = donutArc(cx,cy,r,rInner,startAngle,endAngle);
+    svgHTML += `<path class="donut-seg" data-idx="${idx}" d="${path}" fill="${s.hex}"/>`;
+    angle = endAngle;
+  });
+  svgHTML += `<text class="donut-center-num" x="${cx}" y="${cy-2}" text-anchor="middle">${total}</text>`;
+  svgHTML += `<text class="donut-center-lbl" x="${cx}" y="${cy+14}" text-anchor="middle">ORDERS</text>`;
+  svg.innerHTML = svgHTML;
+
+  function donutArc(cx,cy,rOuter,rInner,startDeg,endDeg){
+    const toRad = d => (d*Math.PI)/180;
+    const x0 = cx + rOuter*Math.cos(toRad(startDeg));
+    const y0 = cy + rOuter*Math.sin(toRad(startDeg));
+    const x1 = cx + rOuter*Math.cos(toRad(endDeg));
+    const y1 = cy + rOuter*Math.sin(toRad(endDeg));
+    const x2 = cx + rInner*Math.cos(toRad(endDeg));
+    const y2 = cy + rInner*Math.sin(toRad(endDeg));
+    const x3 = cx + rInner*Math.cos(toRad(startDeg));
+    const y3 = cy + rInner*Math.sin(toRad(startDeg));
+    const largeArc = (endDeg-startDeg) > 180 ? 1 : 0;
+    return `M ${x0} ${y0} A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${x1} ${y1} L ${x2} ${y2} A ${rInner} ${rInner} 0 ${largeArc} 0 ${x3} ${y3} Z`;
+  }
+
+  statuses.forEach((s,idx)=>{
+    const pct = ((s.count/total)*100).toFixed(0);
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `
+      <span class="legend-swatch" style="background:${s.hex}"></span>
+      <span class="legend-label">${s.label}</span>
+      <span class="legend-count">${s.count}</span>
+      <span class="legend-pct">${pct}%</span>
+    `;
+    legend.appendChild(item);
+    item.addEventListener('mouseenter', ()=> highlight(idx));
+    item.addEventListener('mouseleave', unhighlight);
+  });
+
+  svg.querySelectorAll('.donut-seg').forEach(seg=>{
+    seg.addEventListener('mousemove', e=>{
+      const idx = +seg.dataset.idx;
+      const s = statuses[idx];
+      const pct = ((s.count/total)*100).toFixed(0);
+      const rect = svg.parentElement.getBoundingClientRect();
+      tooltip.style.left = (e.clientX-rect.left)+'px';
+      tooltip.style.top = (e.clientY-rect.top-10)+'px';
+      tooltip.style.opacity = 1;
+      tooltip.innerHTML = `<span class="t-label">${s.label}</span><br><b>${s.count} orders</b> (${pct}%)`;
+    });
+    seg.addEventListener('mouseleave', ()=>{ tooltip.style.opacity = 0; });
+  });
+
+  function highlight(idx){
+    svg.querySelectorAll('.donut-seg').forEach(seg=>{
+      seg.style.opacity = (+seg.dataset.idx===idx) ? 1 : 0.35;
+    });
+  }
+  function unhighlight(){
+    svg.querySelectorAll('.donut-seg').forEach(seg=> seg.style.opacity = 1);
+  }
+})();
+
+/* ---------------- render: traffic sources bar chart ---------------- */
+(function(){
+  const svg = document.getElementById('trafficChart');
+  const tooltip = document.getElementById('trafficTooltip');
+  const W=380,H=150,padL=10,padR=10,padT=10,padB=28;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const max = Math.max(...traffic.map(t=>t.value));
+  const n = traffic.length;
+  const gap = 24;
+  const barW = (plotW - gap*(n-1))/n;
+
+  let svgHTML = '';
+  traffic.forEach((t,i)=>{
+    const h = (t.value/max)*plotH;
+    const x = padL + i*(barW+gap);
+    const y = padT + plotH - h;
+    svgHTML += `<rect class="traffic-bar" data-idx="${i}" x="${x}" y="${y}" width="${barW}" height="${h}" rx="5"/>`;
+    svgHTML += `<text class="traffic-value" x="${x+barW/2}" y="${y-6}" text-anchor="middle">${t.value.toLocaleString()}</text>`;
+    svgHTML += `<text class="traffic-label" x="${x+barW/2}" y="${H-8}" text-anchor="middle">${t.label}</text>`;
+  });
+  svg.innerHTML = svgHTML;
+
+  svg.querySelectorAll('.traffic-bar').forEach(bar=>{
+    bar.addEventListener('mousemove', e=>{
+      const idx = +bar.dataset.idx;
+      const t = traffic[idx];
+      const totalSessions = traffic.reduce((a,x)=>a+x.value,0);
+      const pct = ((t.value/totalSessions)*100).toFixed(0);
+      const rect = svg.parentElement.getBoundingClientRect();
+      tooltip.style.left = (e.clientX-rect.left)+'px';
+      tooltip.style.top = (e.clientY-rect.top-10)+'px';
+      tooltip.style.opacity = 1;
+      tooltip.innerHTML = `<span class="t-label">${t.label}</span><br><b>${t.value.toLocaleString()} sessions</b> (${pct}%)`;
+    });
+    bar.addEventListener('mouseleave', ()=>{ tooltip.style.opacity = 0; });
+  });
+})();
+
+/* ---------------- render: shop health tiles ---------------- */
+(function(){
+  const el = document.getElementById('healthGrid');
+  health.forEach(h=>{
+    const tile = document.createElement('div');
+    tile.className = 'health-tile';
+    tile.innerHTML = `
+      <div class="h-label">${h.label}</div>
+      <div class="h-value">${h.value}</div>
+      <div class="h-delta">${h.delta}</div>
+    `;
+    el.appendChild(tile);
+  });
+})();
+
+/* ---------------- render: recent orders table ---------------- */
+(function(){
+  const body = document.getElementById('ordersBody');
+  const statusMeta = {
+    delivered: {cls:'status-delivered', label:'Delivered'},
+    shipped: {cls:'status-shipped', label:'Shipped'},
+    production: {cls:'status-production', label:'In Production'},
+    pending: {cls:'status-pending', label:'Pending'},
+  };
+  orders.forEach(o=>{
+    const meta = statusMeta[o.status];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="order-id">${o.id}</td>
+      <td>${o.product}</td>
+      <td>${o.date}</td>
+      <td><span class="status-badge ${meta.cls}"><span class="status-dot"></span>${meta.label}</span></td>
+      <td class="amt">${fmtUSD(o.amount)}</td>
+    `;
+    body.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>

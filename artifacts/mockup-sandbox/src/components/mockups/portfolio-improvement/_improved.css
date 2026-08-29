@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  
+  --prof-bg: #ffffff;
+  --prof-surface: #f8fafc;
+  --prof-text: #0f172a;
+  --prof-muted: #64748b;
+  --prof-border: #e2e8f0;
+  --prof-accent: #2563eb;
+
+  --pers-bg: #1c1917;
+  --pers-surface: #292524;
+  --pers-text: #fafaf9;
+  --pers-muted: #a8a29e;
+  --pers-border: #44403c;
+  --pers-accent: #d97706;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.prof-theme {
+  background-color: var(--prof-bg);
+  color: var(--prof-text);
+}
+
+.pers-theme {
+  background-color: var(--pers-bg);
+  color: var(--pers-text);
+}
+
+/* Navigation active states */
+.nav-link {
+  transition: all 0.2s ease;
+  color: var(--prof-muted);
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--prof-text);
+}
+
+.nav-link.active {
+  font-weight: 600;
+}
+
+.pers-theme .nav-link {
+  color: var(--pers-muted);
+}
+.pers-theme .nav-link:hover {
+  color: var(--pers-text);
+}
+.pers-theme .nav-link.active {
+}
+
+/* Timeline vertical line */
+.timeline-line {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  bottom: -2rem;
+  width: 2px;
+  background-color: var(--prof-border);
+}
+.timeline-item:last-child .timeline-line {
+  display: none;
+}
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: var(--prof-accent);
+  border: 3px solid var(--prof-bg);
+}
+
+.stat-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.monogram-bg {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.photo-placeholder {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Geometric patterns for placeholders */
+.pattern-1 { background: radial-gradient(circle at 0% 0%, #3f3f46 0%, transparent 50%), linear-gradient(135deg, #1c1917 0%, #292524 100%); }
+.pattern-2 { background: linear-gradient(45deg, #292524 25%, transparent 25%, transparent 75%, #292524 75%, #292524), linear-gradient(45deg, #292524 25%, transparent 25%, transparent 75%, #292524 75%, #292524) 20px 20px, #1c1917; background-size: 40px 40px; }
+.pattern-3 { background: repeating-linear-gradient(45deg, #292524, #292524 10px, #1c1917 10px, #1c1917 20px); }
+.pattern-4 { background: radial-gradient(circle, #3f3f46 10%, transparent 10%), radial-gradient(circle, #3f3f46 10%, transparent 10%) 20px 20px, #1c1917; background-size: 40px 40px; }
+.pattern-5 { background: linear-gradient(135deg, #44403c 25%, transparent 25%), linear-gradient(225deg, #44403c 25%, transparent 25%), linear-gradient(45deg, #44403c 25%, transparent 25%), linear-gradient(315deg, #44403c 25%, #1c1917 25%); background-position: 20px 0, 20px 0, 0 0, 0 0; background-size: 40px 40px; }
+.pattern-6 { background: repeating-radial-gradient(circle, #292524, #292524 10px, #1c1917 10px, #1c1917 20px); }

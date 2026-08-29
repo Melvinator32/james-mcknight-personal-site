@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "James McKnight Portfolio"
+description = "A personal portfolio for James McKnight, showcasing corporate development experience, financial modeling work, side ventures, projects, and interests."
+version = "1.0.0"
+id = "artifacts/james-mcknight-portfolio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23580
+
+[services.development]
+run = "pnpm --filter @workspace/james-mcknight-portfolio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/james-mcknight-portfolio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/james-mcknight-portfolio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23580"
+BASE_PATH = "/"
