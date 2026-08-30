@@ -63,15 +63,18 @@
   footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--lgray);font-size:12.5px;color:#8a978f}
   @media(max-width:620px){header .wrap{flex-direction:column;text-align:center}}
 </style>
-<link rel="icon" type="image/png" href="/bonsai-logo.png">
-<link rel="apple-touch-icon" href="/bonsai-logo.png">
-<style>.app-bonsai{width:48px;height:48px;object-fit:contain;flex-shrink:0;vertical-align:middle;background:#E1E2D8;border-radius:10px;padding:4px}</style>
 </head>
 <body>
 
 <header>
   <div class="wrap">
-    <img class="app-bonsai" src="/bonsai-logo.png" alt="Bonsai logo" width="48" height="48">
+    <svg class="chip" viewBox="-100 -100 200 200" aria-hidden="true">
+      <circle r="99" fill="#0d454e"/><g id="ticks"></g>
+      <circle r="79" fill="#11525c"/><circle r="79" fill="none" stroke="#f3e7d3" stroke-width="2.5"/>
+      <g id="rays"></g>
+      <circle r="36" fill="#f8ecdb" stroke="#0d454e" stroke-width="3"/>
+      <circle r="29" fill="none" stroke="#e2d3b8" stroke-width="1.6"/>
+    </svg>
     <div>
       <h1>Tuned In</h1>
       <div class="tagline">A five-minute walkthrough of the demo</div>
@@ -81,7 +84,7 @@
 
 <div class="wrap">
 
-  <p class="lede">Tuned In is a personal productivity system &mdash; a task board that knows what
+  <p class="lede"><strong>Tuned In</strong> is a personal productivity system &mdash; a task board that knows what
   the work is <em>for</em>. It tracks tasks, but it also tracks the goals those tasks serve, the skills
   you're building, and what the work actually feels like day to day.</p>
 
@@ -126,15 +129,15 @@
   </div>
 
   <h2>A guided tour</h2>
-  <p>Ten tabs is a lot to meet at once. These six are the spine, in the order that makes sense.</p>
+  <p>Four stops, in the order that builds on itself.</p>
 
   <ol class="stops">
     <li>
       <h3>The board <span class="where">Table</span></h3>
       <p>Eight groups, and every column is user-defined &mdash; text, status, person, date, number,
       priority, checkbox. Click any cell to edit it in place.</p>
-      <p>Two columns are worth noticing. <strong>Pillar</strong> and <strong>Goal</strong> connect a task
-      to what it's for; tag a goal and the pillar fills itself in. At the far right, <strong>Win</strong>
+      <p>Two columns are worth noticing. <strong>Values</strong> and <strong>Goal</strong> connect a task
+      to what it's for; tag a goal and its value fills itself in. At the far right, <strong>Win</strong>
       and <strong>Loss</strong> close out an outcome &mdash; marking a Loss files that task and its goals
       into an Improvements list, so misses land somewhere instead of evaporating.</p>
       <p>Open <em>Build the pricing scenario model</em> with the arrow on its left to see subtasks; finished
@@ -159,52 +162,91 @@
 
     <li>
       <h3>What the work is for <span class="where">Goals</span></h3>
-      <p>Goals live inside <strong>Sections</strong>, and each goal is measured by the share of its tagged
-      tasks that are done &mdash; you never update a goal by hand.</p>
-      <p>The strip along the top is the part worth pausing on: <strong>completed work counted against role
-      expectations</strong>, from Analyst up to VP. It answers &ldquo;am I already operating a level
-      up?&rdquo; using tasks you actually finished. Click a role to filter. The <strong>Personal</strong>
-      filter separates life goals from career ones.</p>
-      <p>Open any goal to see its plan, its progress, and the tasks advancing it &mdash; and there's a
-      search box to tag more tasks to it without leaving the page.</p>
-    </li>
-
-    <li>
-      <h3>Everything that isn't a task <span class="where">Notebook</span></h3>
-      <p>Five surfaces share this tab, because they're all writing rather than doing:</p>
-      <ul>
-        <li><strong>Notes</strong> &mdash; rich text with bold, italic, lists and photos. Try the pinned note.</li>
-        <li><strong>Ideas</strong> &mdash; sparks with a brainstorm log, before they're projects.</li>
-        <li><strong>Prompt Studio</strong> &mdash; reusable AI prompts with fill-in fields.</li>
-        <li><strong>Vibe Coding</strong> &mdash; side projects with their own to-do lists.</li>
-        <li><strong>Career Notes</strong> &mdash; the most unusual one; see below.</li>
-      </ul>
-    </li>
-
-    <li>
-      <h3>What the work feels like <span class="where">Notebook &rarr; Career Notes</span></h3>
-      <p>A log of the job itself rather than the tasks in it. You capture one line at a time &mdash;
-      <em>&ldquo;four interruptions before lunch; the deep work never started&rdquo;</em> &mdash; file it
-      under one of twelve dimensions, and mark it Thrive, Neutral or Drain.</p>
-      <p>Over time the <strong>Dimensions</strong> tab shows where the energy actually goes, and the
-      <strong>Ikigai</strong> tab synthesises it into four circles with the overlaps derived automatically.</p>
-      <p>The <strong>Baseline</strong> tab is deliberately locked until enough has been logged &mdash;
-      reading your own stated preferences while you're still recording observations biases what you notice.
-      That lock is the feature, not a limitation.</p>
+      <p>This is the part that makes it more than a task list, so it's worth a minute.</p>
+      <p>Goals live inside <strong>Values</strong> &mdash; Craft &amp; Quality, Judgment, Reach &amp;
+      Influence, Self-Investment, Future Options. A goal isn't a checkbox: it's measured by the tasks
+      tagged to it, so you never update one by hand.</p>
     </li>
   </ol>
 
-  <h3>The rest, briefly</h3>
+  <h2>How tasks connect to goals</h2>
+  <p>Every other view feeds this one. The loop has five steps, and you can follow all of them in the demo.</p>
+
+  <ol class="stops">
+    <li>
+      <h3>Write a goal under a value</h3>
+      <p>On <strong>Goals</strong>, each card sits in a value. <em>&ldquo;Writing that carries a
+      decision&rdquo;</em> lives under Craft &amp; Quality, with a plan and, optionally, a number to hit
+      &mdash; that one is tracked at <strong>3 of 12 memos</strong>.</p>
+    </li>
+    <li>
+      <h3>Tag a task to it <span class="where">Table</span></h3>
+      <p>Back on the board, the <strong>Goal</strong> column links a task to a goal. <em>Draft the
+      quarterly summary</em> is tagged to that writing goal.</p>
+      <p>Notice what happens to the <strong>Values</strong> column beside it: tag a goal and its value
+      fills itself in. The two columns can't drift apart, and you only ever make one decision.</p>
+    </li>
+    <li>
+      <h3>Finish the task, and the goal moves</h3>
+      <p>Set that task to <strong>Done</strong>. The automation files it into the Done group and stamps
+      today's date &mdash; and the goal's progress bar moves, because progress is the share of its tagged
+      tasks that are finished. <em>&ldquo;Writing that carries a decision&rdquo;</em> currently reads
+      <strong>25%</strong> off four tagged tasks.</p>
+      <p>Nothing was self-reported. The goal moved because work moved.</p>
+    </li>
+    <li>
+      <h3>See it counted against a level</h3>
+      <p>The strip at the top of Goals is the payoff: <strong>completed work by role expectation</strong>,
+      Analyst through VP. Each goal carries a level, so finishing a tagged task credits that level
+      automatically.</p>
+      <p>Two numbers per card, and the second is the useful one. <strong>Done</strong> is volume.
+      <strong>Expectations covered</strong> is spread &mdash; four finished tasks all serving one
+      expectation reads as busy, not as ready. Click a level to filter the whole page to it.</p>
+    </li>
+    <li>
+      <h3>Open a goal to close the loop</h3>
+      <p>Click any goal. You get its plan, its progress, and <strong>every task advancing it</strong>,
+      finished ones ticked. There's a search box to tag more tasks without leaving the page, and a
+      running count of how many are tagged versus done.</p>
+      <p>In the full application this is also where a scorecard exports &mdash; every expectation with the
+      tasks that evidence it, which is the document you'd take into a review.</p>
+    </li>
+  </ol>
+
+  <div class="card note">
+    <div class="eyebrow">Why it's built this way</div>
+    <p style="margin:0">Goal tracking usually fails because it's a second system: you do the work in one
+    place and report on it in another, and the reporting rots. Here there is no second system. The goal
+    is a query over tasks you were going to move anyway &mdash; so the only way to make progress look
+    good is to actually do the work.</p>
+  </div>
+
+
+
+  <h3>The other two tabs</h3>
   <ul>
-    <li><strong>Kanban</strong> &mdash; the same tasks as columns by status.</li>
-    <li><strong>PARA</strong> &mdash; Projects, Areas, Resources, Archives. A project can point at a board
-      group and show live progress. Archiving never deletes.</li>
-    <li><strong>Skill Lab</strong> &mdash; what you're learning, with reading progress, a
-      &ldquo;1% better today&rdquo; streak, and a Today-I-Learned log.</li>
-    <li><strong>Zen Garden</strong> &mdash; a rake-the-sand break. Build one and set it as the app's
-      wallpaper. The sand patterns are generated, not drawn.</li>
-    <li><strong>Rewards</strong> &mdash; points for finished work, spent on things you choose.</li>
+    <li><strong>Kanban</strong> &mdash; the same tasks as columns by status. Drag between columns and the
+      automations fire exactly as they do on the board.</li>
+    <li><strong>Skill Lab</strong> &mdash; what you're learning, tracked like a project: reading progress
+      by page or minute, a &ldquo;1% better today&rdquo; streak, and a Today-I-Learned log. Tasks from the
+      board can be filed under a skill, so it shows what you're actually practising.</li>
   </ul>
+
+  <div class="card note">
+    <div class="eyebrow">Not in this demo</div>
+    <p style="margin:0">The full application also has a <strong>Notebook</strong> (notes, ideas, prompts,
+    side projects, and a career-observation log), <strong>PARA</strong> for organising projects and
+    reference material, a <strong>Rewards</strong> system that pays out points for finished work, a
+    <strong>Zen Garden</strong> whose raked-sand patterns are generated rather than drawn, and three more
+    Goals views &mdash; a mind map, an improvements log, and a personal operating system. They hold
+    long-form writing rather than anything you could try in five minutes, so they're left out here.</p>
+  </div>
+
+  <h3>One more thing to try</h3>
+  <p>The <strong>Dark</strong> button at the top right of the banner switches the whole app between a
+  light ground and a Wet Slate dark one. The palette is the same either way &mdash; beach tones, slate,
+  driftwood and jade &mdash; and the wood banner is repainted rather than recoloured, so its grain
+  changes with the ground.</p>
 
   <h2>If you're looking at how it's built</h2>
   <div class="card">
@@ -231,7 +273,6 @@
 
 <script>
   var t = document.getElementById("ticks"), r = document.getElementById("rays"), i, e;
-  if (!t || !r) return;
   for (i = 0; i < 12; i++) {
     e = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     e.setAttribute("x", "-7.5"); e.setAttribute("y", "-98");
