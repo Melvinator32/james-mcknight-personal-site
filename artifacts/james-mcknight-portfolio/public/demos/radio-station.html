@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tuned In</title>
+  <title>Tuned In — demo</title>
   <style>
 /* ===========================================================
-   Tuned In — styles
+   Radio Station — styles
    IMTT palette, charcoal banner, warm off-white body
    =========================================================== */
 :root {
@@ -1850,24 +1850,25 @@ body.theme-dark {
   --page-bg: #292d28;        /* Wet Slate */
 }
 
+/* Inline icons replacing emoji — inherit colour and sit on the text baseline */
+.rs-ic { display: inline-block; vertical-align: -0.16em; flex-shrink: 0; }
+button .rs-ic, .row-menu-opt .rs-ic { margin-right: 5px; }
+
   </style>
-<link rel="icon" type="image/png" href="/bonsai-logo.png">
-<link rel="apple-touch-icon" href="/bonsai-logo.png">
-<style>.app-bonsai{width:48px;height:48px;object-fit:contain;flex-shrink:0;vertical-align:middle;background:#E1E2D8;border-radius:10px;padding:4px}</style>
 </head>
 <body>
   <!-- Banner -->
   <header class="banner" id="app-banner">
     <canvas id="banner-sand" aria-hidden="true"></canvas>
     <div class="banner-left">
-      <img src="/bonsai-logo.png" alt="Bonsai logo" class="logo" id="banner-logo" />
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMDAgLTEwMCAyMDAgMjAwIj4KICA8IS0tIFJhZGlvIFN0YXRpb24gY2hpcCDigJQgb3JpZ2luYWwgemVuLXNrdWxsIHBva2VyIGNoaXAgKG5vdCB0aGUgdHJhZGVtYXJrZWQKICAgICAgIFN0ZWFsIFlvdXIgRmFjZSBkZXNpZ24pLiBWZWN0b3IsIHNvIGl0IHN0YXlzIHNoYXJwIGF0IGFueSBzaXplLiAtLT4KICA8Y2lyY2xlIHI9Ijk5IiBmaWxsPSIjMGQ0NTRlIi8+CiAgPGNpcmNsZSByPSI5OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDgzMTM3IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Zz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMzApIiBmaWxsPSIjZjNlN2QzIi8+PHJlY3QgeD0iLTcuNSIgeT0iLTk4IiB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHJ4PSIzLjUiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSg5MCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSgxNTApIiBmaWxsPSIjZjNlN2QzIi8+PHJlY3QgeD0iLTcuNSIgeT0iLTk4IiB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHJ4PSIzLjUiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMjEwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIiBmaWxsPSIjZjNlN2QzIi8+PHJlY3QgeD0iLTcuNSIgeT0iLTk4IiB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHJ4PSIzLjUiIHRyYW5zZm9ybT0icm90YXRlKDI3MCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMzAwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSgzMzApIiBmaWxsPSIjZjNlN2QzIi8+PC9nPgogIDxjaXJjbGUgcj0iNzkiIGZpbGw9IiMxMTUyNWMiLz4KICA8Y2lyY2xlIHI9Ijc5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmM2U3ZDMiIHN0cm9rZS13aWR0aD0iMi41Ii8+CiAgPGc+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMTEuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMzMuNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoNTYuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoNzguNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMTAxLjI1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDEyMy43NSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgxNDYuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMTY4Ljc1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDE5MS4yNSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgyMTMuNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMjM2LjI1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDI1OC43NSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgyODEuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMzAzLjc1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDMyNi4yNSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgzNDguNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PC9nPgogIDxjaXJjbGUgcj0iMzYiIGZpbGw9IiNmOGVjZGIiIHN0cm9rZT0iIzBkNDU0ZSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPGNpcmNsZSByPSIyOSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTJkM2I4IiBzdHJva2Utd2lkdGg9IjEuNiIvPgo8L3N2Zz4=" alt="Tuned In chip" class="logo" id="banner-logo" />
       <div>
         <div class="title" id="banner-title">Tuned In</div>
         <div class="tagline" id="banner-tagline">What a long, strange to-do list it's been...</div>
       </div>
     </div>
     <input id="search" class="search" type="text" placeholder="Search tasks…" />
-    <button id="btn-theme" class="theme-btn" title="Switch to dark"><span class="tb-ic">☽</span><span>Dark</span></button>
+    <button id="btn-theme" class="theme-btn" title="Switch to dark"><span class="tb-ic"></span><span>Dark</span></button>
   </header>
 
   <!-- Toolbar -->
@@ -1883,13 +1884,13 @@ body.theme-dark {
     <button class="view-btn" data-view="notes"><svg class="vb-ic" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3.4 1.8h7.2l3 3v9.4a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1V2.8a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M10.4 1.9v3.2h3.1M5 8.2h6M5 11h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Notebook</button>
     <button class="view-btn" data-view="zen"><svg class="vb-ic" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="8" cy="8" r="2" fill="currentColor"/><path d="M8 3.4a4.6 4.6 0 1 1-4.6 4.6M8 0.8A7.2 7.2 0 1 1 0.8 8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Zen Garden</button>
     <span id="points-badge" class="points-badge" title="Your point balance — earn by completing tasks, spend on rewards"></span>
-    <button id="alarm-toggle" class="alarm-toggle" title="Timer alarm: plays a sound and shows a banner when a running task passes its Est. Hours">🔔</button>
+    <button id="alarm-toggle" class="alarm-toggle" title="Timer alarm: plays a sound and shows a banner when a running task passes its Est. Hours"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a5.5 5.5 0 0 0-5.5 5.5V13L5 16h14l-1.5-3V8.5A5.5 5.5 0 0 0 12 3zM10 19a2 2 0 0 0 4 0"/></svg></button>
     <span class="spacer"></span>
     <button id="btn-sort" class="tool-btn" title="Sort by priority — ties broken by earliest due date — with completed tasks pushed to the bottom. Applies to subtasks too; you can still drag to fine-tune afterward">↓ Sort</button>
     <button id="btn-toggle-subs" class="tool-btn" title="Expand or collapse all subtasks&#10;Shift-click: show or hide finished subtasks">⊟ Subtasks</button>
-    <button id="btn-collapse-goals" class="tool-btn" title="Collapse the Pillar & Idea columns to one line each to shrink row height. Use a cell's caret to expand just that one.">⊟ Pillar/Idea</button>
-    <button id="btn-tags" class="tool-btn">🏷 Tags</button>
-    <button id="btn-export" class="tool-btn">⬇ Export</button>
+    <button id="btn-collapse-goals" class="tool-btn" title="Collapse the Values & Goal columns to one line each to shrink row height. Use a cell's caret to expand just that one.">⊟ Values/Goal</button>
+    <button id="btn-tags" class="tool-btn"><svg class="vb-ic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3H3v8l10 10 8-8zM7.5 7.5h.01"/></svg> Tags</button>
+    <button id="btn-export" class="tool-btn"><svg class="vb-ic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5 12 15l4.5-4.5M4 20h16"/></svg> Export</button>
     <button id="btn-edit" class="tool-btn accent-green" title="Columns, display, automations, appearance, header"><svg class="vb-ic" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="8" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.4v1.8M8 12.8v1.8M14.6 8h-1.8M3.2 8H1.4M12.7 3.3l-1.3 1.3M4.6 11.4l-1.3 1.3M12.7 12.7l-1.3-1.3M4.6 4.6L3.3 3.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Settings ▾</button>
     <button id="btn-new-task" class="tool-btn accent-teal">+ New Task</button>
     <button id="btn-new-group" class="tool-btn">+ New Group</button>
@@ -1940,7 +1941,7 @@ body.theme-dark {
 
 const DEMO_MODE = true;
 // No /static in a single file: the banner icon is inlined by the builder.
-const DEMO_ICON = "/bonsai-logo.png";
+const DEMO_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMDAgLTEwMCAyMDAgMjAwIj4KICA8IS0tIFJhZGlvIFN0YXRpb24gY2hpcCDigJQgb3JpZ2luYWwgemVuLXNrdWxsIHBva2VyIGNoaXAgKG5vdCB0aGUgdHJhZGVtYXJrZWQKICAgICAgIFN0ZWFsIFlvdXIgRmFjZSBkZXNpZ24pLiBWZWN0b3IsIHNvIGl0IHN0YXlzIHNoYXJwIGF0IGFueSBzaXplLiAtLT4KICA8Y2lyY2xlIHI9Ijk5IiBmaWxsPSIjMGQ0NTRlIi8+CiAgPGNpcmNsZSByPSI5OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDgzMTM3IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Zz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMzApIiBmaWxsPSIjZjNlN2QzIi8+PHJlY3QgeD0iLTcuNSIgeT0iLTk4IiB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHJ4PSIzLjUiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSg5MCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSgxNTApIiBmaWxsPSIjZjNlN2QzIi8+PHJlY3QgeD0iLTcuNSIgeT0iLTk4IiB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHJ4PSIzLjUiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMjEwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIiBmaWxsPSIjZjNlN2QzIi8+PHJlY3QgeD0iLTcuNSIgeT0iLTk4IiB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHJ4PSIzLjUiIHRyYW5zZm9ybT0icm90YXRlKDI3MCkiIGZpbGw9IiNmM2U3ZDMiLz48cmVjdCB4PSItNy41IiB5PSItOTgiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNyIgcng9IjMuNSIgdHJhbnNmb3JtPSJyb3RhdGUoMzAwKSIgZmlsbD0iI2YzZTdkMyIvPjxyZWN0IHg9Ii03LjUiIHk9Ii05OCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3IiByeD0iMy41IiB0cmFuc2Zvcm09InJvdGF0ZSgzMzApIiBmaWxsPSIjZjNlN2QzIi8+PC9nPgogIDxjaXJjbGUgcj0iNzkiIGZpbGw9IiMxMTUyNWMiLz4KICA8Y2lyY2xlIHI9Ijc5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmM2U3ZDMiIHN0cm9rZS13aWR0aD0iMi41Ii8+CiAgPGc+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMTEuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMzMuNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoNTYuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoNzguNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMTAxLjI1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDEyMy43NSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgxNDYuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMTY4Ljc1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDE5MS4yNSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgyMTMuNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMjM2LjI1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDI1OC43NSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgyODEuMjUpIiBmaWxsPSIjZWZlMmM5Ii8+PHBhdGggZD0iTSAtMy40IC0zOCBMIC03LjUgLTcyIEwgNy41IC03MiBMIDMuNCAtMzggWiIgdHJhbnNmb3JtPSJyb3RhdGUoMzAzLjc1KSIgZmlsbD0iI2VmZTJjOSIvPjxwYXRoIGQ9Ik0gLTMuNCAtMzggTCAtNy41IC03MiBMIDcuNSAtNzIgTCAzLjQgLTM4IFoiIHRyYW5zZm9ybT0icm90YXRlKDMyNi4yNSkiIGZpbGw9IiNlZmUyYzkiLz48cGF0aCBkPSJNIC0zLjQgLTM4IEwgLTcuNSAtNzIgTCA3LjUgLTcyIEwgMy40IC0zOCBaIiB0cmFuc2Zvcm09InJvdGF0ZSgzNDguNzUpIiBmaWxsPSIjZWZlMmM5Ii8+PC9nPgogIDxjaXJjbGUgcj0iMzYiIGZpbGw9IiNmOGVjZGIiIHN0cm9rZT0iIzBkNDU0ZSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPGNpcmNsZSByPSIyOSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTJkM2I4IiBzdHJva2Utd2lkdGg9IjEuNiIvPgo8L3N2Zz4=";
 const DONE_DATE_KEY = "__done_date";
 
 function dUid() { return Math.random().toString(36).slice(2, 12); }
@@ -1965,7 +1966,7 @@ const DB = (() => {
     { id: "c_priority", name: "Priority",   type: "priority", is_primary: 0, position: 4,  width: 204 },
     { id: "c_notes",    name: "Notes",      type: "text",     is_primary: 0, position: 5,  width: 119 },
     { id: "c_hours",    name: "Est. Hours", type: "number",   is_primary: 0, position: 6,  width: 60  },
-    { id: "c_pillar",   name: "Pillar",     type: "goal",     is_primary: 0, position: 7,  width: 233 },
+    { id: "c_pillar",   name: "Values",     type: "goal",     is_primary: 0, position: 7,  width: 233 },
     { id: "c_goal",     name: "Goal",       type: "goal",     is_primary: 0, position: 8,  width: 200 },
     { id: "c_win",      name: "Win",        type: "check",    is_primary: 0, position: 9,  width: null },
     { id: "c_loss",     name: "Loss",       type: "check",    is_primary: 0, position: 10, width: null },
@@ -2218,7 +2219,7 @@ const DB = (() => {
       ],
     }),
     hdr_title_text: "Tuned In",
-    hdr_tagline_text: "A demo of Tuned In \u2014 nothing here is saved",
+    hdr_tagline_text: "A demo \u2014 nothing here is saved",
     plan_start: "08:00", plan_end: "18:00",
   };
 
@@ -2995,7 +2996,7 @@ async function api(path, opts) {
 // Must match SERVER_BUILD in app.py for this release. If the running server
 // reports a different build, the files were updated without restarting the
 // server — show a clear banner instead of letting features fail mysteriously.
-const EXPECTED_SERVER_BUILD = "2026-08-12-A";
+const EXPECTED_SERVER_BUILD = "2026-08-21-A";
 function checkServerBuild() {
   if (typeof DEMO_MODE !== "undefined" && DEMO_MODE) return;
   const existing = document.getElementById("stale-server-banner");
@@ -3462,6 +3463,78 @@ function filteredTasks() {
     Object.values(t.cells).some((v) => String(v).toLowerCase().includes(q))
   );
 }
+
+// ---- Icons -----------------------------------------------------------------
+// Inline SVG rather than emoji: emoji render differently on every platform, some
+// don't render at all on Windows, and they can't take the theme's colour. These
+// inherit currentColor and scale with font size.
+const RS_ICONS = {
+  broom:    'M9.5 14.5 4 20M14 3l3 3M12.5 4.5l3 3-5.5 5.5-3-3zM8 12l-3.6 3.6a2 2 0 0 0-.5 2L4 19l1.4.1a2 2 0 0 0 2-.5L11 15z',
+  bolt:     'M9.5 2 4 12h4l-1.5 8L14 9h-4l1.5-7z',
+  gear:     'M12 9.4a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2zM12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4',
+  calendar: 'M4.5 5.5h15v14h-15zM4.5 10h15M8.5 3v4M15.5 3v4',
+  bell:     'M12 3a5.5 5.5 0 0 0-5.5 5.5V13L5 16h14l-1.5-3V8.5A5.5 5.5 0 0 0 12 3zM10 19a2 2 0 0 0 4 0',
+  bellOff:  'M12 3a5.5 5.5 0 0 0-5.5 5.5V13L5 16h14l-1.5-3V8.5A5.5 5.5 0 0 0 12 3zM10 19a2 2 0 0 0 4 0M3 3l18 18',
+  flag:     'M6 21V4M6 4h11l-2 3.5L17 11H6',
+  clipboard:'M9 3.5h6v3H9zM7 5H5.5v15.5h13V5H17',
+  hand:     'M9 12V5.5a1.5 1.5 0 0 1 3 0V11m0-.5V4.5a1.5 1.5 0 0 1 3 0V11m0-.5V6.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6v-3a1.5 1.5 0 0 1 3 0',
+  eyeOff:   'M3 3l18 18M10.6 5.2A7.6 7.6 0 0 1 12 5c5 0 9 5 9 7a11 11 0 0 1-2.3 3.1M6.5 7.4C4.3 8.9 3 11.2 3 12c0 2 4 7 9 7a8.6 8.6 0 0 0 3.4-.7M9.9 9.9a3 3 0 0 0 4.2 4.2',
+  dice:     'M5 5.5h14v14H5zM9 9.5h.01M15 9.5h.01M12 12.5h.01M9 15.5h.01M15 15.5h.01',
+  image:    'M4 5.5h16v13H4zM4 15l4.5-4.5 4 4L16 11l4 4M9 9.5h.01',
+  chart:    'M4 20V9M10 20V4M16 20v-7M22 20H2',
+  doc:      'M7 3h7l4 4v14H7zM14 3v4h4M10 12h6M10 16h6',
+  abacus:   'M4 4v16M20 4v16M4 8h16M4 13h16M8 6v4M14 6v4M11 11v4M17 11v4',
+  search:   'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM16.2 16.2 21 21',
+  cap:      'M2.5 8.5 12 4.5l9.5 4-9.5 4zM6.5 11v5c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-5',
+  pen:      'M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1z',
+  compass:  'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM15.5 8.5l-2 5-5 2 2-5z',
+  scales:   'M12 4v16M6 20h12M4 9l3.5-4L11 9M3.5 9a3.5 3.5 0 0 0 7 0zM13 9l3.5-4L20 9M12.5 9a3.5 3.5 0 0 0 7 0z',
+  tools:    'M14.5 6.5a3.5 3.5 0 0 0 4.6 4.6l-8 8a2 2 0 0 1-2.8-2.8zM6.5 4l2.5 2.5M4 6.5 6.5 4M4.8 9.2 9.2 4.8',
+  mail:     'M3.5 6h17v12h-17zM3.5 6.5 12 13l8.5-6.5',
+  tree:     'M12 3 6.5 12h11zM12 8l-4 7h8zM12 15v6M9 21h6',
+  bamboo:   'M9 21V3M15 21V3M6 8h6M12 8h6M6 14h6M12 14h6',
+  lantern:  'M12 3v2M12 19v2M8 6h8l1.5 5-1.5 5H8l-1.5-5zM9.5 6v10M14.5 6v10',
+  circle:   'M12 5.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z',
+  pagoda:   'M12 3 4 8h16zM6 8v3M18 8v3M5 11h14l-2 3H7zM8 14v4M16 14v4M6.5 18h11l-1 3h-9z',
+  tag:      'M11 3H3v8l10 10 8-8zM7.5 7.5h.01',
+  columns:  'M4 4.5h16v15H4zM10 4.5v15M16 4.5v15',
+  moon:     'M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z',
+  sun:      'M12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zM12 2v2.2M12 19.8V22M22 12h-2.2M4.2 12H2M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6M19.1 19.1l-1.6-1.6M6.5 6.5 4.9 4.9',
+  sliders:  'M4 8h10M18 8h2M4 16h4M12 16h8M15 5.5v5M8 13.5v5',
+  header:   'M4 5.5h16v5H4zM4 14h7M4 17.5h11',
+  contrast: 'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM12 3.5v17a8.5 8.5 0 0 0 0-17z',
+  keyboard: 'M3 6.5h18v11H3zM7 10h.01M11 10h.01M15 10h.01M17.5 10h.01M6.5 13.5h.01M8.5 13.5h7M17.5 13.5h.01',
+  history:  'M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3.5 4.5V10h5.5M12 7.5V12l3 2',
+};
+function icon(name, size) {
+  const d = RS_ICONS[name];
+  if (!d) return document.createTextNode("");
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  const s = size || 14;
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", s); svg.setAttribute("height", s);
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "1.7");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("class", "rs-ic");
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", d);
+  svg.appendChild(path);
+  return svg;
+}
+// For places that build markup as a string rather than DOM nodes.
+function iconHtml(name, size) {
+  const d = RS_ICONS[name];
+  if (!d) return "";
+  const s = size || 14;
+  return `<svg class="rs-ic" viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" `
+       + `stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+}
+
 function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(props)) {
@@ -3594,7 +3667,7 @@ function buildDueRing(ymd) {
   const wrap = el("span", { class: "due-ring-wrap" });
   if (ymd && left != null && left < 0) {
     // Overdue → red flag
-    wrap.append(el("span", { class: "due-flag", title: `Overdue by ${Math.abs(left)} day${Math.abs(left) === 1 ? "" : "s"}` }, "🚩"));
+    wrap.append(el("span", { class: "due-flag", title: `Overdue by ${Math.abs(left)} day${Math.abs(left) === 1 ? "" : "s"}` }, ""));
     return wrap;
   }
   if (!ymd || left == null) {
@@ -3855,7 +3928,10 @@ function updateAlarmToggle() {
   const b = document.getElementById("alarm-toggle");
   if (!b) return;
   const on = alarmEnabled();
-  b.textContent = on ? "🔔" : "🔕";
+  // Swap the icon rather than the text: the bell is an inline SVG, so writing
+  // textContent here would erase it.
+  b.innerHTML = "";
+  b.append(icon(on ? "bell" : "bellOff", 14));
   b.classList.toggle("off", !on);
   b.title = on
     ? "Timer alarm ON — sound + banner when a running task passes its Est. Hours (click to turn off)"
@@ -3912,13 +3988,13 @@ function checkEstimateAlarm(task) {
 </script>
 <script>
 /* ---- board.js ---- */
-/* Tuned In — board.js
+/* Radio Station — board.js
    Board — goal-link column, Table & Kanban views, rewards system, Improvements board, Vibe project data
    Load order matters: see templates/index.html. Classic scripts share one global scope. */
 
 // ---- Goal-link column: tag a task to a pillar or a specific idea/framework node ----
 // Cell value is "" (none), "pillar:<key>", or "idea:<ideaId>". Used by the Map
-// (task appears under that pillar/idea) and Goals (counts toward the focus area).
+// (task appears under that pillar/idea) and Goals (counts toward the value).
 function gsEnsureLoaded() {
   if (typeof GOALS === "undefined" || !GOALS) { try { loadGoals(); } catch (e) {} }
 }
@@ -4053,7 +4129,7 @@ function buildCheckCell(col, task) {
 async function lossToImprovement(task) {
   const pc = primaryCol();
   const name = task.cells[pc.id] || "Untitled task";
-  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar/i.test(String(c.name || "")));
+  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar|value/i.test(String(c.name || "")));
   const goals = gcol ? parseGoalTags(task.cells[gcol.id]).map(goalTagLabel).filter(Boolean) : [];
   const entry = `${name} — missed: ${goals.length ? goals.join(", ") : "no goal tagged"}`;
   // One improvement entry per loss; re-marking the same task doesn't duplicate
@@ -4092,11 +4168,11 @@ function isDoneReviewGroup(list) {
 }
 function doneDateOf(t) { return String(t.cells["__done_date"] || ""); }
 function taskGoalTagList(t) {
-  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar/i.test(String(c.name || "")));
+  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar|value/i.test(String(c.name || "")));
   return gcol ? parseGoalTags(t.cells[gcol.id]) : [];
 }
 function taskPillarKeys(t) {
-  const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar/i.test(String(c.name || "")));
+  const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar|value/i.test(String(c.name || "")));
   const direct = pcol ? parseGoalTags(t.cells[pcol.id]).map((x) => x.replace(/^pillar:/, "")) : [];
   if (direct.length) return direct;
   // fall back to the sections of whatever goals are tagged
@@ -4163,7 +4239,7 @@ function buildDoneReviewBar(g, fullList, shownList) {
   sum.append(el("span", {}, " tagged to a goal"));
   bar.append(sum);
 
-  // Which focus areas the finished work actually served
+  // Which values the finished work actually served
   const byPillar = {};
   shownList.forEach((t) => taskPillarKeys(t).forEach((pk) => { byPillar[pk] = (byPillar[pk] || 0) + 1; }));
   const keys = Object.keys(byPillar).sort((a, b) => byPillar[b] - byPillar[a]);
@@ -4196,13 +4272,13 @@ function openGoalPicker(col, task, scope) {
 }
 
 // The reverse of syncPillarsFromGoals: tagging a pillar in the Pillar column
-// also files that pillar in the Goal column, so a task attached to a focus area
+// also files that pillar in the Goal column, so a task attached to a value
 // is visible from the goal side even before a specific goal is picked. Only
 // pillar: tags are mirrored — existing idea: tags are left exactly as they are,
 // and pillars already there aren't duplicated.
 async function mirrorPillarsIntoGoals(task, editedCol, tags) {
-  if (!/pillar/i.test(String(editedCol.name || ""))) return;   // only when the Pillar column was edited
-  const goalCol = STATE.columns.find((c) => c.type === "goal" && !/pillar/i.test(String(c.name || "")));
+  if (!/pillar|value/i.test(String(editedCol.name || ""))) return;   // only when the Pillar column was edited
+  const goalCol = STATE.columns.find((c) => c.type === "goal" && !/pillar|value/i.test(String(c.name || "")));
   if (!goalCol || goalCol.id === editedCol.id) return;
   const t = STATE.tasks.find((x) => x.id === task.id) || task;
   const existing = parseGoalTags(t.cells[goalCol.id]);
@@ -4220,8 +4296,8 @@ async function mirrorPillarsIntoGoals(task, editedCol, tags) {
 // Pillar column directly still works — it just re-syncs on the next Goal
 // change. Detected by type + name ("pillar" vs the other), never by id.
 async function syncPillarsFromGoals(task, editedCol, tags) {
-  if (/pillar/i.test(String(editedCol.name || ""))) return;   // pillar edited directly — nothing to derive
-  const pillarCol = STATE.columns.find((c) => c.type === "goal" && /pillar/i.test(String(c.name || "")));
+  if (/pillar|value/i.test(String(editedCol.name || ""))) return;   // pillar edited directly — nothing to derive
+  const pillarCol = STATE.columns.find((c) => c.type === "goal" && /pillar|value/i.test(String(c.name || "")));
   if (!pillarCol || pillarCol.id === editedCol.id) return;
   const order = (gsPillars() || []).map((p) => p.key);
   const derived = [];
@@ -4279,7 +4355,7 @@ function openTagPicker(title, scope, initialTags, commitFn, blurb) {
       row.append(el("span", { class: "goal-pick-lab", style: indent ? `padding-left:${indent * 14}px` : "" }, label));
       // Hide control (eye). Toggling re-renders the picker list.
       const isPillar = tag.startsWith("pillar:");
-      const eye = el("span", { class: "goal-pick-eye", title: "Hide this from the picker, Map and Goals", onClick: (e) => { e.preventDefault(); e.stopPropagation(); if (isPillar) gsToggleHidePillar(tag.slice(7)); else gsToggleHideIdea(tag.slice(5)); build(search.value); } }, "🙈");
+      const eye = el("span", { class: "goal-pick-eye", title: "Hide this from the picker, Map and Goals", onClick: (e) => { e.preventDefault(); e.stopPropagation(); if (isPillar) gsToggleHidePillar(tag.slice(7)); else gsToggleHideIdea(tag.slice(5)); build(search.value); } }, "");
       row.append(eye);
       return row;
     }
@@ -4293,7 +4369,7 @@ function openTagPicker(title, scope, initialTags, commitFn, blurb) {
       const f = (filter || "").trim().toLowerCase();
       const hiddenItems = []; // {tag,label,color}
       if (scope !== "ideas") {
-        const hdr = el("div", { class: "goal-pick-head" }, "Focus areas");
+        const hdr = el("div", { class: "goal-pick-head" }, "Values");
         listWrap.append(hdr);
         let any = false;
         (gsPillars() || []).forEach((p) => {
@@ -4306,18 +4382,18 @@ function openTagPicker(title, scope, initialTags, commitFn, blurb) {
         if (!any) hdr.remove();
       }
       if (scope !== "pillars" && ideas.length) {
-        // Pillar-first: with one or more focus areas checked, the goal list
+        // Pillar-first: with one or more values checked, the goal list
         // narrows to just those areas' goals (already-checked goals stay).
         const checkedPillars = working.filter((t) => t.startsWith("pillar:")).map((t) => t.slice(7));
         const hdr = el("div", { class: "goal-pick-head" },
-          checkedPillars.length ? "Goals in the ticked focus areas" : "Goals already tagged");
+          checkedPillars.length ? "Goals in the ticked values" : "Goals already tagged");
         listWrap.append(hdr);
         const ordered = ideas.slice().sort((a, b) => (pillarOrder.indexOf(a.pillar) - pillarOrder.indexOf(b.pillar)));
         let any = false;
         ordered.forEach((idea) => {
           const tag = "idea:" + idea.id;
           const color = idea.pillar ? gsP(idea.pillar).color : "#b3b3b3";
-          // Show a goal only when its focus area is ticked above, or when it's
+          // Show a goal only when its value is ticked above, or when it's
           // already tagged on this task. With nothing ticked the list stays
           // short instead of dumping every goal in the system.
           if (!checkedPillars.includes(idea.pillar) && !working.includes(tag)) return;
@@ -4335,8 +4411,8 @@ function openTagPicker(title, scope, initialTags, commitFn, blurb) {
           if (!f) {
             listWrap.append(el("div", { class: "goal-pick-hint" },
               checkedPillars.length
-                ? "No goals in the ticked focus areas yet."
-                : "Tick a focus area above to see its goals."));
+                ? "No goals in the ticked values yet."
+                : "Tick a value above to see its goals."));
           }
         }
       }
@@ -5250,7 +5326,7 @@ function planComplete(proj) {
 </script>
 <script>
 /* ---- studio.js ---- */
-/* Tuned In — studio.js
+/* Radio Station — studio.js
    Studio — prompt generators, Prompt Studio library, Vibe cards, Rewards view
    Load order matters: see templates/index.html. Classic scripts share one global scope. */
 
@@ -5434,7 +5510,7 @@ function openProjectPlan(proj) {
       showFlavor(active);
       plan.prompts = prompts;  // persist alongside the plan
     }
-    const genBtn = el("button", { class: "tool-btn", style: "margin:6px 0", onClick: () => { buildPrompts(); scheduleSave(); } }, "⚙ Generate prompt");
+    const genBtn = el("button", { class: "tool-btn", style: "margin:6px 0", onClick: () => { buildPrompts(); scheduleSave(); } }, "Generate prompt");
     body.append(genBtn);
     if (plan.prompts && plan.prompts.chat) buildPrompts();
 
@@ -5492,66 +5568,66 @@ const PS_SHARED = [
   { key: "done", label: "Definition of done", req: true, ph: "What a finished, approvable version looks like.", help: "The bar for 'I'd send this.' Make it checkable." },
 ];
 const PS_CATEGORIES = [
-  { key: "finmodel", label: "Financial modeling & analysis", icon: "📊", color: "#00859b",
+  { key: "finmodel", label: "Financial modeling & analysis", icon: "", color: "#00859b",
     output: "A working model or section: assumptions stated up front, formulas (not hard-codes), ties-out shown, units consistent, and a one-line base/upside/downside read.",
     specific: [
       { key: "drivers", label: "Key drivers / assumptions", req: true, ph: "The inputs that move the answer (volumes, rates, escalators, WACC…).", help: "List the handful of inputs the answer is most sensitive to." },
       { key: "sensitivities", label: "Sensitivities / scenarios", req: false, ph: "What to flex and the ranges (base/upside/downside).", help: "Name what to flex and the band for each case." },
       { key: "checks", label: "Sanity checks", req: false, ph: "Ties-out, ranges, units the model must respect.", help: "The checks a reviewer would run — so the model self-proves." },
     ] },
-  { key: "deck", label: "Deck & memo drafting", icon: "📑", color: "#38a66f",
+  { key: "deck", label: "Deck & memo drafting", icon: "", color: "#38a66f",
     output: "A structured draft: each section leads with its 'so what,' claims are backed, and the ask/recommendation lands at the end.",
     specific: [
       { key: "audience", label: "Audience & decision", req: true, ph: "Who reads it and what they must decide / approve.", help: "The reader and the single decision the document drives." },
       { key: "soswhat", label: "The 'so what'", req: true, ph: "The single takeaway each section must land.", help: "If they remember one line per section, what is it?" },
       { key: "structure", label: "Section order", req: false, ph: "Your preferred flow / template, if any.", help: "Leave blank to let the draft propose a structure." },
     ] },
-  { key: "email", label: "Email & stakeholder comms", icon: "✉️", color: "#00bfb8",
+  { key: "email", label: "Email & stakeholder comms", icon: "", color: "#00bfb8",
     output: "A send-ready message: subject line, the ask in the first two lines, right tone for the relationship, and a clear next step.",
     specific: [
       { key: "recipient", label: "Recipient & relationship", req: true, ph: "Who, and your standing with them (manager, commercial, exec…).", help: "Their seniority and your standing set the register." },
       { key: "ask", label: "The ask", req: true, ph: "The one action you need from them.", help: "Exactly one action. Two asks halve the reply rate." },
       { key: "tone", label: "Tone", req: false, ph: "Direct, warm, formal, apologetic, firm…", help: "One or two words; the draft calibrates." },
     ] },
-  { key: "data", label: "Data & spreadsheet work", icon: "🧮", color: "#77b28c",
+  { key: "data", label: "Data & spreadsheet work", icon: "", color: "#77b28c",
     output: "A correct transformation: the operation applied, edge cases handled, and the result plus the exact steps/formulas to reproduce it.",
     specific: [
       { key: "shape", label: "Data shape", req: true, ph: "Columns, types, size, source (API pull, CSV export…).", help: "Columns, types, rough row count, and where it came from." },
       { key: "operation", label: "Operation", req: true, ph: "Clean / pivot / formula / chart — what transformation.", help: "The transformation, in plain terms, end to end." },
     ] },
-  { key: "research", label: "Research & synthesis", icon: "🔎", color: "#c0782a",
+  { key: "research", label: "Research & synthesis", icon: "", color: "#c0782a",
     output: "A grounded synthesis: each claim sourced, conflicts flagged, recency noted, and a short bottom-line answer to each question.",
     specific: [
       { key: "questions", label: "Questions to answer", req: true, ph: "The specific things you need to know.", help: "Concrete questions beat a vague topic." },
       { key: "sources", label: "Sources / scope", req: false, ph: "Where to look or avoid; recency; geography.", help: "Steer or fence the search; note how fresh it must be." },
       { key: "output", label: "Synthesis form", req: false, ph: "Bullets, table, brief, pros/cons…", help: "How you want it digested." },
     ] },
-  { key: "learn", label: "Learning & explainers", icon: "🎓", color: "#8e7cc3",
+  { key: "learn", label: "Learning & explainers", icon: "", color: "#8e7cc3",
     output: "An explanation pitched to your level: builds from what you know, one worked example, and a check-for-understanding at the end.",
     specific: [
       { key: "level", label: "Your current level", req: true, ph: "What you already know — so it starts at the right place.", help: "Where to start so it neither bores nor loses you." },
       { key: "depth", label: "Depth & analogy", req: false, ph: "ELI5, working-level, or deep; analogies you like.", help: "How deep, and any analogy styles that click for you." },
     ] },
-  { key: "writing", label: "Writing & editing", icon: "✍️", color: "#5d7479",
+  { key: "writing", label: "Writing & editing", icon: "", color: "#5d7479",
     output: "A revised text that meets the editing goal, plus a short note on the substantive changes — not a silent rewrite.",
     specific: [
       { key: "text", label: "The text", req: true, ph: "Paste what to edit (or describe what to write).", help: "Paste the actual text — editing beats describing." },
       { key: "goal", label: "Editing goal", req: true, ph: "Tighten, restructure, fix tone, behavioral framing…", help: "What 'better' means here." },
     ] },
-  { key: "career", label: "Career & professional development", icon: "🧭", color: "#38a66f",
+  { key: "career", label: "Career & professional development", icon: "", color: "#38a66f",
     output: "A concrete plan or script tied to the goal: specific moves, the words to use, and how you'll know it worked.",
     specific: [
       { key: "pillar", label: "Pillar / goal", req: true, ph: "Which promotion pillar or goal this advances.", help: "Ties the ask to a goal you're tracking." },
       { key: "situation", label: "Situation", req: false, ph: "The review, conversation, or positioning at hand.", help: "The specific moment this is for." },
     ] },
-  { key: "decision", label: "Decision & critique", icon: "⚖️", color: "#00859b",
+  { key: "decision", label: "Decision & critique", icon: "", color: "#00859b",
     output: "A critique in the mode you chose: the strongest case against, the failure modes, and a clear bottom line — not reflexive agreement.",
     specific: [
       { key: "decision", label: "Decision / claim", req: true, ph: "What you're deciding or the argument to test.", help: "State the call or claim in one line." },
       { key: "options", label: "Options / reasoning", req: false, ph: "The paths you see and your current lean + why.", help: "Your current lean — so the critique can push on it." },
       { key: "mode", label: "Critique mode", req: false, ph: "Steelman, red-team, devil's advocate, blind spots…", help: "How you want it pressure-tested." },
     ] },
-  { key: "improve", label: "Project improvements", icon: "🛠️", color: "#00859b",
+  { key: "improve", label: "Project improvements", icon: "", color: "#00859b",
     forProjects: true,
     output: "A minimal-diff change set: it fixes the named problem, preserves working state, leaves untouched what wasn't mentioned, and states any assumption inline.",
     specific: [
@@ -5949,9 +6025,9 @@ function vibeBuildCard(proj) {
   tagWrap.addEventListener("click", () => {
     openTagPicker("Tags · " + proj.title, "both", parseGoalTags(proj.tags), async (working) => {
       await vibePatch(proj, "tags", serializeGoalTags(working));
-    }, "Tick the focus areas and ideas this project advances — they’ll link it into your Map and Goals.");
+    }, "Tick the values and ideas this project advances — they’ll link it into your Map and Goals.");
   });
-  card.append(el("div", { class: "vibe-tags-label" }, "Linked focus areas & ideas"));
+  card.append(el("div", { class: "vibe-tags-label" }, "Linked values & ideas"));
   card.append(tagWrap);
 
   // Plan button
@@ -5960,7 +6036,7 @@ function vibeBuildCard(proj) {
     class: "vibe-plan-btn" + (hasPlan ? " has" : ""),
     title: hasPlan ? "View or edit this project's plan and prompts" : "Plan this project with the brief template",
     onClick: () => openProjectPlan(proj),
-  }, hasPlan ? `📋 View plan · ${planCoreCount(planOf(proj))}/${planCoreTotal()}` : "📋 Create plan"));
+  }, hasPlan ? `View plan · ${planCoreCount(planOf(proj))}/${planCoreTotal()}` : "Create plan"));
 
   // To-do toggle
   const onTodo = vibeOnTodo(proj);
@@ -5986,7 +6062,7 @@ function renderVibe() {
   const wrap = el("div", { class: "vibe-wrap" });
   const head = el("div", { class: "vibe-head" });
   head.append(el("div", {}, el("div", { class: "vibe-title" }, "Vibe Coding Projects"),
-    el("div", { class: "vibe-sub" }, "Your build pipeline — tag each to the focus areas and ideas it advances.")));
+    el("div", { class: "vibe-sub" }, "Your build pipeline — tag each to the values and ideas it advances.")));
   head.append(el("button", { class: "tool-btn accent-teal", onClick: vibeAddProject }, "+ New project"));
   wrap.append(head);
 
@@ -6085,7 +6161,7 @@ function renderRewards() {
         catch (e) { alert("Not enough points for that yet."); }
       } }, affordable ? "Redeem" : "Locked");
     actions.append(redeem);
-    actions.append(el("button", { class: "rw-mini", title: "Edit", onClick: () => openRewardEditor(r) }, "✎"));
+    actions.append(el("button", { class: "rw-mini", title: "Edit", onClick: () => openRewardEditor(r) }, ""));
     actions.append(el("button", { class: "rw-mini", title: "Delete", onClick: async () => {
       if (confirm(`Delete reward “${r.name}”?`)) { await api(`/api/rewards/${r.id}`, { method: "DELETE" }); await loadState(); }
     } }, "×"));
@@ -6142,7 +6218,7 @@ function openRewardEditor(reward) {
 </script>
 <script>
 /* ---- today.js ---- */
-/* Tuned In — today.js
+/* Radio Station — today.js
    Today — priorities + time-block schedule, .ics import, Eisenhower matrix, Today hub (Day/Week/Month)
    Load order matters: see templates/index.html. Classic scripts share one global scope. */
 
@@ -6189,7 +6265,7 @@ async function rescanCalendarFolder() {
     const resp = await api("/api/schedule/rescan", { method: "POST" });
     scheduleBlocks = null; scheduleDay = null; calBlocks = {};
     if (!resp.found) {
-      showTimerToast("No .ics file found in the Tuned In folder yet.");
+      showTimerToast("No .ics file found in the Radio Station folder yet.");
     } else {
       showTimerToast(`Re-imported ${resp.added} event${resp.added === 1 ? "" : "s"} from ${resp.name}.`);
     }
@@ -6201,7 +6277,7 @@ async function rescanCalendarFolder() {
 // A clickable + drag-and-drop zone for dropping an .ics file.
 function icsImportZone() {
   const zone = el("div", { class: "ics-zone", title: "Drop an Outlook .ics file here, or click to choose" },
-    "⬆ Drop .ics here, or save one in the Tuned In folder");
+    "⬆ Drop .ics here, or save one in the Radio Station folder");
   const input = el("input", { type: "file", accept: ".ics,text/calendar", style: "display:none" });
   input.addEventListener("change", () => { if (input.files && input.files[0]) readIcsFile(input.files[0]); input.value = ""; });
   zone.append(input);
@@ -6335,7 +6411,7 @@ function toastMsg(msg) {
   const old = document.getElementById("timer-toast");
   if (old) old.remove();
   const t = el("div", { id: "timer-toast", class: "timer-toast" });
-  t.append(el("span", { class: "timer-toast-icon" }, "🗓"));
+  t.append(el("span", { class: "timer-toast-icon" }, ""));
   t.append(el("span", {}, msg));
   t.append(el("button", { class: "timer-toast-x", onClick: () => t.remove() }, "×"));
   document.body.append(t);
@@ -6364,7 +6440,7 @@ function renderToday() {
   // Outlook import (drop or click). Imported events become editable blocks.
   const importRow = el("div", { class: "ics-row" });
   importRow.append(icsImportZone());
-  importRow.append(el("span", { class: "ics-clear", title: "Re-read the .ics saved in the Tuned In folder", onClick: rescanCalendarFolder }, "sync folder"));
+  importRow.append(el("span", { class: "ics-clear", title: "Re-read the .ics saved in the Radio Station folder", onClick: rescanCalendarFolder }, "sync folder"));
   importRow.append(el("span", { class: "ics-clear", title: "Remove imported Outlook events", onClick: clearImportedSchedule }, "clear imported"));
   left.append(importRow);
 
@@ -6446,7 +6522,7 @@ function renderToday() {
   const planbar = el("div", { class: "plan-bar" });
   planbar.append(el("button", { class: "today-navbtn plan-go",
     title: "Fill this day's free time with tasks from the Matrix, in quadrant order, using each task's estimate",
-    onClick: () => autoPlanDay(day) }, "⚡ Auto-plan day"));
+    onClick: () => autoPlanDay(day) }, "Auto-plan day"));
   const win = planWindow();
   planbar.append(el("span", { class: "plan-lab" }, "between"));
   const mkTime = (val, key) => {
@@ -6869,7 +6945,7 @@ function renderCalendar() {
   head.append(el("div", { class: "cal-title" }, `${monthName} ${calMonth.y}`));
   head.append(el("button", { class: "tool-btn", onClick: () => { calMonth = calMonth.m === 11 ? { y: calMonth.y + 1, m: 0 } : { y: calMonth.y, m: calMonth.m + 1 }; render(); } }, "›"));
   head.append(icsImportZone());
-  head.append(el("span", { class: "ics-clear", title: "Re-read the .ics saved in the Tuned In folder", onClick: rescanCalendarFolder, style: "margin-left:8px" }, "sync folder"));
+  head.append(el("span", { class: "ics-clear", title: "Re-read the .ics saved in the Radio Station folder", onClick: rescanCalendarFolder, style: "margin-left:8px" }, "sync folder"));
   cal.append(head);
 
   // Fetch this month's schedule blocks (Outlook imports + hand-made) and group
@@ -7580,7 +7656,7 @@ function applyTheme() {
   const btn = document.getElementById("btn-theme");
   if (btn) {
     btn.innerHTML = "";
-    btn.append(el("span", { class: "tb-ic" }, isDark() ? "\u2600" : "\u263D"));
+    btn.append(icon(isDark() ? "sun" : "moon", 13));
     btn.append(el("span", {}, isDark() ? "Light" : "Dark"));
     btn.title = isDark() ? "Switch to light" : "Switch to dark";
   }
@@ -7627,16 +7703,23 @@ function openEditMenu() {
   closeAllPopovers();
   const menu = el("div", { class: "row-menu floating", style: "min-width:180px" });
   menu.append(el("div", { class: "row-menu-head" }, "Settings"));
-  const item = (label, fn) => el("div", { class: "row-menu-opt", onClick: () => { menu.remove(); fn(); } }, label);
-  menu.append(item("⚙ Columns", openColumns));
-  menu.append(item("⇕ Display", openDisplay));
-  menu.append(item("⚡ Automations", openAutomations));
-  menu.append(item("▭ Header", openHeaderSettings));
-  menu.append(item("\u25D0 Appearance", openAppearance));
-  menu.append(item("⌨ Shortcuts", openShortcuts));
-  menu.append(item("\u21BA Data history", openDataHistory));
+  // Each entry carries an inline SVG icon rather than an emoji, so it renders
+  // the same on every platform and takes the theme's colour.
+  const item = (ic, label, fn) => {
+    const row = el("div", { class: "row-menu-opt", onClick: () => { menu.remove(); fn(); } });
+    row.append(icon(ic, 14));
+    row.append(el("span", {}, label));
+    return row;
+  };
+  menu.append(item("columns", "Columns", openColumns));
+  menu.append(item("sliders", "Display", openDisplay));
+  menu.append(item("bolt", "Automations", openAutomations));
+  menu.append(item("header", "Header", openHeaderSettings));
+  menu.append(item("contrast", "Appearance", openAppearance));
+  menu.append(item("keyboard", "Shortcuts", openShortcuts));
+  menu.append(item("history", "Data history", openDataHistory));
   menu.append(el("div", { class: "row-menu-sep" }));
-  menu.append(item("🧹 Clean up empty tasks", cleanupEmptyTasks));
+  menu.append(item("broom", "Clean up empty tasks", cleanupEmptyTasks));
   const anchor = document.getElementById("btn-edit");
   positionFloatingMenu(menu, anchor, "below-right");
   attachOutsideClose(menu, anchor);
@@ -8117,7 +8200,7 @@ function updateCollapseGoalsBtn() {
   const b = document.getElementById("btn-collapse-goals");
   if (!b) return;
   b.classList.toggle("active", goalCellsCollapsed);
-  b.textContent = goalCellsCollapsed ? "⊞ Pillar/Idea" : "⊟ Pillar/Idea";
+  b.textContent = goalCellsCollapsed ? "⊞ Values/Goal" : "⊟ Values/Goal";
   b.title = goalCellsCollapsed
     ? "Pillar & Idea cells are collapsed to one line. Click to expand all (a cell's ▸ caret expands just that one)."
     : "Collapse the Pillar & Idea cells to one line each to shrink row height (a cell's ▾ caret collapses just that one).";
@@ -8486,20 +8569,20 @@ if (alarmBtn) {
 </script>
 <script>
 /* ---- goals.js ---- */
-/* Tuned In — goals.js
+/* Radio Station — goals.js
    Goals — Corp Dev OS, pillars & framework, goal dashboard/detail, Map, momentum
    Load order matters: see templates/index.html. Classic scripts share one global scope. */
 
 /* ===========================================================
    Goals — Corp Dev Operating System + Promotion Path
-   A native Tuned In view. State persists as a single JSON
+   A native Radio Station view. State persists as a single JSON
    blob in settings["goals_os"] via the existing /api/settings
    endpoint — no schema or backend changes.
    =========================================================== */
 
 const GOALS_KEY = "goals_os";
 
-// Strategic pillars are the seven focus areas from the promotion map. They're
+// Strategic pillars are the seven values from the promotion map. They're
 // user-editable: rename, recolor, reweight, add/remove. The live list lives in
 // GOALS.pillars (persisted); this is the seed.
 const GS_PILLAR_SEED = [
@@ -8593,7 +8676,7 @@ function gsNormalizePillars() {
     seedKeys.add(seed.key);
     if (gone.has(seed.key)) { delete byKey[seed.key]; return; }
     const s = byKey[seed.key];
-    // For the seven base focus areas, adopt the new seed's label/why/color (the
+    // For the seven base values, adopt the new seed's label/why/color (the
     // meaning changed in this redefinition), but keep a user-set weight if present.
     result.push({
       key: seed.key, label: seed.label, color: seed.color,
@@ -8608,7 +8691,7 @@ function gsNormalizePillars() {
     const p = byKey[k];
     if (seedKeys.has(k)) return;
     if (gone.has(k)) return;
-    result.push({ key: k, label: p.label || "Pillar", color: p.color || "#b3b3b3", weight: (typeof p.weight === "number" ? p.weight : 10), why: p.why || "", base: false, scope: p.scope || undefined });
+    result.push({ key: k, label: p.label || "Values", color: p.color || "#b3b3b3", weight: (typeof p.weight === "number" ? p.weight : 10), why: p.why || "", base: false, scope: p.scope || undefined });
   });
   GOALS.pillars = result;
 }
@@ -8917,7 +9000,7 @@ function gsRoleExpSection(area, slug) {
 }
 
 // ---- Section-level roles (reverted) ----------------------------------------
-// Pinning a whole section to one rung was tried and undone: a focus area like
+// Pinning a whole section to one rung was tried and undone: a value like
 // Autonomy should hold goals at EVERY level — what you do autonomously as an
 // analyst is not what you do as a VP. Roles belong on individual goals, not on
 // the section. This migration undoes the pinning: it unmarks the sections and
@@ -9027,8 +9110,8 @@ async function gsRetireAutonomy() {
   // Rebuild Pillar cells from the goals each task is tagged to, so no task is
   // left pointing at a section that no longer exists.
   let retagged = 0;
-  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar/i.test(String(c.name || "")));
-  const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar/i.test(String(c.name || "")));
+  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar|value/i.test(String(c.name || "")));
+  const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar|value/i.test(String(c.name || "")));
   if (gcol && pcol) {
     const pillarOf = {};
     (GOALS.ideas || []).forEach((i) => { pillarOf[i.id] = i.pillar || ""; });
@@ -9103,7 +9186,7 @@ async function gsMergePillars() {
 
     // Re-point Pillar-column tags on the board so nothing points at a section
     // that no longer exists.
-    const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar/i.test(String(c.name || "")));
+    const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar|value/i.test(String(c.name || "")));
     if (pcol) {
       for (const t of STATE.tasks) {
         const raw = String(t.cells[pcol.id] || "");
@@ -9514,9 +9597,9 @@ function scExportHtml(opts) {
 <div class="cols">
 ${sections}
 </div>
-<footer>Generated from Tuned In on ${esc(today)}.</footer>
+<footer>Generated from Radio Station on ${esc(today)}.</footer>
 <div id="demo-banner">
-  <b>Tuned In</b> &mdash; a live demo of Tuned In, running entirely in your browser.
+  <b>Tuned In</b> &mdash; a live demo running entirely in your browser.
   Everything works; nothing is saved. <span>Refresh to reset.</span>
 </div>
 <style>
@@ -9595,8 +9678,8 @@ function gsExportScorecard() {
 // to them — and never deletes a goal as a side effect. Goals are moved to a
 // section you choose; only the section itself goes.
 async function gsRebuildPillarTags() {
-  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar/i.test(String(c.name || "")));
-  const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar/i.test(String(c.name || "")));
+  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar|value/i.test(String(c.name || "")));
+  const pcol = STATE.columns.find((c) => c.type === "goal" && /pillar|value/i.test(String(c.name || "")));
   if (!gcol || !pcol) return 0;
   const pillarOf = {};
   (GOALS.ideas || []).forEach((i) => { pillarOf[i.id] = i.pillar || ""; });
@@ -9621,7 +9704,7 @@ async function gsRebuildPillarTags() {
 function gsSectionStats(key) {
   const goals = (GOALS.ideas || []).filter((i) => i.pillar === key);
   const ids = new Set(goals.map((i) => i.id));
-  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar/i.test(String(c.name || "")));
+  const gcol = STATE.columns.find((c) => c.type === "goal" && !/pillar|value/i.test(String(c.name || "")));
   const sc = STATE.columns.find((c) => c.type === "status");
   let tagged = 0, done = 0;
   if (gcol) {
@@ -9983,7 +10066,7 @@ function loadGoals() {
   GS_SETUP.forEach((s) => { if (!GOALS.setup[s.id]) GOALS.setup[s.id] = { done: false }; });
   gsNormalizePillars();
   gsMigrateRefs();
-  // Fresh installs start with empty focus areas — no seeded goal set.
+  // Fresh installs start with empty values — no seeded goal set.
   // Existing databases keep whatever they already saved.
   if (GOALS.fwSeeded || (GOALS.ideas && GOALS.ideas.length)) {
     gsSeedFramework();
@@ -9998,7 +10081,7 @@ function loadGoals() {
   gsMigrateImprovements();
 }
 
-// The promotion map, digitized from handwritten notes. Each focus area is a
+// The promotion map, digitized from handwritten notes. Each value is a
 // pillar; its nested sub-concepts seed as nested ideas (one-time) so the whole
 // framework appears in the Map, editable and assignable.
 const GS_FRAMEWORK = {
@@ -10264,9 +10347,9 @@ function renderGoalsDashboard() {
   ht.append(el("div", { class: "gd-eyebrow" }, "Active goals"));
   ht.append(el("div", { class: "gd-title" }, "What am I moving forward?"));
   head.append(ht);
-  // Sections (focus areas) group your goals. Creating one was previously only
+  // Sections (values) group your goals. Creating one was previously only
   // reachable from the Operating System tab; surface it where the goals are.
-  head.append(el("button", { class: "tool-btn", title: "Create a new goal section (focus area) to group goals under",
+  head.append(el("button", { class: "tool-btn", title: "Create a new goal section (value) to group goals under",
     onClick: gsAddPillar }, "+ New Section"));
   head.append(el("button", { class: "tool-btn", title: "Rename, mark personal, or delete sections",
     onClick: gsManageSections }, "\u2699 Sections"));
@@ -10318,7 +10401,7 @@ function renderGoalsDashboard() {
 
   // All goals by pillar
   const allSec = el("div", { class: "gd-section" });
-  allSec.append(el("div", { class: "gd-sec-h" }, "All goals by focus area"));
+  allSec.append(el("div", { class: "gd-sec-h" }, "All goals by value"));
   const active = gsActiveGoals();
   const byPillar = {};
   active.forEach((g) => { (byPillar[g.pillar || ""] = byPillar[g.pillar || ""] || []).push(g); });
@@ -10453,11 +10536,11 @@ function renderGoalDetail(id) {
   wrap.append(title);
 
   const metaRow = el("div", { class: "gd-d-meta" });
-  // focus area
+  // value
   const psel = el("select", { class: "gd-sel", onChange: (e) => { g.pillar = e.target.value; saveGoals(); gsOpenGoal(id); } });
   gsPillars().forEach((pp) => psel.append(el("option", Object.assign({ value: pp.key }, pp.key === g.pillar ? { selected: "selected" } : {}), pp.label)));
   psel.append(el("option", Object.assign({ value: "" }, !g.pillar ? { selected: "selected" } : {}), "Unassigned"));
-  metaRow.append(gsField("Focus area", psel));
+  metaRow.append(gsField("Value", psel));
   // status
   const ssel = el("select", { class: "gd-sel", onChange: (e) => { g.status = e.target.value; saveGoals(); gsOpenGoal(id); } });
   [["active", "Active"], ["blocked", "Blocked"], ["done", "Done"]].forEach(([v, l]) => {
@@ -10651,7 +10734,7 @@ function gsTiedTasksBlock(g) {
 
 // Find the board's goal-link column (the one that isn't the Pillar column).
 function gsGoalLinkCol() {
-  return STATE.columns.find((c) => c.type === "goal" && !/pillar/i.test(String(c.name || "")));
+  return STATE.columns.find((c) => c.type === "goal" && !/pillar|value/i.test(String(c.name || "")));
 }
 async function gsTagTask(task, goal) {
   const col = gsGoalLinkCol();
@@ -10753,7 +10836,7 @@ function gsNewGoalForm(parentId, presetPillar, presetRole) {
     const psel = el("select", { class: "gd-sel" });
     gsPillars().forEach((p) => psel.append(el("option", Object.assign({ value: p.key }, p.key === defPillar ? { selected: "selected" } : {}), p.label)));
     psel.append(el("option", { value: "" }, "Unassigned"));
-    body.append(gsFormRow("Focus area", psel));
+    body.append(gsFormRow("Value", psel));
     const whyI = el("textarea", { class: "gd-input", rows: "2", placeholder: "Why it matters" });
     body.append(gsFormRow("Why", whyI));
     const planI = el("textarea", { class: "gd-input", rows: "3", placeholder: "Plan \u2014 the next concrete moves (required)" });
@@ -11021,7 +11104,7 @@ function renderGoalsOS() {
   focusCard.append(fhead);
   let pTotal = 0;
   gsPillars().forEach((p) => {
-    if (gsPillarHidden(p.key)) return;   // hidden focus areas drop out of the bars
+    if (gsPillarHidden(p.key)) return;   // hidden values drop out of the bars
     pTotal += Number(p.weight) || 0;
     const row = el("div", { class: "gs-bar-row" });
     const top = el("div", { class: "gs-bar-top" });
@@ -11035,16 +11118,16 @@ function renderGoalsOS() {
     wIn.addEventListener("change", () => { const v = Math.max(0, Math.min(100, parseInt(wIn.value || "0", 10) || 0)); p.weight = v; wIn.value = String(v); fill.style.width = v + "%"; saveGoals(true); });
     top.append(wIn);
     top.append(el("span", { class: "gs-bar-pct" }, "%"));
-    top.append(el("span", { class: "gs-eye", title: "Hide this focus area (from the Map, these bars, and the cell pickers)", onClick: () => { gsToggleHidePillar(p.key); $("#board").innerHTML = ""; renderGoals(); } }, "🙈"));
+    top.append(el("span", { class: "gs-eye", title: "Hide this value (from the Map, these bars, and the cell pickers)", onClick: () => { gsToggleHidePillar(p.key); $("#board").innerHTML = ""; renderGoals(); } }, ""));
     if (!p.base) top.append(el("span", { class: "gs-x", title: "Remove pillar", onClick: () => gsRemovePillar(p.key) }, "✕"));
     const tally = gsPillarTaskTally(p.key);
     if (tally.total) {
-      top.append(el("span", { class: "gs-bar-tasks", title: "Tasks tagged to this focus area via the Goal column", onClick: () => setView("table") },
+      top.append(el("span", { class: "gs-bar-tasks", title: "Tasks tagged to this value via the Goal column", onClick: () => setView("table") },
         `${tally.done}/${tally.total} tasks`));
     }
     const projN = gsPillarProjectTally(p.key);
     if (projN) {
-      top.append(el("span", { class: "gs-bar-tasks", title: "Vibe Coding projects linked to this focus area", onClick: () => { if (typeof notebookTab !== "undefined") notebookTab = "vibe"; setView("notes"); } },
+      top.append(el("span", { class: "gs-bar-tasks", title: "Vibe Coding projects linked to this value", onClick: () => { if (typeof notebookTab !== "undefined") notebookTab = "vibe"; setView("notes"); } },
         `${projN} project${projN === 1 ? "" : "s"}`));
     }
     row.append(top);
@@ -11057,7 +11140,7 @@ function renderGoalsOS() {
     row.append(why);
     focusCard.append(row);
   });
-  // Hidden focus areas — click a chip to bring it back.
+  // Hidden values — click a chip to bring it back.
   const hiddenP = gsPillars().filter((p) => gsPillarHidden(p.key));
   if (hiddenP.length) {
     const hr = el("div", { class: "gs-hidden-row" });
@@ -11641,7 +11724,7 @@ function mmNode(n) {
     const meta = el("div", { class: "mm-meta" });
     if (n.topLevel) meta.append(mmPillarSelect(null, n.pillar, n.ideaId));
     meta.append(el("span", { class: "mm-mini", title: "Add sub-item", onClick: (e) => { e.stopPropagation(); mmAddChildIdea(n.ideaId, n.pillar); } }, "＋"));
-    meta.append(el("span", { class: "mm-mini", title: "Rename", onClick: (e) => { e.stopPropagation(); mmRenameIdea(n.ideaId); } }, "✎"));
+    meta.append(el("span", { class: "mm-mini", title: "Rename", onClick: (e) => { e.stopPropagation(); mmRenameIdea(n.ideaId); } }, ""));
     meta.append(el("span", { class: "mm-x", title: "Remove (and any sub-items)", onClick: (e) => { e.stopPropagation(); mmRemoveIdea(n.ideaId); } }, "✕"));
     div.append(meta);
     if (mmHasKids(n)) div.addEventListener("click", () => mmToggle(n.id));
@@ -11758,11 +11841,11 @@ const ZEN_ITEMS = [
   { key: "rock_lg",  label: "Boulder",      icon: "⬤" },
   { key: "rock_sm",  label: "Stone",        icon: "●" },
   { key: "rock_flat",label: "Flat rock",    icon: "▬" },
-  { key: "bonsai",   label: "Bonsai",       icon: "🌳" },
-  { key: "bonsai_c", label: "Cascade bonsai", icon: "🎋" },
-  { key: "lantern",  label: "Stone lantern",icon: "🏮" },
-  { key: "moss",     label: "Moss mound",   icon: "🟢" },
-  { key: "pagoda",   label: "Pagoda",       icon: "🗼" },
+  { key: "bonsai",   label: "Bonsai",       icon: "" },
+  { key: "bonsai_c", label: "Cascade bonsai", icon: "" },
+  { key: "lantern",  label: "Stone lantern",icon: "" },
+  { key: "moss",     label: "Moss mound",   icon: "" },
+  { key: "pagoda",   label: "Pagoda",       icon: "" },
 ];
 
 function zenLoad() {
@@ -12138,7 +12221,7 @@ function renderZen() {
     el("div", { class: "vibe-title" }, "Zen Garden"),
     el("div", { class: "vibe-sub" }, "Take a break. Place rocks and bonsai, rake the sand, bend the lines — then make it your backdrop.")));
   const headBtns = el("div", { style: "display:flex;gap:8px;align-items:center" });
-  headBtns.append(el("button", { class: "tool-btn accent-teal", onClick: zenSetBackdrop }, "🖼 Set as app backdrop"));
+  headBtns.append(el("button", { class: "tool-btn accent-teal", onClick: zenSetBackdrop }, "Set as app backdrop"));
   // Show the on/off toggle only once a garden has been saved as a backdrop.
   // "off" hides it (white background) without deleting the saved image, so you
   // can flip it back on later. Default for anyone starting fresh is OFF.
@@ -12168,7 +12251,7 @@ function renderZen() {
     b.append(el("span", {}, label));
     return b;
   };
-  rail.append(toolBtn("move", "Move", "✋", "Drag items to rearrange. Double-click an item to remove it."));
+  rail.append(toolBtn("move", "Move", "", "Drag items to rearrange. Double-click an item to remove it."));
   rail.append(toolBtn("bend", "Swirl", "〰", "Click the sand to rake a circular swirl into it. Click a swirl to grow it (cycles 3 sizes); double-click to remove."));
   rail.append(el("span", { class: "zen-rail-div" }));
   ZEN_ITEMS.forEach((d) => rail.append(toolBtn(d.key, d.label, d.icon, `Click the garden to place a ${d.label.toLowerCase()}`)));
@@ -12190,8 +12273,8 @@ function renderZen() {
   bar.append(el("button", { class: "tool-btn", title: "Rake the sand fresh with new waviness (keeps items and swirls)",
     onClick: () => { ZEN.seed = Math.floor(Math.random() * 100000); zenDraw(); zenSave(); } }, "↻ Re-rake"));
   bar.append(el("button", { class: "tool-btn", title: "Generate a whole new random garden — items, swirls, raking",
-    onClick: zenRandomGarden }, "🎲 New garden"));
-  // How many items 🎲 places
+    onClick: zenRandomGarden }, "New garden"));
+  // How many items places
   const nSeg = el("div", { class: "zen-seg", title: "How many items a new random garden gets" });
   nSeg.append(el("label", {}, "Items"));
   const nInp = el("input", { type: "range", min: "2", max: "12", value: String(ZEN.autoN || 6) });
@@ -12221,7 +12304,7 @@ function renderZen() {
   cwrap.append(zenCanvas);
   wrap.append(cwrap);
   wrap.append(el("div", { class: "zen-hint" },
-    "✋ Move: drag items, double-click to remove · 〰 Swirl: click sand to rake a circular swirl, click it to grow, double-click to remove · Palette: click the garden to place · 🎲 for a fresh random garden"));
+    "Move: drag items, double-click to remove · 〰 Swirl: click sand to rake a circular swirl, click it to grow, double-click to remove · Palette: click the garden to place · for a fresh random garden"));
 
   // ---- Interactions ----
   zenCanvas.addEventListener("mousedown", (e) => {
@@ -12470,7 +12553,7 @@ zenPaintBanner();
 </script>
 <script>
 /* ---- skilllab.js ---- */
-/* Tuned In — skilllab.js
+/* Radio Station — skilllab.js
    Skill Lab — categories (seeded + custom), multi-category task links (primary/
    secondary/tertiary), resource tracker with per-type gauges (pages, minutes,
    study sessions, notecard sessions, custom types), priorities (max 3 High),
@@ -12715,7 +12798,7 @@ function renderSignalBoost() {
     sbSave(); render();
   } }, "+ New category"));
   headBtns.append(el("button", { class: "tool-btn", onClick: () => { sbShowLog = !sbShowLog; render(); } },
-    sbShowLog ? "Hide activity" : "📅 Activity"));
+    sbShowLog ? "Hide activity" : "Activity"));
   const sortWrap = el("label", { class: "sb-sortwrap", title: "How linked tasks are ordered inside every category" });
   sortWrap.append(el("span", {}, "Tasks by"));
   const sortSel = el("select", { class: "sb-sortsel" });
@@ -13334,7 +13417,7 @@ function sbGroupOverride(groupName) {
 }
 function sbBoardHeaderLabel(col) {
   // The pillar-named goal column becomes Category; the other becomes Resource.
-  return /pillar/i.test(String(col.name || "")) ? "Category" : "Resource";
+  return /pillar|value/i.test(String(col.name || "")) ? "Category" : "Resource";
 }
 function sbTaskResources(nameKey) {
   sbLoad();
@@ -13457,7 +13540,7 @@ function sbOpenCellMenu(anchor, task, isCat) {
 </script>
 <script>
 /* ---- ideas.js ---- */
-/* Tuned In — ideas.js
+/* Radio Station — ideas.js
    Ideas — future projects, personal and work. A list of ideas on the left,
    a brainstorm space for the selected idea on the right: dated brainstorm
    notes you keep adding to, plus a one-line "next step".
@@ -13703,12 +13786,12 @@ function ideasInjectCss() {
 </script>
 <script>
 /* ---- para.js ---- */
-/* Tuned In — para.js
+/* Radio Station — para.js
    PARA Method — Projects, Areas, Resources, Archives (Tiago Forte).
      Projects  — short-term efforts with a finish line. Can point at a board
                  group, so the live task count comes from the real board.
      Areas     — ongoing responsibilities with a standard to maintain. Can
-                 point at a Goal section, so it inherits that focus area.
+                 point at a Goal section, so it inherits that value.
      Resources — reference material and links you want to find again.
      Archives  — anything from the three above, set aside but not deleted.
    Archiving is a status change, never a delete: nothing is lost, and
@@ -13981,7 +14064,7 @@ function renderParaDetail(host) {
 </script>
 <script>
 /* ---- notes.js ---- */
-/* Tuned In — notes.js
+/* Radio Station — notes.js
    Notebook — freeform thoughts, reflections, and ideas that don't belong to a
    task, a goal, or a skill. A list on the left, the note on the right.
    Notes can be tagged, pinned, linked to a PARA item, and archived (never
@@ -14354,7 +14437,7 @@ function renderNoteEditor(host) {
 </script>
 <script>
 /* ---- career.js ---- */
-/* Tuned In — career.js
+/* Radio Station — career.js
    Career Notes — what the work is actually like, logged as it happens.
 
    Five surfaces: Quick Capture, Dimensions, Ikigai synthesis, Working
@@ -15029,7 +15112,7 @@ function renderCareerBaseline(host) {
   const bl = el("div", { class: "cn-bllist" });
   if (!(CAREER.baselines || []).length) {
     bl.append(el("div", { class: "cn-empty" },
-      "No baseline recorded yet. Run career/seed_baseline.py from the Tuned In folder with the app closed."));
+      "No baseline recorded yet. Run career/seed_baseline.py from the Radio Station folder with the app closed."));
   }
   (CAREER.baselines || []).forEach((b, i) => {
     const r = el("div", { class: "cn-bl" });
@@ -15146,7 +15229,7 @@ loadState();
 
 </script>
 <div id="demo-banner">
-  <b>Tuned In</b> &mdash; a live demo of Tuned In, running entirely in your browser.
+  <b>Tuned In</b> &mdash; a live demo running entirely in your browser.
   Everything works; nothing is saved. <span>Refresh to reset.</span>
 </div>
 <style>
