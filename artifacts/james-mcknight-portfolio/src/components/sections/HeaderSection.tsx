@@ -21,14 +21,14 @@ export default function HeaderSection() {
             Explore projects <ArrowUpRight size={20} aria-hidden="true" />
           </Link>
         </div>
-        <div className="block w-full max-w-xs justify-self-center rounded-3xl md:justify-self-end">
+        <div className="aspect-square w-full max-w-xs justify-self-center overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm md:justify-self-end">
           <img
             src={personalInfo.avatar}
             alt={`${personalInfo.name} headshot`}
             width={1500}
             height={1500}
             fetchPriority="high"
-            className="aspect-square w-full rounded-3xl border border-slate-200 object-cover shadow-sm"
+            className="h-full w-full origin-top scale-[1.55] object-cover object-top"
           />
         </div>
       </div>
