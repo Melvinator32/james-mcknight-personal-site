@@ -1,4 +1,5 @@
 # Build and deploy the portfolio to GitHub Pages
+# Updated to redeploy the cleaned photo collection
 name: Deploy portfolio to Pages
 
 on:
