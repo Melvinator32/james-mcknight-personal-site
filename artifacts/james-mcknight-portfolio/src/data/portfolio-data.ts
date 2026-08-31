@@ -1,16 +1,13 @@
 import flyFishingBoatPhoto from "@/assets/photo-flyfishing-boat.jpeg";
 import golfYoungPhoto from "@/assets/photo-golf-young.jpeg";
 import musicWinterWonderGrassPhoto from "@/assets/photo-music-winterwondergrass.jpeg";
-import travelMadeiraPhoto from "@/assets/photo-travel-madeira.jpeg";
 import travelAlpineHikePhoto from "@/assets/photo-travel-alpine-hike.jpeg";
-import musicConcertGroupPhoto from "@/assets/photo-music-concert-group.jpeg";
 import sportsLsuFootballPhoto from "@/assets/photo-sports-lsu-football.jpeg";
 import sportsBasketballPhoto from "@/assets/photo-sports-basketball.jpeg";
 import travelVenicePhoto from "@/assets/photo-travel-venice.jpeg";
 import sportsSkiingPhoto from "@/assets/photo-sports-skiing.jpeg";
 import wfhSetupPhoto from "@/assets/photo-wfh-setup.png";
 import houseplantPropagationBottlePhoto from "@/assets/photo-houseplant-propagation-bottle.jpeg";
-import houseplantBonsaiPhoto from "@/assets/photo-houseplant-bonsai.jpeg";
 import houseplantPonytailPalmPhoto from "@/assets/photo-houseplant-ponytail-palm.jpeg";
 import houseplantPropagationStationPhoto from "@/assets/photo-houseplant-propagation-station.jpeg";
 import projectPodShop from "@/assets/project-pod-shop.png";
@@ -52,11 +49,9 @@ import melvinBlanketPhoto from "@/assets/photo-melvin-blanket.jpeg";
 import melvinRunningPhoto from "@/assets/photo-melvin-running.jpeg";
 import melvinBedPhoto from "@/assets/photo-melvin-bed.jpeg";
 import golfPhoto from "@/assets/photo-golf.jpeg";
-import alpineCowPhoto from "@/assets/photo-alpine-cow.jpeg";
 import winterBridgePhoto from "@/assets/photo-winter-bridge.jpeg";
 import duckHuntingPhoto from "@/assets/photo-duck-hunting.jpeg";
 import groupPhoto from "@/assets/photo-group.jpeg";
-import homeOfficePhoto from "@/assets/photo-home-office.jpeg";
 import jazzArtPhoto from "@/assets/photo-jazz-art.jpeg";
 
 import backpackingRidgePhoto from "@/assets/photo-backpacking-ridge.jpeg";
@@ -317,11 +312,6 @@ export const photos: Photo[] = [
     caption: "Golf, links-style",
   },
   {
-    src: alpineCowPhoto,
-    alt: "James walking alongside a cow in an alpine meadow with a mountain hut in the background",
-    caption: "An unexpected trail companion in the Alps",
-  },
-  {
     src: groupPhoto,
     alt: "A group of nine friends and family dressed up for a holiday gathering in front of a house",
     caption: "Holiday gathering",
@@ -357,11 +347,6 @@ export const photos: Photo[] = [
     caption: "Melvin, on duty",
   },
   {
-    src: homeOfficePhoto,
-    alt: "A home office corner with a standing desk, three monitors, house plants, and a framed concert poster on the wall",
-    caption: "Home office, with the collection on the wall",
-  },
-  {
     src: jazzArtPhoto,
     alt: "An ink illustration of a trumpet player painted over sheet music, signed Pazos 2026",
     caption: "Jazz artwork by Pazos, part of the collection",
@@ -373,7 +358,6 @@ export const interests: Interest[] = [
     name: "Travel",
     photos: [
       ...photos.filter((photo) => [winterBridgePhoto].includes(photo.src)),
-      { src: travelMadeiraPhoto, alt: "A couple overlooking the Atlantic coast in Madeira", caption: "Madeira" },
       { src: travelAlpineHikePhoto, alt: "A hiking selfie above an alpine valley", caption: "Alpine hiking" },
       { src: travelVenicePhoto, alt: "Friends on the water in Venice at sunset", caption: "Venice at sunset" },
     ],
@@ -392,7 +376,7 @@ export const interests: Interest[] = [
   {
     name: "Backpacking",
     photos: [
-      ...photos.filter((photo) => [travelMountain, alpineCowPhoto].includes(photo.src)),
+      ...photos.filter((photo) => [travelMountain].includes(photo.src)),
       { src: backpackingRidgePhoto, alt: "Two hikers posing on a rocky ridge beneath a tall mountain and blue sky", caption: "A moment on the trail" },
       { src: backpackingFriendsPhoto, alt: "Two friends with hiking gear in an alpine meadow with snowy mountains behind them", caption: "Backpacking with friends" },
     ],
@@ -419,7 +403,6 @@ export const interests: Interest[] = [
     photos: [
       ...photos.filter((photo) => [jazzFestPhoto].includes(photo.src)),
       { src: musicWinterWonderGrassPhoto, alt: "WinterWonderGrass festival stage in the mountains", caption: "WinterWonderGrass" },
-      { src: musicConcertGroupPhoto, alt: "A group of family and friends outside a concert venue", caption: "A night of live music" },
     ],
     description:
       "I am obsessed with music, although I do not play any instruments myself. I can talk your ear off about any genre, as virtually every one has been my favorite at some point in the last 10 years. Right now, my Jazz playlists own most of my attention.\n\nNew Orleans makes this an easy one to dive into — I am at as many shows and festivals as possible whenever they come through. At any given moment, I have tickets, or at least plans, for my next 3–5 shows. My ultimate favorite band is the Grateful Dead, and it has probably been several years since I went more than a day without listening to them or learning about their famous lore. If you look closely at my vibe coding portfolio page, you will see lots of easter egg references to the Dead…",
@@ -489,7 +472,6 @@ export const interests: Interest[] = [
         name: "Collecting Houseplants / Propagating",
         photos: [
           { src: houseplantPropagationBottlePhoto, alt: "A pothos cutting propagating in a green glass bottle", caption: "A pothos propagation" },
-          { src: houseplantBonsaiPhoto, alt: "A bonsai-style succulent beside grasses and a small cactus", caption: "A windowsill plant collection" },
           { src: houseplantPonytailPalmPhoto, alt: "A ponytail palm in a blue ceramic pot", caption: "Ponytail palm" },
           { src: houseplantPropagationStationPhoto, alt: "Pothos and philodendron cuttings growing in glass propagation vessels", caption: "The propagation station" },
         ],
