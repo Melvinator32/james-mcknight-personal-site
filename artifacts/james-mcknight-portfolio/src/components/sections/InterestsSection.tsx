@@ -130,10 +130,35 @@ function InterestNode({ node, depth, contentKey }: { node: Interest; depth: numb
   );
 }
 
+const damagedPhotoNames = [
+  "photo-winter-bridge",
+  "photo-melvin-bed",
+  "photo-flyfishing-",
+  "photo-duck-hunting",
+  "photo-jazzfest",
+  "photo-jazz-art",
+  "photo-group",
+  "photo-golf-",
+  "photo-golf-young",
+  "photo-alpine-cow",
+  "photo-travel-madeira",
+  "photo-poster-billy-strings",
+  "photo-music-concert-group",
+  "photo-home-office",
+  "photo-travel-mountain",
+  "photo-houseplant-bonsai",
+];
+
 function InterestPhotos({ photos, products = false }: { photos: NonNullable<Interest["photos"]>; products?: boolean }) {
+  const usablePhotos = photos.filter(
+    (photo) => !damagedPhotoNames.some((name) => photo.src.includes(name)),
+  );
+
+  if (usablePhotos.length === 0) return null;
+
   if (products) return (
     <div className="grid grid-cols-1 gap-3 pb-4 pt-3 sm:grid-cols-3">
-      {photos.map(photo => (
+      {usablePhotos.map(photo => (
         <figure key={photo.src} className="overflow-hidden rounded-xl bg-[#E1E2D8] text-[#263229]">
           <PhotoLightbox src={photo.src} alt={photo.alt}>
             <img src={photo.src} alt={photo.alt} loading="lazy" className="h-44 w-full bg-white p-3 object-contain" />
@@ -145,7 +170,7 @@ function InterestPhotos({ photos, products = false }: { photos: NonNullable<Inte
   );
   return (
     <div className="grid max-w-xl grid-cols-2 gap-3 pb-4 pt-1">
-      {photos.map((photo) => (
+      {usablePhotos.map((photo) => (
         <PhotoLightbox key={photo.src} src={photo.src} alt={photo.alt}>
         <img
           src={photo.src}
