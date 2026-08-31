@@ -3,7 +3,12 @@ import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 
 const build = spawnSync('pnpm', ['--filter', '@workspace/james-mcknight-portfolio', 'build'], {
   stdio: 'inherit',
-  env: { ...process.env, NODE_ENV: 'production', PORT: '4173', BASE_PATH: '/' },
+  env: {
+    ...process.env,
+    NODE_ENV: 'production',
+    PORT: process.env.PORT || '4173',
+    BASE_PATH: process.env.BASE_PATH || '/',
+  },
 });
 if (build.status !== 0) process.exit(build.status ?? 1);
 await rm('dist', { recursive: true, force: true });
