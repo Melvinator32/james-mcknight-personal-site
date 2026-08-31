@@ -36,7 +36,7 @@ import type {
   Stat,
 } from "@/types/portfolio";
 
-import headshotPhoto from "@/assets/headshot-photo.png";
+import headshotPhoto from "@/assets/headshot-photo.jpg";
 import projectWeirwoodPreview from "@/assets/project-weirwood-preview.jpg";
 import projectRewardsPreview from "@/assets/project-cardwise-perks-preview.jpg";
 import projectBlackjackPreview from "@/assets/project-blackjack-preview.jpg";
