@@ -41,6 +41,8 @@ jobs:
 
       - name: Build portfolio
         run: pnpm run build
+        env:
+          BASE_PATH: /james-mcknight-personal-site/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
