@@ -28,7 +28,7 @@ export default function HeaderSection() {
             width={1500}
             height={1500}
             fetchPriority="high"
-            className="h-full w-full origin-top scale-[2.1] object-cover object-top"
+            className="h-full w-full object-cover object-top"
           />
         </div>
       </div>
