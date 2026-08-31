@@ -131,21 +131,11 @@ function InterestNode({ node, depth, contentKey }: { node: Interest; depth: numb
 }
 
 const damagedPhotoNames = [
-  "photo-winter-bridge",
-  "photo-melvin-bed",
-  "photo-flyfishing-",
-  "photo-duck-hunting",
-  "photo-jazzfest",
-  "photo-jazz-art",
-  "photo-group",
-  "photo-golf-",
-  "photo-golf-young",
-  "photo-alpine-cow",
   "photo-travel-madeira",
-  "photo-poster-billy-strings",
   "photo-music-concert-group",
   "photo-home-office",
-  "photo-travel-mountain",
+  "photo-golf-young",
+  "photo-alpine-cow",
   "photo-houseplant-bonsai",
 ];
 
