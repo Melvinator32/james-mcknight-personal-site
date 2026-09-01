@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import { PencilLine } from "lucide-react";
 import { useContentEditor } from "@/components/ContentEditorProvider";
 import EditableText from "@/components/EditableText";
 
@@ -10,7 +9,7 @@ interface NavigationProps {
 export default function Navigation(_props: NavigationProps) {
   const { pathname } = useLocation();
   const onHome = pathname === "/";
-  const { content, enterEditing, exitEditing, isEditing } = useContentEditor();
+  const { content, isEditing } = useContentEditor();
   const personalInfo = content.personalInfo;
 
   return (
@@ -52,20 +51,9 @@ export default function Navigation(_props: NavigationProps) {
                 </Link>
               </>
             )}
-            <button
-              type="button"
-              onClick={isEditing ? exitEditing : enterEditing}
-              className="inline-flex items-center gap-2 border border-foreground/20 px-2.5 py-1.5 text-small font-semibold transition-colors hover:bg-secondary"
-              aria-pressed={isEditing}
-            >
-              <PencilLine className="h-3.5 w-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">{isEditing ? "Editing" : "Edit portfolio"}</span>
-              <span className="sm:hidden">{isEditing ? "Editing" : "Edit"}</span>
-            </button>
           </div>
         </div>
       </div>
     </nav>
   );
 }
-
