@@ -1,7 +1,7 @@
 import BonsaiMark from "./BonsaiMark";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Linkedin, Mail, MapPin, PencilLine, FileText, Award } from "lucide-react";
+import { Linkedin, Mail, MapPin, FileText, Award } from "lucide-react";
 import EditableText from "@/components/EditableText";
 import { useContentEditor } from "@/components/ContentEditorProvider";
 import { useActiveSection } from "@/hooks/useActiveSection";
@@ -28,7 +28,7 @@ function scrollToSection(id: string) {
 }
 
 export default function PortfolioSidebar() {
-  const { content, enterEditing, exitEditing, isEditing } = useContentEditor();
+  const { content, isEditing } = useContentEditor();
   const activeSection = useActiveSection(180);
   const { pathname, hash } = useLocation();
   const navigate = useNavigate();
@@ -115,11 +115,8 @@ export default function PortfolioSidebar() {
           ) : (
             <a href={`mailto:${info.email}`} className={`flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold text-white ${personalRegister ? "bg-[var(--pers-accent-strong)]" : "bg-slate-900"}`}><Mail size={16} /><EditableText contentKey="labels.sidebarCta" fallback="Get in touch" label="Sidebar CTA label" /></a>
           )}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <a href={linkedInUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={`rounded-full p-2 transition-colors ${personalRegister ? "text-[var(--pers-muted)] hover:bg-[var(--pers-border)] hover:text-[var(--pers-text)]" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}><Linkedin size={20} /></a>
-            <button type="button" onClick={isEditing ? exitEditing : enterEditing} className={`inline-flex items-center gap-2 rounded border px-2.5 py-1.5 text-xs font-semibold transition-colors ${personalRegister ? "border-[var(--pers-border-strong)] hover:bg-[var(--pers-border)]" : "border-slate-300 hover:bg-slate-100"}`} aria-pressed={isEditing}>
-              <PencilLine size={14} />{isEditing ? "Editing" : "Edit portfolio"}
-            </button>
           </div>
         </div>
       </aside>
