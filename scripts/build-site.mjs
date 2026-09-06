@@ -1,7 +1,9 @@
 import { spawnSync } from 'node:child_process';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 
-const build = spawnSync('pnpm', ['--filter', '@workspace/james-mcknight-portfolio', 'build'], {
+const isWindows = process.platform === 'win32';
+const buildArgs = ['--filter', '@workspace/james-mcknight-portfolio', 'build'];
+const buildOptions = {
   stdio: 'inherit',
   env: {
     ...process.env,
@@ -9,7 +11,19 @@ const build = spawnSync('pnpm', ['--filter', '@workspace/james-mcknight-portfoli
     PORT: process.env.PORT || '4173',
     BASE_PATH: process.env.BASE_PATH || '/',
   },
-});
+};
+
+// On Windows pnpm is a .cmd shim, which spawnSync cannot resolve from the bare
+// name (it fails with ENOENT), so it has to go through the shell. The args are
+// joined into the command string because Node deprecates passing an args array
+// alongside shell: true; every argument here is a fixed, shell-safe literal.
+const build = isWindows
+  ? spawnSync(['pnpm', ...buildArgs].join(' '), { ...buildOptions, shell: true })
+  : spawnSync('pnpm', buildArgs, buildOptions);
+if (build.error) {
+  console.error(`Failed to run pnpm: ${build.error.message}`);
+  process.exit(1);
+}
 if (build.status !== 0) process.exit(build.status ?? 1);
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist/server', { recursive: true });
