@@ -47,3 +47,6 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Demo apps built from their own repos by scripts/build-demos.mjs
+artifacts/james-mcknight-portfolio/public/demos/*/

@@ -1,0 +1,21 @@
+{
+  "$comment": "Demos on the portfolio that are built from their own GitHub repo. Each entry is published to /demos/<slug>/ on jamesmcknight.me. See scripts/DEMOS.md.",
+  "publicDir": "artifacts/james-mcknight-portfolio/public/demos",
+  "demos": [
+    {
+      "slug": "blackjack-trainer",
+      "repo": "melvinator32/Blackjack-trainer",
+      "ref": "main"
+    },
+    {
+      "slug": "bayou-bill-shop-tracker",
+      "repo": "melvinator32/Bayou-Bill-Tracker",
+      "ref": "main"
+    },
+    {
+      "slug": "rewards-ledger",
+      "repo": "melvinator32/CardWise",
+      "ref": "main"
+    }
+  ]
+}

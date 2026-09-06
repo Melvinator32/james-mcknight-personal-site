@@ -251,7 +251,7 @@ export const projects: Project[] = [
     description:
       "A shop analytics dashboard for Bayou Bill, bringing revenue, profit, advertising performance, top products, traffic sources, and order fulfillment into one view. Explore interactive charts with illustrative sample data — no live Etsy or Printify connection.",
     techStack: ["JavaScript", "SVG Charts", "E-commerce Analytics"],
-    demoUrl: "/demos/bayou-bill-shop-tracker.html",
+    demoUrl: "/demos/bayou-bill-shop-tracker/",
     thumbnail: projectBayouBillPreview,
     status: "active",
   },
@@ -262,7 +262,7 @@ export const projects: Project[] = [
     description:
       "A personal spend and rewards ledger that ingests statement exports, categorizes transactions, and tracks points earn rates and card-level value across time.",
     techStack: ["Spend Analytics", "XLSX Parsing", "Dashboards"],
-    demoUrl: "/demos/rewards-ledger.html",
+    demoUrl: "/demos/rewards-ledger/",
     thumbnail: projectRewardsPreview,
     status: "active",
   },
@@ -284,7 +284,7 @@ export const projects: Project[] = [
     description:
       "A basic-strategy and counting trainer that deals real shoes, grades every decision against optimal play, and tracks accuracy over sessions.",
     techStack: ["Game Logic", "Probability", "PWA"],
-    demoUrl: "/demos/blackjack-trainer.html",
+    demoUrl: "/demos/blackjack-trainer/",
     thumbnail: projectBlackjackPreview,
     status: "active",
   },

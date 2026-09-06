@@ -2,9 +2,14 @@
 # Updated to redeploy the cleaned photo collection
 name: Deploy portfolio to Pages
 
+run-name: "${{ github.event_name == 'repository_dispatch' && format('Deploy (demo update - {0})', github.event.client_payload.repo) || 'Deploy portfolio to Pages' }}"
+
 on:
   push:
     branches: ["main"]
+  # Fired by the demo app repos when their own main branch changes.
+  repository_dispatch:
+    types: [demo-updated]
   workflow_dispatch:
 
 permissions:
@@ -42,6 +47,9 @@ jobs:
 
       - name: Build portfolio
         run: pnpm run build
+        env:
+          # Only needed if a demo app repo is private; public repos clone without it.
+          DEMO_REPOS_TOKEN: ${{ secrets.DEMO_REPOS_TOKEN }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

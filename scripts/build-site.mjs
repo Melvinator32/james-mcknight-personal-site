@@ -1,6 +1,9 @@
 import { spawnSync } from 'node:child_process';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 
+const demos = spawnSync('node', ['scripts/build-demos.mjs'], { stdio: 'inherit', env: process.env });
+if (demos.status !== 0) process.exit(demos.status ?? 1);
+
 const build = spawnSync('pnpm', ['--filter', '@workspace/james-mcknight-portfolio', 'build'], {
   stdio: 'inherit',
   env: {
