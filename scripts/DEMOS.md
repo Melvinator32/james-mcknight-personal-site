@@ -20,6 +20,10 @@ Demos on `/projects` come from two places:
 
 The built directories are gitignored — they are produced at build time, not committed.
 
+An hourly `schedule:` trigger in `static.yml` does the same thing without any token,
+so a demo repo with no `notify-portfolio.yml` still goes live within the hour. The
+dispatch only makes it immediate.
+
 ## Adding a demo
 
 1. Add an entry to `scripts/demos.json`:
@@ -38,7 +42,7 @@ The built directories are gitignored — they are produced at build time, not co
    `artifacts/james-mcknight-portfolio/src/data/portfolio-data.ts`:
    `demoUrl: "/demos/my-app/"` (note the trailing slash, no `.html`).
 
-3. Copy `.github/demo-app-template/notify-portfolio.yml` into the app repo as
+3. Optional, for instant updates: copy `.github/demo-app-template/notify-portfolio.yml` into the app repo as
    `.github/workflows/notify-portfolio.yml`, and add a `PORTFOLIO_DISPATCH_TOKEN`
    secret there — a fine-grained PAT scoped to this repo with
    **Contents: Read and write**.

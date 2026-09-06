@@ -58,6 +58,12 @@ function detectOutput(checkout, configured) {
   return null;
 }
 
+// A repo that publishes from its root would otherwise ship .git and friends.
+const NEVER_PUBLISH = new Set(['.git', '.github', 'node_modules']);
+function publishable(src) {
+  return !NEVER_PUBLISH.has(path.basename(src));
+}
+
 async function publish(demo) {
   const { slug, repo, ref = 'main' } = demo;
   const checkout = await mkdtemp(path.join(tmpdir(), `demo-${slug}-`));
@@ -79,7 +85,7 @@ async function publish(demo) {
 
     const target = path.join(demosDir, slug);
     await rm(target, { recursive: true, force: true });
-    await cp(path.join(checkout, output), target, { recursive: true });
+    await cp(path.join(checkout, output), target, { recursive: true, filter: publishable });
     console.log(`[demos] ${slug}: published from ${output} -> /demos/${slug}/`);
     return null;
   } finally {

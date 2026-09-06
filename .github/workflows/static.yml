@@ -10,6 +10,9 @@ on:
   # Fired by the demo app repos when their own main branch changes.
   repository_dispatch:
     types: [demo-updated]
+  # Safety net: picks up demo changes even if a repo has no dispatch workflow.
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
