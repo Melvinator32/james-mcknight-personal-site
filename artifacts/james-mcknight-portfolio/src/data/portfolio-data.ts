@@ -195,7 +195,7 @@ export const projects: Project[] = [
     description:
       "A personal productivity workspace for organizing tasks, planning the day, tracking goals, and staying focused. Explore its board and matrix views in a browser-based demo with sample tasks — refresh to reset your changes.",
     techStack: ["App Design", "State Management", "Productivity UX"],
-    demoUrl: "/demos/radio-station.html",
+    demoUrl: "/demos/radio-station/",
     walkthroughUrl: "/demos/radio-station-walkthrough.html",
     thumbnail: projectRadioPreview,
     status: "active",
@@ -207,7 +207,7 @@ export const projects: Project[] = [
     description:
       "An interactive vessel and cargo movement dashboard with region, product, and terminal filters, pivot views, and PDF/PPT/XLS export of any view. Every terminal, region, and product in the demo is a code name.",
     techStack: ["Data Visualization", "Market Intelligence", "Dashboards"],
-    demoUrl: "/demos/weirwood.html",
+    demoUrl: "/demos/weirwood/",
     thumbnail: projectWeirwoodPreview,
     status: "active",
   },
@@ -218,7 +218,7 @@ export const projects: Project[] = [
     description:
       "A personal relationship manager built to make staying in touch more intentional. Connections organizes the people in your life, tracks the last time you connected, and turns custom relationship cadences into a focused list of timely follow-ups. Explore the interactive demo using invented sample data.",
     techStack: ["Python / Flask", "SQLite", "Relationship Management"],
-    demoUrl: "/demos/connections.html",
+    demoUrl: "/demos/connections/",
     status: "active",
   },
   {
@@ -228,7 +228,7 @@ export const projects: Project[] = [
     description:
       "A personal learning app that turns book highlights, practical tips, and finance and energy notes into short daily lessons. It covers unseen material before repeating, with configurable topics and email previews. Try the interactive demo with sample content — no emails are sent.",
     techStack: ["Python / Flask", "SQLite", "Learning Tools"],
-    demoUrl: "/demos/daily-wisdom-demo.html",
+    demoUrl: "/demos/daily-wisdom/",
     thumbnail: projectDailyWisdomPreview,
     status: "active",
   },
@@ -272,7 +272,7 @@ export const projects: Project[] = [
     description:
       "A canvas-based zen garden sandbox — rake patterns into sand, place stones and plants, and pan or zoom around the composition.",
     techStack: ["Canvas", "Generative Art", "Touch UX"],
-    demoUrl: "/demos/zen-garden.html",
+    demoUrl: "/demos/zen-garden/",
     thumbnail: projectZenPreview,
     status: "active",
   },

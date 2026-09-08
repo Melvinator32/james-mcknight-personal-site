@@ -16,6 +16,41 @@
       "slug": "rewards-ledger",
       "repo": "melvinator32/CardWise",
       "ref": "main"
+    },
+    {
+      "slug": "radio-station",
+      "repo": "melvinator32/Tune-In",
+      "ref": "main",
+      "build": null,
+      "output": "demo"
+    },
+    {
+      "slug": "weirwood",
+      "repo": "melvinator32/Weirwood",
+      "ref": "main",
+      "build": null,
+      "output": "demo"
+    },
+    {
+      "slug": "connections",
+      "repo": "melvinator32/Connections",
+      "ref": "main",
+      "build": null,
+      "output": "demo"
+    },
+    {
+      "slug": "daily-wisdom",
+      "repo": "melvinator32/Daily-Wisdom",
+      "ref": "main",
+      "build": null,
+      "output": "demo"
+    },
+    {
+      "slug": "zen-garden",
+      "repo": "melvinator32/Zen-Garden-Meditation",
+      "ref": "main",
+      "build": null,
+      "output": "demo"
     }
   ]
 }
