@@ -34,6 +34,18 @@ await mkdir('dist/.openai', { recursive: true });
 await cp('artifacts/james-mcknight-portfolio/dist/public', 'dist/client', { recursive: true });
 await cp('.openai/hosting.json', 'dist/.openai/hosting.json');
 const html = await readFile('dist/client/index.html', 'utf8');
+
+// GitHub Pages serves dist/client as plain static files, so a client-side route
+// such as /projects has no file behind it: reloading or opening the link cold
+// gets Pages' own 404 instead of the app. Give each router path its own copy of
+// index.html so Pages answers those with a 200, and add 404.html as the
+// catch-all so anything else still boots the app and renders NotFound.
+const spaRoutes = ['projects', 'style-guide']; // keep in sync with the routes in artifacts/james-mcknight-portfolio/src/App.tsx
+for (const route of spaRoutes) {
+  await mkdir(`dist/client/${route}`, { recursive: true });
+  await writeFile(`dist/client/${route}/index.html`, html);
+}
+await writeFile('dist/client/404.html', html);
 await writeFile('dist/server/index.js', `
 const html = ${JSON.stringify(html)};
 export default {
