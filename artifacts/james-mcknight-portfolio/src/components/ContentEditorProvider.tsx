@@ -361,7 +361,14 @@ async function putFile(token: string, path: string, content: string, message: st
     headers: { ...apiHeaders(token), "Content-Type": "application/json" },
     body: JSON.stringify({ message, content, branch: "main", ...(sha ? { sha } : {}) }),
   });
-  if (!response.ok) throw new Error(`GitHub could not publish ${path} (HTTP ${response.status}). Check the token's Contents: read and write permission.`);
+  if (!response.ok) {
+    const details = await response.json().catch(() => null) as { message?: string; errors?: Array<{ message?: string }> } | null;
+    const reason = [details?.message, ...(details?.errors ?? []).map((error) => error.message)].filter(Boolean).join(" ");
+    const guidance = response.status === 403
+      ? " Verify that the fine-grained token is assigned to this repository with Contents: Read and write, then generate a new token if you changed its permissions."
+      : "";
+    throw new Error(`GitHub rejected ${path} (HTTP ${response.status}): ${reason || "No reason was provided."}${guidance}`);
+  }
   const result = await response.json() as { content?: { sha?: string } };
   return result.content?.sha ?? "";
 }
