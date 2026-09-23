@@ -186,6 +186,19 @@ function isValidContent(value: unknown): value is PortfolioContent {
   );
 }
 
+// Vite fingerprints image URLs on every build. A saved photo can still point to a
+// removed asset after its image changes, so resolve known photos against this build.
+function restorePhotos(saved: Photo[], defaults: Photo[]): Photo[] {
+  const restored = saved.map((photo) => {
+    const current = defaults.find((item) => item.alt === photo.alt);
+    return current ? { ...photo, src: current.src } : photo;
+  });
+  return [
+    ...restored,
+    ...defaults.filter((photo) => !restored.some((item) => item.src === photo.src)),
+  ];
+}
+
 // Keep saved copy edits while adding photos introduced after the last local save.
 function restoreInterestPhotos(saved: Interest[], defaults: Interest[]): Interest[] {
   return saved.map((interest, index) => {
@@ -209,7 +222,7 @@ function restoreInterestPhotos(saved: Interest[], defaults: Interest[]): Interes
     return {
       ...interest,
       photos: savedPhotos
-        ? [...savedPhotos, ...(original?.photos ?? []).filter((photo) => !savedPhotos.some((savedPhoto) => savedPhoto.src === photo.src))]
+        ? restorePhotos(savedPhotos, original?.photos ?? [])
         : original?.photos,
       ...(children && {
         children: restoreInterestPhotos(children, original?.children ?? []),
@@ -304,6 +317,7 @@ function getStoredContent(): PortfolioContent {
               : parsed.personalInfo.heroHeadline,
           },
           interests: restoreInterestPhotos(parsed.interests, defaultContent.interests),
+          photos: restorePhotos(parsed.photos, defaultContent.photos),
           projects: restoreProjects(parsed.projects, defaultContent.projects),
         }
       : cloneContent(defaultContent);
