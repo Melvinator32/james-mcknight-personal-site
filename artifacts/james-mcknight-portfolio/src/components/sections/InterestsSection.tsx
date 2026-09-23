@@ -1,6 +1,6 @@
 import SportsInterests from "@/components/SportsInterests";
 import PhotoLightbox from "@/components/PhotoLightbox";
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import type { Interest } from "@/types/portfolio";
 import EditableText from "@/components/EditableText";
 import { useContentEditor } from "@/components/ContentEditorProvider";
@@ -85,7 +85,7 @@ function InterestNode({ node, depth, contentKey }: { node: Interest; depth: numb
             ))}
           </div>
         )}
-        {hasPhotos && <InterestPhotos photos={node.photos!} products={node.name === "Hot Sauces"} />}
+        <InterestPhotos photos={node.photos ?? []} products={node.name === "Hot Sauces"} contentKey={`${contentKey}.photos`} />
       </div>
     );
   }
@@ -130,7 +130,61 @@ function InterestNode({ node, depth, contentKey }: { node: Interest; depth: numb
   );
 }
 
-function InterestPhotos({ photos, products = false }: { photos: NonNullable<Interest["photos"]>; products?: boolean }) {
+async function readPhoto(file: File): Promise<string> {
+  if (!file.type.startsWith("image/") || file.size > 10_000_000) throw new Error("Choose an image under 10 MB.");
+  const source = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.src = source;
+    await image.decode();
+    const scale = Math.min(1, 1800 / Math.max(image.width, image.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(image.width * scale);
+    canvas.height = Math.round(image.height * scale);
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Could not process this image.");
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.82);
+  } finally {
+    URL.revokeObjectURL(source);
+  }
+}
+
+function InterestPhotos({ photos, products = false, contentKey }: { photos: NonNullable<Interest["photos"]>; products?: boolean; contentKey?: string }) {
+  const { isEditing, updatePhotos } = useContentEditor();
+  const [error, setError] = useState<string | null>(null);
+  async function addPhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file || !contentKey) return;
+    try {
+      const src = await readPhoto(file);
+      const title = file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+      updatePhotos(contentKey, [...photos, { src, alt: title, caption: title }]);
+      setError(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not add photo.");
+    }
+    event.target.value = "";
+  }
+
+  if (isEditing && contentKey) return (
+    <div className="pb-4 pt-2">
+      <div className="grid max-w-xl grid-cols-2 gap-3">
+        {photos.map((photo, index) => (
+          <div key={`${photo.src}-${index}`} className="relative rounded-xl border border-[var(--pers-border)] bg-white p-2 text-slate-800">
+            <img src={photo.src} alt={photo.alt} className="h-32 w-full rounded-lg object-cover" />
+            <button type="button" onClick={() => updatePhotos(contentKey, photos.filter((_, i) => i !== index))} className="absolute right-3 top-3 rounded bg-black/80 px-2 py-1 text-xs text-white" aria-label={`Delete ${photo.alt}`}>Delete</button>
+            <label className="mt-2 block text-xs">Caption<input value={photo.caption} onChange={(event) => updatePhotos(contentKey, photos.map((item, i) => i === index ? { ...item, caption: event.target.value } : item))} className="mt-1 w-full rounded border px-2 py-1" /></label>
+            <label className="mt-2 block text-xs">Alt text<input value={photo.alt} onChange={(event) => updatePhotos(contentKey, photos.map((item, i) => i === index ? { ...item, alt: event.target.value } : item))} className="mt-1 w-full rounded border px-2 py-1" /></label>
+          </div>
+        ))}
+      </div>
+      <label className="mt-3 inline-block cursor-pointer rounded border border-[var(--pers-border)] px-3 py-2 text-sm">Add photo<input type="file" accept="image/png,image/jpeg,image/webp" onChange={addPhoto} className="sr-only" /></label>
+      {error && <p role="alert" className="mt-2 text-sm text-red-700">{error}</p>}
+    </div>
+  );
   if (products) return (
     <div className="grid grid-cols-1 gap-3 pb-4 pt-3 sm:grid-cols-3">
       {photos.map(photo => (

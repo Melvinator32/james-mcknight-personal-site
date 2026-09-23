@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -28,6 +29,8 @@ import type {
 } from "@/types/portfolio";
 
 const STORAGE_KEY = "james-mcknight-portfolio-content-v1";
+const PUBLISHED_CONTENT_URL = `${import.meta.env.BASE_URL}site-content.json`;
+const REPO_CONTENTS_URL = "https://api.github.com/repos/Melvinator32/james-mcknight-personal-site/contents/artifacts/james-mcknight-portfolio/public";
 
 export interface PortfolioContent {
   personalInfo: PersonalInfo;
@@ -188,19 +191,23 @@ function isValidContent(value: unknown): value is PortfolioContent {
 
 // Vite fingerprints image URLs on every build. A saved photo can still point to a
 // removed asset after its image changes, so resolve known photos against this build.
-function restorePhotos(saved: Photo[], defaults: Photo[]): Photo[] {
-  const restored = saved.map((photo) => {
-    const current = defaults.find((item) => item.alt === photo.alt);
+function restorePhotos(saved: Photo[], defaults: Photo[], addNew = true): Photo[] {
+  const restored = saved.map((photo, index) => {
+    // Older saved copies may have different alt text, so also identify Vite
+    // assets by their original filename (the hash at the end changes).
+    const current = defaults.find((item) =>
+      item.alt === photo.alt || item.caption === photo.caption ||
+      (item.src.includes("/assets/") && photo.src.includes(item.src.replace(/-[A-Za-z0-9_-]{8}\.[^.]+$/, "-")))
+    ) ?? (photo.src.includes("/assets/") ? defaults[index] : undefined);
     return current ? { ...photo, src: current.src } : photo;
   });
-  return [
-    ...restored,
-    ...defaults.filter((photo) => !restored.some((item) => item.src === photo.src)),
-  ];
+  return addNew
+    ? [...restored, ...defaults.filter((photo) => !restored.some((item) => item.src === photo.src))]
+    : restored;
 }
 
 // Keep saved copy edits while adding photos introduced after the last local save.
-function restoreInterestPhotos(saved: Interest[], defaults: Interest[]): Interest[] {
+function restoreInterestPhotos(saved: Interest[], defaults: Interest[], addNew = true): Interest[] {
   return saved.map((interest, index) => {
     const original = defaults.find((item) => item.name === interest.name) ?? defaults[index];
     const savedPhotos = interest.name === "Sports"
@@ -222,10 +229,10 @@ function restoreInterestPhotos(saved: Interest[], defaults: Interest[]): Interes
     return {
       ...interest,
       photos: savedPhotos
-        ? restorePhotos(savedPhotos, original?.photos ?? [])
-        : original?.photos,
+        ? restorePhotos(savedPhotos, original?.photos ?? [], addNew)
+        : addNew ? original?.photos : undefined,
       ...(children && {
-        children: restoreInterestPhotos(children, original?.children ?? []),
+        children: restoreInterestPhotos(children, original?.children ?? [], addNew),
       }),
     };
   });
@@ -331,6 +338,61 @@ function getStoredContent(): PortfolioContent {
   }
 }
 
+function base64Text(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 8192) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  }
+  return btoa(binary);
+}
+
+function apiHeaders(token: string): Record<string, string> {
+  return {
+    Accept: "application/vnd.github+json",
+    Authorization: `Bearer ${token}`,
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+}
+
+async function putFile(token: string, path: string, content: string, message: string, sha?: string): Promise<string> {
+  const response = await fetch(`${REPO_CONTENTS_URL}/${path}`, {
+    method: "PUT",
+    headers: { ...apiHeaders(token), "Content-Type": "application/json" },
+    body: JSON.stringify({ message, content, branch: "main", ...(sha ? { sha } : {}) }),
+  });
+  if (!response.ok) throw new Error(`GitHub could not publish ${path} (HTTP ${response.status}). Check the token's Contents: read and write permission.`);
+  const result = await response.json() as { content?: { sha?: string } };
+  return result.content?.sha ?? "";
+}
+
+async function uploadNewPhotos(content: PortfolioContent, token: string): Promise<PortfolioContent> {
+  const next = cloneContent(content);
+  const uploaded = new Map<string, string>();
+  async function publish(photo: Photo): Promise<void> {
+    if (!photo.src.startsWith("data:image/")) return;
+    let url = uploaded.get(photo.src);
+    if (!url) {
+      const path = `uploads/${crypto.randomUUID()}.jpg`;
+      const data = photo.src.split(",")[1];
+      if (!data) throw new Error("The selected image could not be read.");
+      await putFile(token, path, data, `Upload portfolio photo: ${photo.alt}`);
+      url = `${import.meta.env.BASE_URL}${path}`;
+      uploaded.set(photo.src, url);
+    }
+    photo.src = url;
+  }
+  for (const photo of next.photos) await publish(photo);
+  async function visit(interests: Interest[]): Promise<void> {
+    for (const interest of interests) {
+      for (const photo of interest.photos ?? []) await publish(photo);
+      if (interest.children) await visit(interest.children);
+    }
+  }
+  await visit(next.interests);
+  return next;
+}
+
 function readTextAtPath(content: PortfolioContent, path: string): string | undefined {
   const value = path.split(".").reduce<unknown>((current, part) => {
     if (current === null || current === undefined) return undefined;
@@ -372,6 +434,9 @@ interface ContentEditorContextValue {
   isDirty: boolean;
   getText: (path: string, fallback: string) => string;
   updateText: (path: string, value: string) => void;
+  updatePhotos: (path: string, photos: Photo[]) => void;
+  unlockEditing: (token: string) => Promise<boolean>;
+  isPublishing: boolean;
   enterEditing: () => void;
   exitEditing: () => void;
   saveChanges: () => void;
@@ -387,21 +452,90 @@ export function ContentEditorProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<PortfolioContent>(savedContent);
   const [isEditing, setIsEditing] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [publishedSha, setPublishedSha] = useState<string | null>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  // Published edits take priority over older browser-only edits. The file is
+  // optional until the first authenticated publication.
+  useEffect(() => {
+    let active = true;
+    fetch(`${PUBLISHED_CONTENT_URL}?v=${Date.now()}`, { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() as Promise<unknown> : null)
+      .then((published) => {
+        if (!active || !isValidContent(published)) return;
+        const current = {
+          ...published,
+          interests: restoreInterestPhotos(published.interests, defaultContent.interests, false),
+          photos: restorePhotos(published.photos, defaultContent.photos, false),
+        };
+        setContent(current);
+        setSavedContent(current);
+      })
+      .catch(() => { /* The published file does not exist yet. */ });
+    return () => { active = false; };
+  }, []);
 
   const updateText = useCallback((path: string, value: string) => {
     setContent((current) => writeTextAtPath(current, path, value));
   }, []);
 
-  const saveChanges = useCallback(() => {
-    const snapshot = cloneContent(content);
+  const updatePhotos = useCallback((path: string, photos: Photo[]) => {
+    setContent((current) => {
+      const next = cloneContent(current);
+      const parts = path.split(".");
+      let cursor: Record<string, unknown> = next as unknown as Record<string, unknown>;
+      for (const part of parts.slice(0, -1)) {
+        if (!cursor[part] || typeof cursor[part] !== "object") return current;
+        cursor = cursor[part] as Record<string, unknown>;
+      }
+      cursor[parts.at(-1) ?? ""] = photos;
+      return next;
+    });
+  }, []);
+
+  const unlockEditing = useCallback(async (candidate: string) => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+      const response = await fetch("https://api.github.com/repos/Melvinator32/james-mcknight-personal-site", {
+        headers: apiHeaders(candidate.trim()),
+      });
+      const repo = await response.json() as { permissions?: { push?: boolean } };
+      if (!response.ok || !repo.permissions?.push) throw new Error("This token needs write access to the site repository.");
+      const file = await fetch(`${REPO_CONTENTS_URL}/site-content.json?ref=main`, { headers: apiHeaders(candidate.trim()) });
+      if (file.status !== 404 && !file.ok) throw new Error("Could not check the published content on GitHub.");
+      const info = file.ok ? await file.json() as { sha: string } : null;
+      setPublishedSha(info?.sha ?? null);
+      setToken(candidate.trim());
+      setIsEditing(true);
+      setStorageError(null);
+      return true;
+    } catch (error) {
+      setStorageError(error instanceof Error ? error.message : "Could not unlock editing.");
+      return false;
+    }
+  }, []);
+
+  const saveChanges = useCallback(async () => {
+    if (!token || isPublishing) return;
+    setIsPublishing(true);
+    try {
+      const latest = await fetch(`${REPO_CONTENTS_URL}/site-content.json?ref=main`, { headers: apiHeaders(token) });
+      if (latest.status !== 404 && !latest.ok) throw new Error("Could not check the latest published version.");
+      const latestFile = latest.ok ? await latest.json() as { sha: string } : null;
+      if ((latestFile?.sha ?? null) !== publishedSha) throw new Error("The site was edited in another session. Reload before saving.");
+      const snapshot = await uploadNewPhotos(content, token);
+      const sha = await putFile(token, "site-content.json", base64Text(JSON.stringify(snapshot)), "Publish portfolio edits", publishedSha ?? undefined);
+      setPublishedSha(sha);
+      setContent(snapshot);
       setSavedContent(snapshot);
       setStorageError(null);
-    } catch {
-      setStorageError("This browser could not save your edits. Keep this page open or copy the text before leaving.");
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      setStorageError(error instanceof Error ? error.message : "Could not publish changes.");
+    } finally {
+      setIsPublishing(false);
     }
-  }, [content]);
+  }, [content, isPublishing, publishedSha, token]);
 
   const discardChanges = useCallback(() => {
     setContent(cloneContent(savedContent));
@@ -426,14 +560,17 @@ export function ContentEditorProvider({ children }: { children: ReactNode }) {
       isDirty: JSON.stringify(content) !== JSON.stringify(savedContent),
       getText: (path, fallback) => readTextAtPath(content, path) ?? fallback,
       updateText,
-      enterEditing: () => setIsEditing(true),
-      exitEditing: () => setIsEditing(false),
+      updatePhotos,
+      unlockEditing,
+      isPublishing,
+      enterEditing: () => { if (token) setIsEditing(true); },
+      exitEditing: () => { setIsEditing(false); setToken(null); },
       saveChanges,
       discardChanges,
       resetContent,
       storageError,
     }),
-    [content, discardChanges, isEditing, resetContent, saveChanges, savedContent, storageError, updateText],
+    [content, discardChanges, isEditing, isPublishing, resetContent, saveChanges, savedContent, storageError, unlockEditing, updatePhotos, updateText, token],
   );
 
   return <ContentEditorContext.Provider value={value}>{children}</ContentEditorContext.Provider>;
