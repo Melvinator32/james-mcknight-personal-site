@@ -191,18 +191,6 @@ export const sideVentures: SideVenture[] = [
 
 export const projects: Project[] = [
   {
-    id: "demo-radio",
-    icon: "Radio",
-    name: "Tuned In",
-    description:
-      "A personal productivity workspace for organizing tasks, planning the day, tracking goals, and staying focused. Explore its board and matrix views in a browser-based demo with sample tasks — refresh to reset your changes.",
-    techStack: ["App Design", "State Management", "Productivity UX"],
-    demoUrl: "/demos/radio-station/",
-    walkthroughUrl: "/demos/radio-station-walkthrough.html",
-    thumbnail: projectRadioPreview,
-    status: "active",
-  },
-  {
     id: "magazine-st-listening-room",
     icon: "Disc3",
     name: "Magazine St. Listening Room",
@@ -214,35 +202,15 @@ export const projects: Project[] = [
     status: "active",
   },
   {
-    id: "demo-weirwood",
-    icon: "Ship",
-    name: "Weirwood",
+    id: "demo-radio",
+    icon: "Radio",
+    name: "Tuned In",
     description:
-      "An interactive vessel and cargo movement dashboard with region, product, and terminal filters, pivot views, and PDF/PPT/XLS export of any view. Every terminal, region, and product in the demo is a code name.",
-    techStack: ["Data Visualization", "Market Intelligence", "Dashboards"],
-    demoUrl: "/demos/weirwood/",
-    thumbnail: projectWeirwoodPreview,
-    status: "active",
-  },
-  {
-    id: "proj-2",
-    icon: "Users",
-    name: "Connections",
-    description:
-      "A personal relationship manager built to make staying in touch more intentional. Connections organizes the people in your life, tracks the last time you connected, and turns custom relationship cadences into a focused list of timely follow-ups. Explore the interactive demo using invented sample data.",
-    techStack: ["Python / Flask", "SQLite", "Relationship Management"],
-    demoUrl: "/demos/connections/",
-    status: "active",
-  },
-  {
-    id: "demo-daily-wisdom",
-    icon: "BookOpen",
-    name: "Daily Wisdom",
-    description:
-      "A personal learning app that turns book highlights, practical tips, and finance and energy notes into short daily lessons. It covers unseen material before repeating, with configurable topics and email previews. Try the interactive demo with sample content — no emails are sent.",
-    techStack: ["Python / Flask", "SQLite", "Learning Tools"],
-    demoUrl: "/demos/daily-wisdom/",
-    thumbnail: projectDailyWisdomPreview,
+      "A personal productivity workspace for organizing tasks, planning the day, tracking goals, and staying focused. Explore its board and matrix views in a browser-based demo with sample tasks — refresh to reset your changes.",
+    techStack: ["App Design", "State Management", "Productivity UX"],
+    demoUrl: "/demos/radio-station/",
+    walkthroughUrl: "/demos/radio-station-walkthrough.html",
+    thumbnail: projectRadioPreview,
     status: "active",
   },
   {
@@ -257,14 +225,35 @@ export const projects: Project[] = [
     status: "active",
   },
   {
-    id: "demo-bayou-bill-tracker",
-    icon: "ChartNoAxesCombined",
-    name: "Bayou Bill Shop Data Tracker",
+    id: "sixth-street-website",
+    icon: "Globe",
+    name: "Website Development — Sixth Street Creative",
     description:
-      "A shop analytics dashboard for Bayou Bill, bringing revenue, profit, advertising performance, top products, traffic sources, and order fulfillment into one view. Explore interactive charts with illustrative sample data — no live Etsy or Printify connection.",
-    techStack: ["JavaScript", "SVG Charts", "E-commerce Analytics"],
-    demoUrl: "/demos/bayou-bill-shop-tracker/",
-    thumbnail: projectBayouBillPreview,
+      "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
+    techStack: ["Website Development", "Responsive Design", "Content Editing"],
+    liveUrl: "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
+    thumbnail: projectSixthStreet,
+    status: "active",
+  },
+  {
+    id: "demo-daily-wisdom",
+    icon: "BookOpen",
+    name: "Daily Wisdom",
+    description:
+      "A personal learning app that turns book highlights, practical tips, and finance and energy notes into short daily lessons. It covers unseen material before repeating, with configurable topics and email previews. Try the interactive demo with sample content — no emails are sent.",
+    techStack: ["Python / Flask", "SQLite", "Learning Tools"],
+    demoUrl: "/demos/daily-wisdom/",
+    thumbnail: projectDailyWisdomPreview,
+    status: "active",
+  },
+  {
+    id: "proj-2",
+    icon: "Users",
+    name: "Connections",
+    description:
+      "A personal relationship manager built to make staying in touch more intentional. Connections organizes the people in your life, tracks the last time you connected, and turns custom relationship cadences into a focused list of timely follow-ups. Explore the interactive demo using invented sample data.",
+    techStack: ["Python / Flask", "SQLite", "Relationship Management"],
+    demoUrl: "/demos/connections/",
     status: "active",
   },
   {
@@ -301,14 +290,25 @@ export const projects: Project[] = [
     status: "active",
   },
   {
-    id: "sixth-street-website",
-    icon: "Globe",
-    name: "Website Development — Sixth Street Creative",
+    id: "demo-bayou-bill-tracker",
+    icon: "ChartNoAxesCombined",
+    name: "Bayou Bill Shop Data Tracker",
     description:
-      "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
-    techStack: ["Website Development", "Responsive Design", "Content Editing"],
-    liveUrl: "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
-    thumbnail: projectSixthStreet,
+      "A shop analytics dashboard for Bayou Bill, bringing revenue, profit, advertising performance, top products, traffic sources, and order fulfillment into one view. Explore interactive charts with illustrative sample data — no live Etsy or Printify connection.",
+    techStack: ["JavaScript", "SVG Charts", "E-commerce Analytics"],
+    demoUrl: "/demos/bayou-bill-shop-tracker/",
+    thumbnail: projectBayouBillPreview,
+    status: "active",
+  },
+  {
+    id: "demo-weirwood",
+    icon: "Ship",
+    name: "Weirwood",
+    description:
+      "An interactive vessel and cargo movement dashboard with region, product, and terminal filters, pivot views, and PDF/PPT/XLS export of any view. Every terminal, region, and product in the demo is a code name.",
+    techStack: ["Data Visualization", "Market Intelligence", "Dashboards"],
+    demoUrl: "/demos/weirwood/",
+    thumbnail: projectWeirwoodPreview,
     status: "active",
   },
 ];
