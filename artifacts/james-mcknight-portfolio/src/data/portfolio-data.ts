@@ -10,6 +10,8 @@ import wfhSetupPhoto from "@/assets/photo-wfh-setup.png";
 import houseplantPropagationBottlePhoto from "@/assets/photo-houseplant-propagation-bottle.jpeg";
 import houseplantPonytailPalmPhoto from "@/assets/photo-houseplant-ponytail-palm.jpeg";
 import houseplantPropagationStationPhoto from "@/assets/photo-houseplant-propagation-station.jpeg";
+import projectSixthStreet from "@/assets/project-sixth-street-preview.jpg";
+import projectListeningRoom from "@/assets/project-listening-room-preview.jpg";
 import projectPodShop from "@/assets/project-pod-shop.png";
 import yellowbirdSauce from "@/assets/yellowbird-serrano.webp";
 import marieSharpsSauce from "@/assets/marie-sharps-habanero.webp";
@@ -188,6 +190,28 @@ export const sideVentures: SideVenture[] = [
 ];
 
 export const projects: Project[] = [
+  {
+    id: "sixth-street-website",
+    icon: "Globe",
+    name: "Website Development — Sixth Street Creative",
+    description:
+      "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
+    techStack: ["Website Development", "Responsive Design", "Content Editing"],
+    liveUrl: "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
+    thumbnail: projectSixthStreet,
+    status: "active",
+  },
+  {
+    id: "magazine-st-listening-room",
+    icon: "Disc3",
+    name: "Magazine St. Listening Room",
+    description:
+      "A New Orleans listening bar concept inspired by the sense of wonder that comes from discovering music in the right setting. The vision brings together high-fidelity sound, curated records, thoughtful cocktails, and an intimate room designed around shared listening. Explore the concept, room renderings, and the story behind it.",
+    techStack: ["Hospitality Concept", "Brand Development", "Experience Design"],
+    liveUrl: "https://magazine-st-listening-room.jrmcknight08.workers.dev/#story",
+    thumbnail: projectListeningRoom,
+    status: "active",
+  },
   {
     id: "demo-radio",
     icon: "Radio",
