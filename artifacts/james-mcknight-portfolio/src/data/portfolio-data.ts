@@ -191,14 +191,15 @@ export const sideVentures: SideVenture[] = [
 
 export const projects: Project[] = [
   {
-    id: "sixth-street-website",
-    icon: "Globe",
-    name: "Website Development — Sixth Street Creative",
+    id: "demo-radio",
+    icon: "Radio",
+    name: "Tuned In",
     description:
-      "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
-    techStack: ["Website Development", "Responsive Design", "Content Editing"],
-    liveUrl: "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
-    thumbnail: projectSixthStreet,
+      "A personal productivity workspace for organizing tasks, planning the day, tracking goals, and staying focused. Explore its board and matrix views in a browser-based demo with sample tasks — refresh to reset your changes.",
+    techStack: ["App Design", "State Management", "Productivity UX"],
+    demoUrl: "/demos/radio-station/",
+    walkthroughUrl: "/demos/radio-station-walkthrough.html",
+    thumbnail: projectRadioPreview,
     status: "active",
   },
   {
@@ -210,18 +211,6 @@ export const projects: Project[] = [
     techStack: ["Founder","Concept Development","Website Development","Brand Direction","Guest Experience","Business Planning"],
     liveUrl: "https://magazine-st-listening-room.jrmcknight08.workers.dev/#story",
     thumbnail: projectListeningRoom,
-    status: "active",
-  },
-  {
-    id: "demo-radio",
-    icon: "Radio",
-    name: "Tuned In",
-    description:
-      "A personal productivity workspace for organizing tasks, planning the day, tracking goals, and staying focused. Explore its board and matrix views in a browser-based demo with sample tasks — refresh to reset your changes.",
-    techStack: ["App Design", "State Management", "Productivity UX"],
-    demoUrl: "/demos/radio-station/",
-    walkthroughUrl: "/demos/radio-station-walkthrough.html",
-    thumbnail: projectRadioPreview,
     status: "active",
   },
   {
@@ -309,6 +298,17 @@ export const projects: Project[] = [
     techStack: ["Game Logic", "Probability", "PWA"],
     demoUrl: "/demos/blackjack-trainer/",
     thumbnail: projectBlackjackPreview,
+    status: "active",
+  },
+  {
+    id: "sixth-street-website",
+    icon: "Globe",
+    name: "Website Development — Sixth Street Creative",
+    description:
+      "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
+    techStack: ["Website Development", "Responsive Design", "Content Editing"],
+    liveUrl: "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
+    thumbnail: projectSixthStreet,
     status: "active",
   },
 ];
