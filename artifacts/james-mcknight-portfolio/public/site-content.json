@@ -104,17 +104,18 @@
   ],
   "projects": [
     {
-      "id": "sixth-street-website",
-      "icon": "Globe",
-      "name": "Website Development — Sixth Street Creative",
-      "description": "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
+      "id": "demo-radio",
+      "icon": "Radio",
+      "name": "Tuned In",
+      "description": "A personal productivity workspace for organizing tasks, planning the day, tracking goals, and staying focused. Explore its board and matrix views in a browser-based demo with sample tasks — refresh to reset your changes.",
       "techStack": [
-        "Website Development",
-        "Responsive Design",
-        "Content Editing"
+        "App Design",
+        "State Management",
+        "Productivity UX"
       ],
-      "liveUrl": "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
-      "thumbnail": "https://blank-canvas-joy-595.jrmcknight08.workers.dev/images/hero.jpg",
+      "demoUrl": "/demos/radio-station.html",
+      "walkthroughUrl": "/demos/radio-station-walkthrough.html",
+      "thumbnail": "/assets/project-radio-dashboard-Il4WEtwa.jpg",
       "status": "active"
     },
     {
@@ -132,21 +133,6 @@
       ],
       "liveUrl": "https://magazine-st-listening-room.jrmcknight08.workers.dev/#story",
       "thumbnail": "https://magazine-st-listening-room.jrmcknight08.workers.dev/bar-room-rendering.png",
-      "status": "active"
-    },
-    {
-      "id": "demo-radio",
-      "icon": "Radio",
-      "name": "Tuned In",
-      "description": "A personal productivity workspace for organizing tasks, planning the day, tracking goals, and staying focused. Explore its board and matrix views in a browser-based demo with sample tasks — refresh to reset your changes.",
-      "techStack": [
-        "App Design",
-        "State Management",
-        "Productivity UX"
-      ],
-      "demoUrl": "/demos/radio-station.html",
-      "walkthroughUrl": "/demos/radio-station-walkthrough.html",
-      "thumbnail": "/assets/project-radio-dashboard-Il4WEtwa.jpg",
       "status": "active"
     },
     {
@@ -260,6 +246,20 @@
       ],
       "demoUrl": "/demos/blackjack-trainer.html",
       "thumbnail": "/assets/project-blackjack-preview-D3cUnl3b.jpg",
+      "status": "active"
+    },
+    {
+      "id": "sixth-street-website",
+      "icon": "Globe",
+      "name": "Website Development — Sixth Street Creative",
+      "description": "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
+      "techStack": [
+        "Website Development",
+        "Responsive Design",
+        "Content Editing"
+      ],
+      "liveUrl": "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
+      "thumbnail": "https://blank-canvas-joy-595.jrmcknight08.workers.dev/images/hero.jpg",
       "status": "active"
     }
   ],
