@@ -206,8 +206,8 @@ export const projects: Project[] = [
     icon: "Disc3",
     name: "Magazine St. Listening Room",
     description:
-      "A New Orleans listening bar concept inspired by the sense of wonder that comes from discovering music in the right setting. The vision brings together high-fidelity sound, curated records, thoughtful cocktails, and an intimate room designed around shared listening. Explore the concept, room renderings, and the story behind it.",
-    techStack: ["Hospitality Concept", "Brand Development", "Experience Design"],
+      "Founder of Magazine St. Listening Room, a New Orleans listening bar concept inspired by a memorable night in Mexico City. I’m developing a space that brings together high-fidelity sound, curated records, thoughtful cocktails, and the sense of wonder that comes from sharing music.\n\nMy role spans concept development, brand direction, website design and development, and the guest experience. I built the concept website and developed room renderings, lighting inspiration, and food and drink ideas to make the vision tangible. I’m also shaping the business model and partnership framework as the concept moves toward becoming a business.",
+    techStack: ["Founder","Concept Development","Website Development","Brand Direction","Guest Experience","Business Planning"],
     liveUrl: "https://magazine-st-listening-room.jrmcknight08.workers.dev/#story",
     thumbnail: projectListeningRoom,
     status: "active",
