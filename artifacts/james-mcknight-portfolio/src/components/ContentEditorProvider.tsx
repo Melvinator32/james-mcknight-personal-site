@@ -473,6 +473,7 @@ export function ContentEditorProvider({ children }: { children: ReactNode }) {
         if (!active || !isValidContent(published)) return;
         const current = {
           ...published,
+          projects: restoreProjects(published.projects, defaultContent.projects),
           interests: restoreInterestPhotos(published.interests, defaultContent.interests, false),
           photos: restorePhotos(published.photos, defaultContent.photos, false),
         };
