@@ -91,7 +91,7 @@ export default function Projects() {
                     <EditableText contentKey={`projects.${index}.name`} fallback={project.name} label="Project name" />
                   </h2>
 
-                  <div className="text-sm leading-relaxed text-slate-600">
+                  <div className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
                     {project.id === "demo-radio" && !isEditing ? (
                       <TunedInDescription description={project.description} />
                     ) : (
