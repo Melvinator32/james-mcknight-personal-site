@@ -231,7 +231,7 @@ export const projects: Project[] = [
     description:
       "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
     techStack: ["Website Development", "Responsive Design", "Content Editing"],
-    liveUrl: "https://blank-canvas-joy-595.jrmcknight08.workers.dev/#/",
+    liveUrl: "https://www.sixthstreetcreative.com",
     thumbnail: projectSixthStreet,
     status: "active",
   },
