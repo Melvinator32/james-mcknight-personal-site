@@ -6,6 +6,10 @@
   "assets": {
     "directory": "dist/client",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application"
+    // "none" so a missing file comes back to the Worker as a 404 to fall
+    // through on. "single-page-application" would answer every miss with the
+    // portfolio index.html before the Worker saw it, which hands /demos/<name>/
+    // the portfolio page and masks a broken demo asset as a 200.
+    "not_found_handling": "none"
   }
 }
