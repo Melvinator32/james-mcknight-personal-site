@@ -20,7 +20,7 @@
     {
       "slug": "radio-station",
       "repo": "melvinator32/Tune-In",
-      "ref": "main",
+      "ref": "demo",
       "build": null,
       "output": "demo"
     },

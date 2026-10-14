@@ -8835,11 +8835,17 @@ function gsMigrateRefs() {
   });
   if (changed) saveGoals(true);
 }
-function gsAddPillar() {
+// A section added from the Personal view belongs to Personal alone; one added
+// anywhere else is career work and is shared by All goals and every rung.
+// Callers wired straight to onClick pass the click event, so anything but a
+// string means "no area".
+function gsAddPillar(scope) {
   loadGoals();
-  const name = prompt("New pillar name:");
+  const area = typeof scope === "string" ? scope : "";
+  const name = prompt(area ? "New Personal section name:" : "New section name:");
   if (!name || !name.trim()) return;
-  gsPillars().push({ key: "p" + mmUid(), label: name.trim(), color: gsNextPillarColor(), weight: 10, why: "", base: false });
+  gsPillars().push({ key: "p" + mmUid(), label: name.trim(), color: gsNextPillarColor(), weight: 10, why: "", base: false,
+    scope: area || undefined });
   saveGoals(true);
   $("#board").innerHTML = ""; (currentView === "map" ? renderMap : renderGoals)();
 }
@@ -10461,6 +10467,13 @@ function gdRoleMatch(g) {
   return (g.role || "") === gdRoleFilter && !gsIsPersonal(g);
 }
 function gdRoleLabel(key) { const r = GD_ROLES.find((x) => x[0] === key); return r ? r[1] : key; }
+// The area a view stands for: Personal, or the career track ("").
+function gsViewScope(view) { return view === "personal" ? "personal" : ""; }
+// All goals shows every section; any other view shows only its own area's.
+function gsSectionInView(pk) {
+  if (!gdRoleFilter) return true;
+  return ((gsP(pk) || {}).scope || "") === gsViewScope(gdRoleFilter);
+}
 
 // ---- Dashboard -----------------------------------------------------------
 function renderGoalsDashboard() {
@@ -10476,7 +10489,7 @@ function renderGoalsDashboard() {
   // Sections (values) group your goals. Creating one was previously only
   // reachable from the Operating System tab; surface it where the goals are.
   head.append(el("button", { class: "tool-btn", title: "Create a new goal section (value) to group goals under",
-    onClick: gsAddPillar }, "+ New Section"));
+    onClick: () => gsAddPillar(gsViewScope(gdRoleFilter)) }, "+ New Section"));
   head.append(el("button", { class: "tool-btn", title: "Rename, mark personal, or delete sections",
     onClick: gsManageSections }, "\u2699 Sections"));
   // The scorecard export is built from the career ladder, so it has nothing to show without one.
@@ -10546,7 +10559,8 @@ function renderGoalsDashboard() {
     // An empty section still renders (with a prompt) so a section you just
     // created is visible and can be filled. The catch-all "" bucket stays
     // hidden when empty — there's nothing to unassign to.
-    if (!list.length && pk === "") return;
+    // A section from another area is left out unless goals in it match here.
+    if (!list.length && (pk === "" || !gsSectionInView(pk))) return;
     list.sort((a, b) => gsGoalScore(b) - gsGoalScore(a));
     const p = gsP(pk);
     const grp = el("div", { class: "gd-pgroup" });
@@ -10962,12 +10976,21 @@ function gsNewGoalForm(parentId, presetPillar, presetRole) {
   openModal(parentId ? "New sub-goal" : "New goal", (body, close) => {
     body.classList.add("gd-form");
     const parent = parentId ? gsGoalById(parentId) : null;
-    const defPillar = presetPillar || (parent && parent.pillar) || (gsPillars()[0] || {}).key || "";
-    const defRole = gsSectionRole(defPillar);
+    // A goal is created for the view it was started from. Defaulting to the
+    // first section and no role meant a goal made under Analyst or Personal
+    // saved fine but matched neither, so it vanished from the screen it was
+    // made on and looked as if it had never been saved. Offer the sections
+    // that belong to this view (all of them if it has none yet) and take the
+    // rung from the view when it is one.
+    const inView = gsPillars().filter((p) => gsSectionInView(p.key));
+    const offered = inView.length ? inView : gsPillars();
+    const defPillar = presetPillar || (parent && parent.pillar) || (offered[0] || {}).key || "";
+    const viewRung = GD_LADDER_ROLES.includes(gdRoleFilter) ? gdRoleFilter : "";
     const titleI = el("input", { type: "text", class: "gd-input", placeholder: "The goal, in one line" });
     body.append(gsFormRow("Goal", titleI));
     const psel = el("select", { class: "gd-sel" });
-    gsPillars().forEach((p) => psel.append(el("option", Object.assign({ value: p.key }, p.key === defPillar ? { selected: "selected" } : {}), p.label)));
+    const shown = offered.some((p) => p.key === defPillar) ? offered : gsPillars();
+    shown.forEach((p) => psel.append(el("option", Object.assign({ value: p.key }, p.key === defPillar ? { selected: "selected" } : {}), p.label)));
     psel.append(el("option", { value: "" }, "Unassigned"));
     body.append(gsFormRow("Value", psel));
     const whyI = el("textarea", { class: "gd-input", rows: "2", placeholder: "Why it matters" });
@@ -10986,9 +11009,14 @@ function gsNewGoalForm(parentId, presetPillar, presetRole) {
       if (!plan) { err.textContent = "A plan is required \u2014 what are the next moves?"; return; }
       const id = "g_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       GOALS.ideas = GOALS.ideas || [];
-      GOALS.ideas.push({ id, text, pillar: psel.value, parent: parentId || null, seed: false,
+      const rung = GD_LADDER_ROLES.includes(presetRole) ? presetRole : "";
+      const goal = { id, text, pillar: psel.value, parent: parentId || null, seed: false,
         why: whyI.value.trim(), plan, status: "active", weaknessBoost: wk.checked, tracking: null,
-        role: presetRole || (parent && parent.role) || "" });
+        role: rung || (parent && parent.role) || viewRung };
+      // Made under Personal in a section that isn't personal: mark the goal
+      // itself personal so it stays where it was made.
+      if (gdRoleFilter === "personal" && !gsIsPersonal(goal)) goal.personal = true;
+      GOALS.ideas.push(goal);
       saveGoals(true); close(); gsOpenGoal(id);
     } }, "Create goal");
     const actions = el("div", { class: "gd-actions" });
