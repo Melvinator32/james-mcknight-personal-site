@@ -5,6 +5,7 @@
   "scripts": {
     "preinstall": "node scripts/preinstall.mjs",
     "build": "node scripts/build-site.mjs",
+    "deploy": "wrangler deploy",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "build:workspace": "pnpm run typecheck && pnpm -r --if-present run build",
@@ -16,7 +17,8 @@
   },
   "devDependencies": {
     "prettier": "^3.9.6",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "wrangler": "^4.150.0"
   },
   "displayName": "James McKnight Portfolio"
 }

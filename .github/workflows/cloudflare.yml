@@ -1,0 +1,62 @@
+# Build and deploy the portfolio to Cloudflare Workers.
+#
+# This runs alongside the GitHub Pages deploy in static.yml rather than
+# replacing it, so the site stays up while the Cloudflare side is verified.
+# Once https://jamesmcknight.me serves from Workers, retire Pages: delete
+# static.yml and set Settings -> Pages -> Source to None. Leaving Pages on
+# keeps melvinator32.github.io serving the same files with no Cloudflare
+# Access in front of them, which is the hole this deploy is meant to close.
+name: Deploy portfolio to Cloudflare
+
+run-name: "${{ github.event_name == 'repository_dispatch' && format('Deploy to Cloudflare (demo update - {0})', github.event.client_payload.repo) || 'Deploy portfolio to Cloudflare' }}"
+
+on:
+  push:
+    branches: ["main"]
+  # Fired by the demo app repos when their own main branch changes.
+  repository_dispatch:
+    types: [demo-updated]
+  # Safety net: picks up demo changes even if a repo has no dispatch workflow.
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "cloudflare"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build portfolio
+        run: pnpm run build
+        env:
+          # Only needed if a demo app repo is private; public repos clone without it.
+          DEMO_REPOS_TOKEN: ${{ secrets.DEMO_REPOS_TOKEN }}
+
+      - name: Deploy to Cloudflare Workers
+        run: pnpm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

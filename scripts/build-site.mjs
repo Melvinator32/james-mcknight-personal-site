@@ -50,16 +50,23 @@ await writeFile('dist/server/index.js', `
 const html = ${JSON.stringify(html)};
 export default {
   async fetch(request, env) {
-    const path = new URL(request.url).pathname;
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method not allowed', { status: 405 });
     }
-    if (path === '/' || path === '/index.html' || !path.split('/').pop().includes('.')) {
-      return new Response(request.method === 'HEAD' ? null : html, {
-        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' },
-      });
-    }
-    return env.ASSETS.fetch(request);
+    // Serve a real file whenever one exists, before treating the path as a
+    // client-side route. The demos under /demos/<name>/ are self-contained
+    // pages, not routes of this SPA, and a directory URL ends in an empty
+    // segment: a "does the last segment look like a filename" test sees no dot
+    // and hands /demos/weirwood/ the portfolio shell instead of the demo.
+    // This relies on not_found_handling being "none" in wrangler.jsonc, which
+    // is what lets a miss come back as a 404 to fall through on.
+    const asset = await env.ASSETS.fetch(request);
+    if (asset.status !== 404) return asset;
+    // Nothing on disk, so this is a client-side route: boot the app and let
+    // the router render it, or render NotFound.
+    return new Response(request.method === 'HEAD' ? null : html, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' },
+    });
   }
 };
 `);
