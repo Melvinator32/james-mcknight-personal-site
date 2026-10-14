@@ -1982,59 +1982,114 @@ const DB = (() => {
     }, extra || {}),
   });
 
-  const tasks = [
-    T("All Active Tasks", "Draft the quarterly summary", "Working On It", "You", dToday(), "Proactive Value Add: High", 3,
-      { c_goal: "idea:g_write", c_pillar: "pillar:tech", __eis: "do", __est: 90 }),
-    T("All Active Tasks", "Pull last month's numbers", "Not Started", "You", dShift(2), "Proactive Value Add: Medium", 2,
-      { c_goal: "idea:g_analysis", c_pillar: "pillar:tech", __eis: "do", __est: 60 }),
-    T("All Active Tasks", "Try changing a Status \u2014 watch the task move groups", "Not Started", "You", "", "Personal Task - Non-Urgent", 0.25,
-      { __eis: "schedule", __est: 15 }),
-    T("All Active Tasks", "Rewrite the onboarding doc", "Working On It", "You", dShift(5), "Proactive Value Add: Medium", 4,
-      { c_goal: "idea:g_write", c_pillar: "pillar:tech", __eis: "schedule", __est: 120 }),
-    T("Commercial Models", "Build the pricing scenario model", "Working On It", "You", dToday(), "Executive Request - Urgent", 8,
-      { c_goal: "idea:g_analysis", c_pillar: "pillar:tech", __eis: "do", __est: 180 }),
-    T("Commercial Models", "Review the vendor proposal", "Not Started", "You", dShift(1), "Proactive Value Add: High", 2,
-      { c_goal: "idea:g_judgment", c_pillar: "pillar:think", __eis: "do", __est: 45 }),
-    T("Waiting for Feedback", "Proposal sent \u2014 waiting on comments", "Waiting for Feedback", "You", "", "Proactive Value Add: Medium", 1,
-      { c_goal: "idea:g_write", c_pillar: "pillar:tech" }),
-    T("Someone Else' Court", "Vendor quote \u2014 with procurement", "In Someone Else' Court", "You", "", "Proactive Value Add: Medium", 1, {}),
-    T("Holding Pattern / Pending", "Office move logistics \u2014 parked until Q3", "Holding Pattern", "You", "", "Personal Task - Non-Urgent", 4, {}),
-    T("Holding Pattern / Pending", "Conference talk proposal", "Holding Pattern", "You", "", "Personal Task - Non-Urgent", 6,
-      { c_goal: "idea:g_visible", c_pillar: "pillar:net" }),
-    T("Personal Tasks", "Book the dentist", "Not Started", "You", dShift(9), "Personal Task - Non-Urgent", 0.5, {}),
-    T("personal development", "Read one chapter a night", "Working On It", "You", "", "Personal Task - Development / Value Add", 0.5,
-      { c_goal: "idea:g_read", c_pillar: "pillar:self" }),
-    T("Personal Tasks", "Half-marathon training block", "Working On It", "You", "", "Proactive Value Add: Medium", 1,
-      { c_goal: "idea:g_health", c_pillar: "pillar:self" }),
-    T("Networking", "Coffee with a former colleague", "Not Started", "You", dShift(4), "Proactive Value Add: Medium", 1,
-      { c_goal: "idea:g_people", c_pillar: "pillar:net" }),
-    T("Networking", "Follow up with the meetup organiser", "Not Started", "You", "", "Personal Task - Non-Urgent", 0.5,
-      { c_goal: "idea:g_people", c_pillar: "pillar:net" }),
-    T("Done", "Ship the reporting dashboard", "Done", "You", "", "Proactive Value Add: High", 12,
-      { c_goal: "idea:g_analysis", c_pillar: "pillar:tech", __done_date: dShift(-3), c_win: "1" }),
-    T("Done", "Automate the weekly export", "Done", "You", "", "Proactive Value Add: Medium", 5,
-      { c_goal: "idea:g_tools", c_pillar: "pillar:tech", __done_date: dShift(-6), c_win: "1" }),
-    T("Done", "Run the retro", "Done", "You", "", "Proactive Value Add: Medium", 1,
-      { c_goal: "idea:g_people", c_pillar: "pillar:net", __done_date: dShift(-8), c_win: "1" }),
-    T("Done", "Fix the numbers in the board deck", "Done", "You", "", "Proactive Value Add: High", 2,
-      { c_goal: "idea:g_detail", c_pillar: "pillar:tech", __done_date: dShift(-12), c_win: "1" }),
-    T("Done", "Write the process guide", "Done", "You", "", "Personal Task - Non-Urgent", 3,
-      { c_goal: "idea:g_write", c_pillar: "pillar:tech", __done_date: dShift(-21), c_win: "1" }),
-    T("Done", "Set up the metrics pipeline", "Done", "You", "", "Proactive Value Add: Medium", 6,
-      { c_goal: "idea:g_tools", c_pillar: "pillar:tech", __done_date: dShift(-30), c_win: "1" }),
-  ];
-  tasks.forEach((t, i) => { t.position = i; });
+  // Which value each goal rolls up to, so a task's Values cell matches its Goal.
+  const DEMO_GOAL_VALUE = {
+    g_half: "health", g_sleep: "health", g_meals: "health",
+    g_pm: "career", g_cert: "career", g_speak: "career", g_network: "career",
+    g_date: "rel", g_family: "rel", g_friends: "rel",
+    g_meditate: "mind", g_read: "mind", g_journal: "mind",
+    g_fund: "money", g_debt: "money", g_shop: "venture", g_sales: "venture",
+  };
+  // A coaching client's life: a marketing manager moving into product,
+  // training for a half marathon, rebuilding savings and opening a small
+  // ceramics shop. The same example the Tuned In demo deployment seeds.
+  // [group, name, status, owner, due, priority, hours, extra, subtasks?]
+  const G = (goal) => ({ c_goal: "idea:" + goal, c_pillar: "pillar:" + DEMO_GOAL_VALUE[goal] });
+  const V = (value) => ({ c_pillar: "pillar:" + value });
+  const DONE = (daysAgo, goal) => Object.assign({ __done_date: dShift(-daysAgo) }, G(goal));
+  const seed = [
+    // ---- In progress now
+    ["All Active Tasks", "Prep three questions for Thursday's coaching session", "Working On It", "You", dShift(1), "High", 0.5, Object.assign(G("g_speak"), { __eis: "do", __est: 30 })],
+    ["All Active Tasks", "Draft the product brief for the onboarding redesign", "Working On It", "You", dShift(3), "Critical", 4, Object.assign(G("g_pm"), { __eis: "do", __est: 240 }),
+      [["Interview 5 customers who churned", "Done", 4], ["Summarise the support-ticket themes", "Done", 4], ["Write the problem statement", "Working On It"], ["Review with engineering lead", "Not Started"]]],
+    ["All Active Tasks", "Certificate module 7: prioritisation frameworks", "Working On It", "You", dShift(2), "High", 3, Object.assign(G("g_cert"), { __eis: "schedule", __est: 180 })],
+    ["All Active Tasks", "Saturday long run — 8 miles", "Not Started", "You", dShift(3), "High", 1.5, Object.assign(G("g_half"), { __eis: "schedule", __est: 90 })],
+    ["All Active Tasks", "Book a gait analysis at the running shop", "Not Started", "You", dShift(5), "Medium", 1, Object.assign(G("g_half"), { __eis: "schedule", __est: 60 })],
+    ["All Active Tasks", "Photograph the launch collection", "Working On It", "You", dShift(6), "High", 3, Object.assign(G("g_shop"), { __eis: "schedule", __est: 180 }),
+      [["Buy a light box and backdrop", "Done", 2], ["Shoot mugs and bowls", "Not Started"], ["Edit and crop for the storefront", "Not Started"]]],
+    ["All Active Tasks", "Try changing a Status — watch the task move groups", "Not Started", "You", "", "Low", 0.25, { __est: 15 }],
 
-  // A subtask tree, so the demo shows nesting and the done-subtask collapse
-  const parent = tasks.find((t) => t.cells.c_name === "Build the pricing scenario model");
-  ["Gather the input assumptions", "Build the base case", "Add the sensitivity table"]
-    .forEach((nm, i) => {
-      const sub = T("Commercial Models", nm, i === 0 ? "Done" : "Not Started", "You", "", "Proactive Value Add: Medium", 1, {});
-      sub.parent_id = parent.id;
-      sub.position = tasks.length + i;
-      if (i === 0) sub.cells[DONE_DATE_KEY] = dShift(-1);
-      tasks.push(sub);
+    // ---- Health & Home
+    ["Health & Home", "Plan four dinners and order groceries", "Not Started", "You", dShift(2), "Medium", 0.5, Object.assign(G("g_meals"), { __eis: "schedule", __est: 30 })],
+    ["Health & Home", "Move the phone charger to the kitchen", "Not Started", "You", dToday(), "Low", 0.25, Object.assign(G("g_sleep"), { __eis: "do", __est: 15 })],
+    ["Health & Home", "Book annual physical", "Not Started", "You", dShift(14), "Medium", 0.5, Object.assign(V("health"), { __eis: "schedule", __est: 15 })],
+    ["Health & Home", "Yoga class — cross-training day", "Not Started", "You", dShift(1), "Low", 1, Object.assign(G("g_half"), { __est: 60 })],
+
+    // ---- Career & Money
+    ["Career & Money", "Ask to present the Q3 campaign results at the leadership sync", "Not Started", "You", dShift(4), "High", 0.5, Object.assign(G("g_speak"), { __eis: "do", __est: 30 })],
+    ["Career & Money", "Coffee chat with Priya (Senior PM, payments team)", "Not Started", "You", dShift(7), "Medium", 1, Object.assign(G("g_network"), { __eis: "schedule", __est: 60 })],
+    ["Career & Money", "Update LinkedIn headline and About section", "Not Started", "You", dShift(10), "Medium", 1.5, Object.assign(G("g_pm"), { __eis: "schedule", __est: 90 })],
+    ["Career & Money", "Raise the automatic savings transfer by $150", "Not Started", "You", dShift(1), "High", 0.25, Object.assign(G("g_fund"), { __eis: "do", __est: 15 })],
+    ["Career & Money", "Review insurance and cancel unused subscriptions", "Not Started", "You", dShift(12), "Low", 1, Object.assign(G("g_fund"), { __eis: "delegate", __est: 60 })],
+
+    // ---- Relationships
+    ["Relationships", "Plan Thursday date night — the new Thai place", "Not Started", "You", dShift(2), "High", 0.5, Object.assign(G("g_date"), { __eis: "do", __est: 30 })],
+    ["Relationships", "Send invites for this month's friends' dinner", "Not Started", "You", dShift(4), "Medium", 0.5, Object.assign(G("g_friends"), { __eis: "schedule", __est: 30 })],
+    ["Relationships", "Birthday card and gift for Sam", "Not Started", "You", dShift(9), "Medium", 0.5, Object.assign(V("rel"), { __eis: "schedule", __est: 30 })],
+
+    // ---- Side Venture
+    ["Side Venture", "Write product descriptions for 12 pieces", "Not Started", "You", dShift(9), "Medium", 2, Object.assign(G("g_shop"), { __eis: "schedule", __est: 120 })],
+    ["Side Venture", "Apply for a booth at the Harvest Craft Fair", "Not Started", "You", dShift(5), "High", 1, Object.assign(G("g_sales"), { __eis: "do", __est: 60 })],
+    ["Side Venture", "Glaze firing — second batch", "Not Started", "You", dShift(8), "Medium", 3, Object.assign(G("g_sales"), { __est: 180 })],
+    ["Side Venture", "Scroll other pottery shops for 'inspiration'", "Not Started", "You", "", "Low", 1, Object.assign(G("g_shop"), { __eis: "eliminate", __est: 60 })],
+
+    // ---- Waiting / with someone else / parked
+    ["Waiting for Feedback", "Weekly reflection sent to coach — awaiting notes", "Waiting for Feedback", "Coach", dShift(1), "Medium", 0.5, G("g_speak")],
+    ["Waiting for Feedback", "Shared the brief outline with my director", "Waiting for Feedback", "You", dShift(4), "High", 0.5, G("g_pm")],
+    ["Someone Else' Court", "Financial planner reviewing the savings plan", "In Someone Else' Court", "Planner", dShift(10), "Medium", 1, G("g_fund")],
+    ["Someone Else' Court", "Partner choosing the anniversary weekend dates", "In Someone Else' Court", "Partner", dShift(14), "Medium", 0.5, G("g_date")],
+    ["Holding Pattern / Pending", "Kiln upgrade — wait until 25 sales", "Holding Pattern", "You", "", "Low", 2, G("g_sales")],
+    ["Holding Pattern / Pending", "Spring trip to Portugal — revisit after the emergency fund", "Holding Pattern", "You", "", "Low", 2, V("money")],
+
+    // ---- Done: twelve weeks of history for Progress and the goal sparklines
+    ["Done", "Register for the Riverfront Half", "Done", "You", "", "High", 0.5, DONE(76, "g_half")],
+    ["Done", "First coaching session — values exercise", "Done", "You", "", "High", 1, DONE(74, "g_journal")],
+    ["Done", "Set up the automatic savings transfer", "Done", "You", "", "High", 0.5, DONE(70, "g_fund")],
+    ["Done", "Certificate module 1: what a PM does", "Done", "You", "", "Medium", 2, DONE(67, "g_cert")],
+    ["Done", "Coffee chat with Marcus (PM, growth)", "Done", "You", "", "Medium", 1, DONE(63, "g_network")],
+    ["Done", "Final credit card payment", "Done", "You", "", "High", 0.25, DONE(60, "g_debt")],
+    ["Done", "Certificate modules 2 and 3", "Done", "You", "", "Medium", 4, DONE(55, "g_cert")],
+    ["Done", "Run 5K without stopping", "Done", "You", "", "High", 0.5, DONE(52, "g_half")],
+    ["Done", "Hosted last month's friends' dinner", "Done", "You", "", "Medium", 3, DONE(47, "g_friends")],
+    ["Done", "Presented the campaign recap to my team", "Done", "You", "", "High", 1, DONE(44, "g_speak")],
+    ["Done", "Coffee chats with Lena and Omar", "Done", "You", "", "Medium", 2, DONE(40, "g_network")],
+    ["Done", "Certificate module 4: discovery", "Done", "You", "", "Medium", 2, DONE(36, "g_cert")],
+    ["Done", "Finished 'Atomic Habits'", "Done", "You", "", "Low", 1, DONE(33, "g_read")],
+    ["Done", "Throw and trim the launch collection", "Done", "You", "", "Medium", 6, DONE(30, "g_shop")],
+    ["Done", "First 10K long run", "Done", "You", "", "High", 1.25, DONE(27, "g_half")],
+    ["Done", "Weekend away — no laptops", "Done", "You", "", "High", 4, DONE(24, "g_date")],
+    ["Done", "Sold four mugs to the neighbours' group chat", "Done", "You", "", "Medium", 1, DONE(20, "g_sales")],
+    ["Done", "Certificate module 5: roadmaps", "Done", "You", "", "Medium", 2, DONE(17, "g_cert")],
+    ["Done", "Spoke up first in the leadership sync", "Done", "You", "", "High", 0.5, DONE(13, "g_speak")],
+    ["Done", "Coffee chats with Ana, Jordan and Wei", "Done", "You", "", "Medium", 3, DONE(10, "g_network")],
+    ["Done", "Certificate module 6: metrics", "Done", "You", "", "Medium", 2, DONE(6, "g_cert")],
+    ["Done", "Meal-prepped for the week", "Done", "You", "", "Low", 2, DONE(4, "g_meals")],
+    ["Done", "Called Mom and Dad", "Done", "You", "", "Medium", 0.5, DONE(3, "g_family")],
+    ["Done", "Moved $500 of the bonus into savings", "Done", "You", "", "Medium", 0.25, DONE(2, "g_fund")],
+  ];
+
+  // Lay the seed out the way the automations would have: every Not Started or
+  // Working On It task outside All Active Tasks also gets a linked copy there.
+  const tasks = [];
+  const subs = [];
+  seed.forEach(([group, name, status, owner, due, prio, hours, extra, children]) => {
+    const t = T(group, name, status, owner, due, prio, hours, extra);
+    tasks.push(t);
+    if ((status === "Not Started" || status === "Working On It") && group !== "All Active Tasks") {
+      t.link_id = dUid();
+      const copy = T("All Active Tasks", name, status, owner, due, prio, hours, extra);
+      copy.link_id = t.link_id;
+      copy.cells = Object.assign({}, t.cells);
+      tasks.push(copy);
+    }
+    (children || []).forEach(([nm, st, doneAgo]) => {
+      const sub = T(group, nm, st, "You", "", "Medium", 0.5, st === "Done" ? { __done_date: dShift(-(doneAgo || 1)) } : {});
+      sub.parent_id = t.id;
+      subs.push(sub);
     });
+  });
+  tasks.push(...subs);
+  tasks.forEach((t, i) => { t.position = i; });
 
   const automations = [
     { id: dUid(), enabled: 0, name: "Mark complete date", trigger_col: "c_status", trigger_val: "Done", action_col: "c_due", action_type: "setToday", action_val: "", position: 0 },
@@ -2044,7 +2099,6 @@ const DB = (() => {
     { id: dUid(), enabled: 1, name: "", trigger_col: "c_status", trigger_val: "Not Started", action_col: "c_due", action_type: "copyToGroup", action_val: "All Active Tasks", position: 4 },
     { id: dUid(), enabled: 1, name: "", trigger_col: "c_status", trigger_val: "Holding Pattern", action_col: "c_due", action_type: "moveToGroup", action_val: "Holding Pattern / Pending", position: 5 },
     { id: dUid(), enabled: 1, name: "", trigger_col: "c_status", trigger_val: "Waiting for Feedback", action_col: "c_due", action_type: "moveToGroup", action_val: "Waiting for Feedback", position: 6 },
-    { id: dUid(), enabled: 1, name: "Personal Development", trigger_col: "c_priority", trigger_val: "Personal Task - Development / Value Add", action_col: "c_due", action_type: "copyToGroup", action_val: "personal development", position: 7 },
   ];
 
 
@@ -2058,54 +2112,114 @@ const DB = (() => {
       { id: "s6", label: "Done",                   color: "#38a66f", position: 5 },
     ],
     priority: [
-      { id: "p01", label: "Executive Request - Urgent",              color: "#7a1f1f", position: 0 },
-      { id: "p02", label: "Manager Request - Urgent",                color: "#990061", position: 1 },
-      { id: "p03", label: "Commercial Request - Urgent",             color: "#a85bd2", position: 2 },
-      { id: "p04", label: "Executive Request - Non Urgent",          color: "#e2685a", position: 3 },
-      { id: "p05", label: "Team Request - Non Urgent",               color: "#87c07c", position: 4 },
-      { id: "p06", label: "Commercial Request - Nonurgent",          color: "#995200", position: 5 },
-      { id: "p07", label: "Personal Task - Urgent",                  color: "#610a0a", position: 6 },
-      { id: "p08", label: "Proactive Value Add: High",               color: "#00859b", position: 7 },
-      { id: "p09", label: "Personal Task - Development / Value Add", color: "#2f8348", position: 8 },
-      { id: "p10", label: "Proactive Value Add: Medium",             color: "#5dbfd0", position: 9 },
-      { id: "p11", label: "Personal Task - Non-Urgent",              color: "#376068", position: 10 },
-      { id: "p12", label: "Proactive Value Add: Low",                color: "#c6f3fb", position: 11 },
-      { id: "p13", label: "Personal Task - Wishlist",                color: "#a8b3ab", position: 12 },
+      { id: "p1", label: "Critical", color: "#7a1f1f", position: 0 },
+      { id: "p2", label: "High",     color: "#e2725b", position: 1 },
+      { id: "p3", label: "Medium",   color: "#00859b", position: 2 },
+      { id: "p4", label: "Low",      color: "#bce194", position: 3 },
     ],
   };
 
 
   // ---- Goals ----
+  // Six life areas replace the app's built-in sections (all retired below).
+  // Scope sorts them in Progress: "" Professional, personal, ventures.
+  const goal = (id, pillar, text, extra) => Object.assign({
+    id, text, pillar, parent: null, status: "active", why: "", plan: "", weaknessBoost: false, tracking: null,
+  }, extra);
   const goals = {
     schema: 1, fwSeeded: 1, roleExpSeed: "v2", scV3: "v1", scRolesRev: "v1",
-    autoRetired: "v1", mergeRev: "v1", personalRev: "v2", secRoleRev: "v2",
-    identity: "I do work that holds up without me in the room.",
-    objective: "This quarter: one project taken end to end, and the write-up in front of people who decide.",
-    diagnosis: "The work is good; not enough of it is visible, and too much of it depends on me being available.",
-    crux: "Turn repeated work into tools so the next one is faster.",
-    // Reuse the app's own base keys so the dashboard isn't padded with the
-    // built-in sections this demo doesn't use; the rest are retired.
-    deletedPillars: ["lead", "prof", "net_imtt"],
+    autoRetired: "v1", mergeRev: "v1", personalRev: "v2", secRoleRev: "v2", impAbsorbed: 1,
+    identity: "I am someone who keeps promises to myself.",
+    objective: "Make the move into product without losing my health, my relationships or my savings along the way.",
+    diagnosis: "Plenty of ambition, but it all lives in my head. Energy leaks into takeout, late nights and saying yes to everything.",
+    crux: "Put the life I want on the calendar first, and let the rest fit around it.",
+    deletedPillars: ["lead", "self", "tech", "prof", "net", "net_imtt", "future"],
     pillars: [
-      { key: "tech", label: "Craft & Quality", color: "#00859b", weight: 30, why: "The work itself, done to a standard.", base: true },
-      { key: "think", label: "Judgment", color: "#00bfb8", weight: 20, why: "Choosing the right problem before solving it.", base: false },
-      { key: "net", label: "Reach & Influence", color: "#c0782a", weight: 20, why: "Whether the work travels beyond your desk.", base: true },
-      { key: "self", label: "Self-Investment", color: "#38a66f", weight: 15, why: "Compounding habits.", base: true, scope: "personal" },
-      { key: "future", label: "Future Options", color: "#8e7cc3", weight: 15, why: "Threads that become the next opportunity.", base: true, scope: "personal" },
+      { key: "health", label: "Health & Energy", color: "#38a66f", weight: 20, scope: "personal", base: false,
+        why: "Everything else runs on sleep, movement and a body that has energy left at 6pm." },
+      { key: "career", label: "Career & Purpose", color: "#00859b", weight: 25, base: false,
+        why: "Work that uses my strengths and points somewhere I actually want to go." },
+      { key: "rel", label: "Relationships", color: "#e2725b", weight: 20, scope: "personal", base: false,
+        why: "The people who will still be here when the job title changes." },
+      { key: "mind", label: "Mindset & Growth", color: "#77b28c", weight: 15, scope: "personal", base: false,
+        why: "Responding instead of reacting. Learning on purpose." },
+      { key: "money", label: "Financial Freedom", color: "#e0a92a", weight: 10, scope: "personal", base: false,
+        why: "Enough runway that fear stops making my decisions." },
+      { key: "venture", label: "Creative Venture", color: "#00bfb8", weight: 10, scope: "ventures", base: false,
+        why: "Making something with my hands that strangers pay for." },
     ],
     ideas: [
-      { id: "g_write", text: "Writing that carries a decision", pillar: "tech", role: "associate", why: "Most work is judged through what's written about it.", plan: "One memo per project, sent before it's asked for.", tracking: { type: "metric", current: 3, target: 12, unit: "memos" } },
-      { id: "g_analysis", text: "Analysis at zero defects", pillar: "tech", role: "analyst", why: "Trust is lost one error at a time.", plan: "Checklist before anything leaves my hands." },
-      { id: "g_detail", text: "Catch it before review", pillar: "tech", role: "analyst", why: "", plan: "Self-review pass on every deliverable." },
-      { id: "g_tools", text: "Build tools instead of repeating work", pillar: "tech", role: "associate", why: "Leverage compounds; effort doesn't.", plan: "Anything done twice gets templated." },
-      { id: "g_judgment", text: "Frame the decision, not just the answer", pillar: "think", role: "associate", why: "", plan: "Lead with the recommendation." },
-      { id: "g_scope", text: "Say no to the wrong work", pillar: "think", role: "vp", why: "", plan: "" },
-      { id: "g_visible", text: "Make the work visible", pillar: "net", role: "associate", why: "Nobody can back what they can't see.", plan: "Present once a quarter." },
-      { id: "g_people", text: "Build the network before needing it", pillar: "net", role: "analyst", why: "", plan: "One conversation a week.", tracking: { type: "metric", current: 4, target: 52, unit: "conversations" } },
-      { id: "g_mentor", text: "Bring someone else up", pillar: "net", role: "director", why: "", plan: "" },
-      { id: "g_health", text: "Train four days a week", pillar: "self", why: "Energy is the input to everything else.", plan: "Mon/Tue/Thu/Sat.", tracking: { type: "streak", current: 9, target: 30 } },
-      { id: "g_read", text: "Read outside the field", pillar: "self", why: "", plan: "" },
-      { id: "g_optional", text: "Keep options open", pillar: "future", why: "", plan: "" },
+      goal("g_half", "health", "Run the Riverfront Half Marathon", { pin: true, pinOrder: 1,
+        why: "Proof to myself that I can commit to something hard for twelve weeks and see it through.",
+        plan: "Novice plan: 3 runs + 1 cross-train a week. Long run on Saturdays, building 1 mile a week. Gait analysis before week 6.",
+        tracking: { type: "milestone", current: 0, target: 0, unit: "", deadline: dShift(68), milestones: [
+          { text: "Register for the race", done: true }, { text: "Run 5K without stopping", done: true },
+          { text: "First 10K long run", done: true }, { text: "Get fitted for proper shoes", done: false },
+          { text: "10-mile long run", done: false }, { text: "Race day", done: false } ] } }),
+      goal("g_sleep", "health", "Sleep 7+ hours, five nights a week", {
+        why: "Every bad week in my journal starts with a short night.",
+        plan: "Phone charges in the kitchen. Lights out by 10:45. No work email after 8pm.",
+        tracking: { type: "streak", current: 9, target: 30, unit: "nights", milestones: [], deadline: "" } }),
+      goal("g_meals", "health", "Cook dinner at home four nights a week", {
+        why: "Takeout is where both the money and the energy go.",
+        plan: "Sunday: plan four meals and order groceries. Double Monday's recipe for Tuesday lunch.",
+        tracking: { type: "metric", current: 3, target: 4, unit: "nights / week", milestones: [], deadline: "" } }),
+      goal("g_pm", "career", "Move into a Product Manager role by spring", { pin: true, pinOrder: 2,
+        why: "I keep doing the parts of product work I love from the marketing side. Time to own it.",
+        plan: "Finish the PM certificate, ship one cross-functional project as the de-facto PM, and have the transfer conversation with my director by end of quarter.",
+        tracking: { type: "percent", current: 45, target: 0, unit: "", milestones: [], deadline: dShift(150) } }),
+      goal("g_cert", "career", "Finish the product management certificate", { parent: "g_pm",
+        why: "Gives me the vocabulary and a credential the hiring manager will recognise.",
+        plan: "Two modules a week, Tuesday and Thursday evenings. Capstone uses the onboarding project.",
+        tracking: { type: "metric", current: 6, target: 10, unit: "modules", milestones: [], deadline: "" } }),
+      goal("g_speak", "career", "Present with confidence in leadership meetings", { weaknessBoost: true,
+        why: "I go quiet when the VP is in the room, and it is costing me visibility. My coach flagged this as the one to work on.",
+        plan: "Volunteer for one update a month. Rehearse out loud the night before. Open with the decision I need, not the background.",
+        tracking: { type: "metric", current: 2, target: 6, unit: "presentations", milestones: [], deadline: "" } }),
+      goal("g_network", "career", "Have 12 coffee chats with PMs", { parent: "g_pm",
+        why: "Every PM I have talked to so far changed how I think about the move.",
+        plan: "One a week. Ask each person for one more introduction.",
+        tracking: { type: "metric", current: 7, target: 12, unit: "chats", milestones: [], deadline: "" } }),
+      goal("g_date", "rel", "Protect a weekly date night", {
+        why: "We have become very good logistics partners. I want us to be more than that.",
+        plan: "Thursdays, on the shared calendar. Phones in a drawer. Take turns planning.",
+        tracking: { type: "streak", current: 5, target: 12, unit: "weeks", milestones: [], deadline: "" } }),
+      goal("g_family", "rel", "Call Mom and Dad every Sunday", {
+        why: "They are getting older and I only ever call when something is wrong.",
+        plan: "Sunday after the long run. Ten minutes counts.",
+        tracking: { type: "streak", current: 7, target: 52, unit: "weeks", milestones: [], deadline: "" } }),
+      goal("g_friends", "rel", "Host a dinner for friends once a month", {
+        why: "Friendships after 30 need a calendar invite or they quietly fade.",
+        plan: "First Saturday of the month. Simple menu. Invite one new person each time.",
+        tracking: { type: "metric", current: 2, target: 6, unit: "dinners", milestones: [], deadline: "" } }),
+      goal("g_meditate", "mind", "Meditate 10 minutes every morning", {
+        why: "On days I sit first, I answer emails instead of reacting to them.",
+        plan: "Right after coffee, before the phone.",
+        tracking: { type: "streak", current: 18, target: 60, unit: "days", milestones: [], deadline: "" } }),
+      goal("g_read", "mind", "Read 20 books this year", {
+        why: "Reading is the cheapest mentor there is.",
+        plan: "20 minutes before bed instead of scrolling. Alternate one work book, one fiction.",
+        tracking: { type: "metric", current: 13, target: 20, unit: "books", milestones: [], deadline: "" } }),
+      goal("g_journal", "mind", "Weekly reflection before every coaching session", { status: "done",
+        why: "Sessions are twice as useful when I arrive knowing what I want from them.",
+        plan: "Friday afternoon: wins, what drained me, one question for my coach.",
+        tracking: { type: "streak", current: 8, target: 8, unit: "weeks", milestones: [], deadline: "" } }),
+      goal("g_fund", "money", "Build a 6-month emergency fund", {
+        why: "Changing careers is far less scary with runway in the bank.",
+        plan: "Automatic transfer the day after payday. Every bonus and shop dollar goes here until it is full.",
+        tracking: { type: "metric", current: 11400, target: 21000, unit: "$", milestones: [], deadline: "" } }),
+      goal("g_debt", "money", "Pay off the credit card", { status: "done",
+        why: "Interest was quietly eating what I saved.",
+        plan: "Avalanche method, extra $400 a month.",
+        tracking: { type: "percent", current: 100, target: 0, unit: "", milestones: [], deadline: "" } }),
+      goal("g_shop", "venture", "Open the ceramics shop online", {
+        why: "I have forty mugs in the garage and a waiting list of friends. Let's find out if strangers agree.",
+        plan: "Photograph the first collection, set up the storefront, launch to the newsletter list.",
+        tracking: { type: "deadline", current: 0, target: 0, unit: "", milestones: [], deadline: dShift(45) } }),
+      goal("g_sales", "venture", "Sell the first 25 pieces", { parent: "g_shop",
+        why: "25 sales to people I don't know is the signal that this is more than a hobby.",
+        plan: "Launch collection of 30. Two craft fairs this autumn.",
+        tracking: { type: "metric", current: 4, target: 25, unit: "pieces", milestones: [], deadline: "" } }),
     ],
     improvements: [], hiddenIdeas: [], ledgerAdds: [],
   };
@@ -2130,38 +2244,39 @@ const DB = (() => {
   };
   // Link a few live tasks to skill categories so the cards show real progress
   const byName = (n) => (tasks.find((t) => t.cells.c_name === n) || {}).id;
-  skill.assign[byName("Draft the quarterly summary")] = ["writ"];
-  skill.assign[byName("Build the pricing scenario model")] = ["tech", "decide"];
-  skill.assign[byName("Review the vendor proposal")] = ["decide"];
-  skill.assign[byName("Rewrite the onboarding doc")] = ["writ"];
+  skill.assign[byName("Draft the product brief for the onboarding redesign")] = ["writ", "decide"];
+  skill.assign[byName("Certificate module 7: prioritisation frameworks")] = ["tech", "decide"];
+  skill.assign[byName("Prep three questions for Thursday's coaching session")] = ["habits"];
+  skill.assign[byName("Ask to present the Q3 campaign results at the leadership sync")] = ["writ", "lead"];
   [1, 2, 3, 5, 8, 13].forEach((d) => { skill.daily[dShift(-d)] = true; });
 
   const notebook = {
     list: [
-      { id: "n1", title: "What actually made this quarter work", tags: "retro, systems",
-        bodyHtml: "Three things carried it:<br><br>1. <b>Templating anything done twice.</b> The weekly export used to be an afternoon; it's now a button.<br>2. <b>Writing the memo before being asked.</b> Changed how the last two reviews went.<br>3. <b>Saying no earlier.</b> Two projects declined in week one that would have eaten a month.<br><br>The pattern is the same each time: <i>front-load the thinking, then automate the repetition.</i>",
-        body: "Three things carried it: 1. Templating anything done twice...", pinned: true, archived: false,
-        created: dShift(-9), updated: dShift(-2) },
-      { id: "n2", title: "Reading notes \u2014 Thinking in Bets", tags: "reading, decisions",
-        bodyHtml: "The core move is separating <b>decision quality</b> from <b>outcome quality</b>. A good decision can lose; a bad one can win.<br><br>Practical version: log the reasoning at the time, not the result afterwards.",
-        body: "The core move is separating decision quality from outcome quality...", pinned: false, archived: false,
-        created: dShift(-14), updated: dShift(-14) },
-      { id: "n3", title: "Ideas for the next tool", tags: "tools",
-        bodyHtml: "Things worth building next:<ul><li>A one-page status generator off the board</li><li>Auto-tagging tasks to goals from keywords</li><li>Weekly digest email of what shipped</li></ul>",
-        body: "Things worth building next...", pinned: false, archived: false,
-        created: dShift(-20), updated: dShift(-6) },
+      { id: "n1", title: "Coaching session notes \u2014 week 8", tags: "coaching, career",
+        bodyHtml: "Big insight this week: I keep waiting to <b>feel ready</b> before I speak up in leadership meetings.<br><br>Coach's reframe: readiness follows action, not the other way round.<br><br><b>Commitments for next session:</b><ul><li>Volunteer for the Q3 results update</li><li>Open with the decision I need, not the background</li><li>Rehearse out loud the night before</li></ul>",
+        body: "Big insight this week: I keep waiting to feel ready before I speak up...", pinned: true, archived: false,
+        created: dShift(-2), updated: dShift(-1) },
+      { id: "n2", title: "Values exercise \u2014 what actually matters", tags: "values, reflection",
+        bodyHtml: "Ranked my top values from the first session:<br><br>1. <b>Health</b> \u2014 nothing works when I'm running on empty<br>2. <b>Growth</b> \u2014 I want work that stretches me<br>3. <b>Connection</b> \u2014 my partner, my parents, my friends<br>4. <b>Freedom</b> \u2014 enough savings that fear doesn't decide for me<br><br>Most of my calendar last month served none of these.",
+        body: "Ranked my top values from the first session...", pinned: false, archived: false,
+        created: dShift(-74), updated: dShift(-30) },
+      { id: "n3", title: "Reading notes \u2014 Atomic Habits", tags: "reading, habits",
+        bodyHtml: "The core idea: <b>you don't rise to the level of your goals, you fall to the level of your systems.</b><br><br>Applied: the phone charger moves to the kitchen, running shoes by the door, groceries ordered every Sunday.",
+        body: "You don't rise to the level of your goals...", pinned: false, archived: false,
+        created: dShift(-33), updated: dShift(-33) },
     ],
   };
 
   const para = {
     items: [
-      { id: "pa1", kind: "project", name: "Reporting dashboard v2", note: "Ship the rebuilt dashboard with live data.", group: "Commercial Models", goal: "idea:g_tools", due: dShift(21), archived: false, pos: 0, created: dShift(-30) },
-      { id: "pa2", kind: "project", name: "Onboarding refresh", note: "Rewrite the docs new joiners actually read.", group: "All Active Tasks", goal: "idea:g_write", due: dShift(45), archived: false, pos: 1, created: dShift(-12) },
-      { id: "pa3", kind: "area", name: "Craft & Quality", note: "The standard everything leaves at.", goal: "pillar:tech", standard: "Nothing goes out without a self-review pass.", archived: false, pos: 2, created: dShift(-60) },
-      { id: "pa4", kind: "area", name: "Health", note: "", standard: "Four training days a week, non-negotiable.", archived: false, pos: 3, created: dShift(-60) },
-      { id: "pa5", kind: "resource", name: "Modelling style guide", note: "House conventions for workbooks.", url: "https://example.com/style-guide", archived: false, pos: 4, created: dShift(-40) },
-      { id: "pa6", kind: "resource", name: "Chart library", note: "Reusable exhibit templates.", archived: false, pos: 5, created: dShift(-40) },
-      { id: "pa7", kind: "project", name: "Conference talk", note: "Parked until the CFP reopens.", archived: true, pos: 6, created: dShift(-90) },
+      { id: "pa1", kind: "project", name: "Riverfront Half Marathon", note: "Twelve-week plan to race day.", group: "Health & Home", goal: "idea:g_half", due: dShift(68), archived: false, pos: 0, created: dShift(-76) },
+      { id: "pa2", kind: "project", name: "Onboarding redesign brief", note: "The de-facto PM project for the transfer case.", group: "All Active Tasks", goal: "idea:g_pm", due: dShift(21), archived: false, pos: 1, created: dShift(-20) },
+      { id: "pa3", kind: "project", name: "Ceramics shop launch", note: "Photos, storefront, first collection of 30.", group: "Side Venture", goal: "idea:g_shop", due: dShift(45), archived: false, pos: 2, created: dShift(-40) },
+      { id: "pa4", kind: "area", name: "Health & Energy", note: "", goal: "pillar:health", standard: "Seven hours of sleep, four home-cooked dinners a week.", archived: false, pos: 3, created: dShift(-74) },
+      { id: "pa5", kind: "area", name: "Relationships", note: "", goal: "pillar:rel", standard: "Thursday date night and a Sunday call home, every week.", archived: false, pos: 4, created: dShift(-74) },
+      { id: "pa6", kind: "resource", name: "PM certificate course materials", note: "Module slides and the capstone brief.", archived: false, pos: 5, created: dShift(-67) },
+      { id: "pa7", kind: "resource", name: "Training plan \u2014 novice half", note: "Week-by-week mileage.", archived: false, pos: 6, created: dShift(-76) },
+      { id: "pa8", kind: "project", name: "Credit card payoff", note: "Done \u2014 paid off in full.", archived: true, pos: 7, created: dShift(-120) },
     ],
   };
 
@@ -2213,19 +2328,19 @@ const DB = (() => {
     career_notes: JSON.stringify(career),
     ideas_lab: JSON.stringify({
       list: [
-        { id: "i1", text: "A weekly digest of everything that shipped", scope: "work", status: "exploring", next: "Sketch the email format", notes: [{ ts: dShift(-4), text: "Pull straight from the Done group, group by goal." }] },
-        { id: "i2", text: "Teach a short internal course on modelling", scope: "work", status: "spark", next: "", notes: [] },
-        { id: "i3", text: "Long-distance hike, one week, no laptop", scope: "personal", status: "ready", next: "Book the time off", notes: [] },
+        { id: "i1", text: "Teach a beginner pottery night at the community centre", scope: "personal", status: "exploring", next: "Ask the centre about Tuesday evenings", notes: [{ ts: dShift(-4), text: "Could double as marketing for the shop." }] },
+        { id: "i2", text: "Run a lunch-and-learn on what marketing can teach product", scope: "work", status: "spark", next: "", notes: [] },
+        { id: "i3", text: "A week-long hiking trip after race day, no laptop", scope: "personal", status: "ready", next: "Book the time off", notes: [] },
       ],
     }),
     hdr_title_text: "Tuned In",
-    hdr_tagline_text: "A demo \u2014 nothing here is saved",
+    hdr_tagline_text: "A coaching client\u2019s board \u2014 a demo, nothing here is saved",
     plan_start: "08:00", plan_end: "18:00",
   };
 
   const projects = [
-    { id: "v1", name: "Tuned In", status: "Building", stack: "Flask \u00b7 SQLite \u00b7 vanilla JS", repo: "", notes: "This app. Personal productivity OS.", todos: JSON.stringify([{ t: "Scorecard export", done: true }, { t: "Career notes", done: true }, { t: "Mobile parity", done: false }]), position: 0, priority: "High", pillar: "pillar:craft" },
-    { id: "v2", name: "Weekly digest bot", status: "Idea", stack: "Python", repo: "", notes: "Emails what shipped each Friday.", todos: JSON.stringify([]), position: 1, priority: "Medium", pillar: "" },
+    { id: "v1", name: "Ceramics shop storefront", status: "Building", stack: "Shopify \u00b7 Canva", repo: "", notes: "The online shop for the launch collection.", todos: JSON.stringify([{ t: "Pick a theme", done: true }, { t: "Product photos", done: false }, { t: "Shipping rates", done: false }]), position: 0, priority: "High", pillar: "pillar:venture" },
+    { id: "v2", name: "Personal budget tracker", status: "Idea", stack: "Spreadsheet", repo: "", notes: "See where the money goes each month.", todos: JSON.stringify([]), position: 1, priority: "Medium", pillar: "pillar:money" },
   ];
 
   const prompts = [
@@ -2238,20 +2353,28 @@ const DB = (() => {
     { id: "ic_note", name: "Notes", type: "text", is_primary: 0, position: 1 },
   ];
   const imp_tasks = [
-    { id: "it1", group_name: "Missed Goals", position: 0, cells: { ic_name: "Conference talk proposal \u2014 missed: Make the work visible", ic_note: "" } },
-    { id: "it2", group_name: "Habits", position: 1, cells: { ic_name: "Reviewing work twice before sending", ic_note: "Checklist helps." } },
+    { id: "it1", group_name: "Patterns to change", position: 0, cells: { ic_name: "Going quiet when senior leaders are in the room", ic_note: "Coach: open with the decision I need." } },
+    { id: "it2", group_name: "Habits", position: 1, cells: { ic_name: "Saying yes before checking the calendar", ic_note: "Pause, then 'let me check and get back to you'." } },
   ];
 
   const rewards = [
-    { id: "rw1", name: "Good coffee", cost: 20, position: 0 },
-    { id: "rw2", name: "Afternoon off", cost: 150, position: 1 },
-    { id: "rw3", name: "New book", cost: 60, position: 2 },
+    { id: "rw1", name: "New running shoes", cost: 150, position: 0 },
+    { id: "rw2", name: "Massage after the long run", cost: 80, position: 1 },
+    { id: "rw3", name: "Pottery studio day", cost: 60, position: 2 },
   ];
 
+  const byNameId = (n) => (tasks.find((t) => t.cells.c_name === n && !t.parent_id) || {}).id || null;
+  const block = (id, start, minutes, label, color, taskName) => ({
+    id, day: dToday(), start, minutes, task_id: taskName ? byNameId(taskName) : null,
+    label: label || taskName, color: color || null, src_uid: taskName ? null : "demo", auto: 0,
+  });
   const schedule = [
-    { id: "sb1", day: dToday(), start: "09:00", minutes: 30, task_id: null, label: "Standup", color: "#b3b3b3", src_uid: "demo", auto: 0 },
-    { id: "sb2", day: dToday(), start: "11:00", minutes: 60, task_id: null, label: "Project review", color: "#b3b3b3", src_uid: "demo", auto: 0 },
-    { id: "sb3", day: dToday(), start: "14:00", minutes: 30, task_id: null, label: "1:1", color: "#b3b3b3", src_uid: "demo", auto: 0 },
+    block("sb1", "06:30", 15, "Meditate", "#77b28c"),
+    block("sb2", "07:00", 45, "Easy 3-mile run", "#38a66f"),
+    block("sb3", "09:00", 120, "", "", "Draft the product brief for the onboarding redesign"),
+    block("sb4", "12:00", 30, "Lunch walk \u2014 no phone", "#bce194"),
+    block("sb5", "14:00", 60, "Coaching session", "#00859b"),
+    block("sb6", "19:30", 60, "", "", "Certificate module 7: prioritisation frameworks"),
   ];
 
   return {
@@ -2259,13 +2382,14 @@ const DB = (() => {
     imp_columns, imp_tasks, rewards, redemptions: [], settings,
     group_colors: {
       "Waiting for Feedback": "#00bfb8", "Someone Else' Court": "#3d0099",
-      "Holding Pattern / Pending": "#b3b3b3", "Personal Tasks": "#cce7eb",
-      Done: "#38a66f", Networking: "#e2725b",
+      "Holding Pattern / Pending": "#b3b3b3", "Health & Home": "#38a66f",
+      "Career & Money": "#00859b", Relationships: "#e2725b", "Side Venture": "#77b28c",
+      Done: "#38a66f",
     },
     group_order: {
-      "All Active Tasks": 0, "Commercial Models": 1, "Waiting for Feedback": 2,
-      "Someone Else' Court": 3, "Holding Pattern / Pending": 4, "Personal Tasks": 5,
-      Done: 6, Networking: 7, "personal development": 8,
+      "All Active Tasks": 0, "Waiting for Feedback": 1, "Someone Else' Court": 2,
+      "Holding Pattern / Pending": 3, "Health & Home": 4, "Career & Money": 5,
+      Relationships: 6, "Side Venture": 7, Done: 8,
     },
   };
 })();
@@ -2599,7 +2723,7 @@ async function demoApi(path, opts) {
 const DEMO_HIDDEN_VIEWS = ["notes", "para", "rewards", "zen"];
 // Goals sub-views the demo leaves out: they hold long-form personal writing
 // rather than anything a visitor can meaningfully try.
-const GS_HIDDEN_SUBVIEWS = ["map", "improve", "os"];
+const GS_HIDDEN_SUBVIEWS = ["map", "improve", "os", "roles"];
 
 function demoHideViews() {
   DEMO_HIDDEN_VIEWS.forEach((v) => {
@@ -8711,11 +8835,17 @@ function gsMigrateRefs() {
   });
   if (changed) saveGoals(true);
 }
-function gsAddPillar() {
+// A section added from the Personal view belongs to Personal alone; one added
+// anywhere else is career work and is shared by All goals and every rung.
+// Callers wired straight to onClick pass the click event, so anything but a
+// string means "no area".
+function gsAddPillar(scope) {
   loadGoals();
-  const name = prompt("New pillar name:");
+  const area = typeof scope === "string" ? scope : "";
+  const name = prompt(area ? "New Personal section name:" : "New section name:");
   if (!name || !name.trim()) return;
-  gsPillars().push({ key: "p" + mmUid(), label: name.trim(), color: gsNextPillarColor(), weight: 10, why: "", base: false });
+  gsPillars().push({ key: "p" + mmUid(), label: name.trim(), color: gsNextPillarColor(), weight: 10, why: "", base: false,
+    scope: area || undefined });
   saveGoals(true);
   $("#board").innerHTML = ""; (currentView === "map" ? renderMap : renderGoals)();
 }
@@ -10318,7 +10448,8 @@ function gsBackToDash() { goalsSubview = "dash"; $("#board").innerHTML = ""; ren
 // Analyst..VP are rungs of the scorecard ladder. "Personal" is a different
 // axis entirely — it sorts life goals out of the career view — so it sits in
 // the same switcher for convenience but never appears on the role ladder.
-const GD_ROLES = [["", "All goals"], ["analyst", "Analyst"], ["associate", "Associate"], ["director", "Director"], ["vp", "VP"], ["personal", "Personal"]];
+// The coaching demo has no career ladder: just all goals, or the personal ones.
+const GD_ROLES = [["", "All goals"], ["personal", "Personal"]];
 const GD_LADDER_ROLES = ["analyst", "associate", "director", "vp"];
 // A goal is personal if its section is marked personal, or the goal itself is.
 function gsIsPersonal(g) {
@@ -10328,6 +10459,7 @@ function gsIsPersonal(g) {
   return !!(p && p.scope === "personal");
 }
 let gdRoleFilter = (() => { try { return localStorage.getItem("rs_gd_role") || ""; } catch (e) { return ""; } })();
+if (!GD_ROLES.some(([k]) => k === gdRoleFilter)) gdRoleFilter = "";
 function gdRoleMatch(g) {
   if (!gdRoleFilter) return true;
   if (gdRoleFilter === "personal") return gsIsPersonal(g);
@@ -10335,6 +10467,13 @@ function gdRoleMatch(g) {
   return (g.role || "") === gdRoleFilter && !gsIsPersonal(g);
 }
 function gdRoleLabel(key) { const r = GD_ROLES.find((x) => x[0] === key); return r ? r[1] : key; }
+// The area a view stands for: Personal, or the career track ("").
+function gsViewScope(view) { return view === "personal" ? "personal" : ""; }
+// All goals shows every section; any other view shows only its own area's.
+function gsSectionInView(pk) {
+  if (!gdRoleFilter) return true;
+  return ((gsP(pk) || {}).scope || "") === gsViewScope(gdRoleFilter);
+}
 
 // ---- Dashboard -----------------------------------------------------------
 function renderGoalsDashboard() {
@@ -10350,11 +10489,14 @@ function renderGoalsDashboard() {
   // Sections (values) group your goals. Creating one was previously only
   // reachable from the Operating System tab; surface it where the goals are.
   head.append(el("button", { class: "tool-btn", title: "Create a new goal section (value) to group goals under",
-    onClick: gsAddPillar }, "+ New Section"));
+    onClick: () => gsAddPillar(gsViewScope(gdRoleFilter)) }, "+ New Section"));
   head.append(el("button", { class: "tool-btn", title: "Rename, mark personal, or delete sections",
     onClick: gsManageSections }, "\u2699 Sections"));
-  head.append(el("button", { class: "tool-btn", title: "Export the scorecard with the tasks that evidence each expectation",
-    onClick: gsExportScorecard }, "\u2193 Scorecard"));
+  // The scorecard export is built from the career ladder, so it has nothing to show without one.
+  if (GD_ROLES.some(([k]) => GD_LADDER_ROLES.includes(k))) {
+    head.append(el("button", { class: "tool-btn", title: "Export the scorecard with the tasks that evidence each expectation",
+      onClick: gsExportScorecard }, "\u2193 Scorecard"));
+  }
   head.append(el("button", { class: "tool-btn accent-teal", onClick: () => gsNewGoalForm(null) }, "+ New Goal"));
   wrap.append(head);
 
@@ -10368,11 +10510,14 @@ function renderGoalsDashboard() {
         $("#board").innerHTML = ""; renderGoals();
       } }, label));
   });
-  const untagged = gsAllGoals().filter((g) => g.status !== "done" && !(g.role || "")).length;
-  roleBar.append(el("button", { class: "gd-role-assign",
-    title: "Sort every goal onto a rung of the scorecard ladder",
-    onClick: () => { goalsSubview = "roles"; $("#board").innerHTML = ""; renderGoals(); } },
-    untagged ? `\u21C6 Assign roles (${untagged} unset)` : "\u21C6 Assign roles"));
+  // Only offer role assignment when there is a ladder to assign goals to.
+  if (GD_ROLES.some(([k]) => GD_LADDER_ROLES.includes(k))) {
+    const untagged = gsAllGoals().filter((g) => g.status !== "done" && !(g.role || "")).length;
+    roleBar.append(el("button", { class: "gd-role-assign",
+      title: "Sort every goal onto a rung of the scorecard ladder",
+      onClick: () => { goalsSubview = "roles"; $("#board").innerHTML = ""; renderGoals(); } },
+      untagged ? `\u21C6 Assign roles (${untagged} unset)` : "\u21C6 Assign roles"));
+  }
   wrap.append(roleBar);
 
   const ladder = buildRoleLadder();
@@ -10414,7 +10559,8 @@ function renderGoalsDashboard() {
     // An empty section still renders (with a prompt) so a section you just
     // created is visible and can be filled. The catch-all "" bucket stays
     // hidden when empty — there's nothing to unassign to.
-    if (!list.length && pk === "") return;
+    // A section from another area is left out unless goals in it match here.
+    if (!list.length && (pk === "" || !gsSectionInView(pk))) return;
     list.sort((a, b) => gsGoalScore(b) - gsGoalScore(a));
     const p = gsP(pk);
     const grp = el("div", { class: "gd-pgroup" });
@@ -10553,7 +10699,8 @@ function renderGoalDetail(id) {
   [["", "\u2014"], ["analyst", "Analyst"], ["associate", "Associate"], ["director", "Director"], ["vp", "VP"]].forEach(([v, l]) => {
     rsel.append(el("option", Object.assign({ value: v }, (g.role || "") === v ? { selected: "selected" } : {}), l));
   });
-  metaRow.append(gsField("Role", rsel));
+  // Role only means something when there is a career ladder to sit on.
+  if (GD_ROLES.some(([k]) => GD_LADDER_ROLES.includes(k))) metaRow.append(gsField("Role", rsel));
   // weakness boost
   const wkBtn = el("button", { class: "gd-toggle" + (g.weaknessBoost ? " on" : ""), onClick: () => { g.weaknessBoost = !g.weaknessBoost; saveGoals(); gsOpenGoal(id); } }, g.weaknessBoost ? "\u26A1 Weakness \u2014 boosted" : "Mark as weakness");
   metaRow.append(gsField("Priority boost", wkBtn));
@@ -10829,12 +10976,21 @@ function gsNewGoalForm(parentId, presetPillar, presetRole) {
   openModal(parentId ? "New sub-goal" : "New goal", (body, close) => {
     body.classList.add("gd-form");
     const parent = parentId ? gsGoalById(parentId) : null;
-    const defPillar = presetPillar || (parent && parent.pillar) || (gsPillars()[0] || {}).key || "";
-    const defRole = gsSectionRole(defPillar);
+    // A goal is created for the view it was started from. Defaulting to the
+    // first section and no role meant a goal made under Analyst or Personal
+    // saved fine but matched neither, so it vanished from the screen it was
+    // made on and looked as if it had never been saved. Offer the sections
+    // that belong to this view (all of them if it has none yet) and take the
+    // rung from the view when it is one.
+    const inView = gsPillars().filter((p) => gsSectionInView(p.key));
+    const offered = inView.length ? inView : gsPillars();
+    const defPillar = presetPillar || (parent && parent.pillar) || (offered[0] || {}).key || "";
+    const viewRung = GD_LADDER_ROLES.includes(gdRoleFilter) ? gdRoleFilter : "";
     const titleI = el("input", { type: "text", class: "gd-input", placeholder: "The goal, in one line" });
     body.append(gsFormRow("Goal", titleI));
     const psel = el("select", { class: "gd-sel" });
-    gsPillars().forEach((p) => psel.append(el("option", Object.assign({ value: p.key }, p.key === defPillar ? { selected: "selected" } : {}), p.label)));
+    const shown = offered.some((p) => p.key === defPillar) ? offered : gsPillars();
+    shown.forEach((p) => psel.append(el("option", Object.assign({ value: p.key }, p.key === defPillar ? { selected: "selected" } : {}), p.label)));
     psel.append(el("option", { value: "" }, "Unassigned"));
     body.append(gsFormRow("Value", psel));
     const whyI = el("textarea", { class: "gd-input", rows: "2", placeholder: "Why it matters" });
@@ -10853,9 +11009,14 @@ function gsNewGoalForm(parentId, presetPillar, presetRole) {
       if (!plan) { err.textContent = "A plan is required \u2014 what are the next moves?"; return; }
       const id = "g_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       GOALS.ideas = GOALS.ideas || [];
-      GOALS.ideas.push({ id, text, pillar: psel.value, parent: parentId || null, seed: false,
+      const rung = GD_LADDER_ROLES.includes(presetRole) ? presetRole : "";
+      const goal = { id, text, pillar: psel.value, parent: parentId || null, seed: false,
         why: whyI.value.trim(), plan, status: "active", weaknessBoost: wk.checked, tracking: null,
-        role: presetRole || (parent && parent.role) || "" });
+        role: rung || (parent && parent.role) || viewRung };
+      // Made under Personal in a section that isn't personal: mark the goal
+      // itself personal so it stays where it was made.
+      if (gdRoleFilter === "personal" && !gsIsPersonal(goal)) goal.personal = true;
+      GOALS.ideas.push(goal);
       saveGoals(true); close(); gsOpenGoal(id);
     } }, "Create goal");
     const actions = el("div", { class: "gd-actions" });
