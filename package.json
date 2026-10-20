@@ -5,6 +5,7 @@
   "scripts": {
     "preinstall": "node scripts/preinstall.mjs",
     "build": "node scripts/build-site.mjs",
+    "test": "pnpm -r --if-present run test",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "build:workspace": "pnpm run typecheck && pnpm -r --if-present run build",
