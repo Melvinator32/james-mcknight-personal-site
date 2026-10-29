@@ -23,7 +23,12 @@
     while (walker.nextNode()) {
       const node = walker.currentNode;
       if (node.parentElement?.closest(ignored)) continue;
-      const cleaned = strip(node.data);
+      let cleaned = strip(node.data);
+      const button = node.parentElement?.closest('button');
+      // Emoji-only controls still need a visible, meaningful label.
+      if (!cleaned.trim() && button && !strip(button.textContent).trim()) {
+        cleaned = strip(button.getAttribute('aria-label') || button.title || '');
+      }
       if (cleaned === node.data) continue;
       const previous = originals.get(node);
       originals.set(node, { original: previous?.cleaned === node.data ? previous.original : node.data, cleaned });
