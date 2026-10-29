@@ -1,7 +1,7 @@
 import BonsaiMark from "./BonsaiMark";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Linkedin, Mail, MapPin, FileText, Award } from "lucide-react";
+import { Linkedin, Mail, MapPin, FileText, Award, ArrowUpRight } from "lucide-react";
 import EditableText from "@/components/EditableText";
 import { useContentEditor } from "@/components/ContentEditorProvider";
 import { useActiveSection } from "@/hooks/useActiveSection";
@@ -74,7 +74,7 @@ export default function PortfolioSidebar() {
           <h1 className="truncate text-lg font-semibold tracking-tight">{nameLink}</h1>
           <p className={`hidden text-xs sm:block ${personalRegister ? "text-[var(--pers-muted)]" : "text-slate-600"}`}><EditableText contentKey="personalInfo.title" fallback={info.title} label="Professional title" /></p>
         </div>
-        <div className="ml-3 flex shrink-0 items-center gap-2"><Link to="/projects" aria-current={onProjects ? "page" : undefined} className=" shrink-0 rounded-xl bg-[#263b30] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#354e40]">Projects ↗</Link><a href={resumeUrl} target="_blank" rel="noopener noreferrer" aria-label="View résumé PDF in a new tab" title="Résumé (PDF)" className="rounded-lg p-2 hover:bg-black/5 focus-visible:outline focus-visible:outline-2"><FileText size={20} aria-hidden="true" /></a><BonsaiMark /></div>
+        <div className="ml-3 flex shrink-0 items-center gap-2"><Link to="/projects" aria-current={onProjects ? "page" : undefined} className=" shrink-0 rounded-xl bg-[#263b30] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#354e40]">Projects <ArrowUpRight className="inline h-4 w-4" aria-hidden="true" /></Link><a href={resumeUrl} target="_blank" rel="noopener noreferrer" aria-label="View résumé PDF in a new tab" title="Résumé (PDF)" className="rounded-lg p-2 hover:bg-black/5 focus-visible:outline focus-visible:outline-2"><FileText size={20} aria-hidden="true" /></a><BonsaiMark /></div>
       </header>
       <aside className={`portfolio-home fixed inset-y-0 left-0 z-40 hidden w-72 flex-col justify-between overflow-y-auto border-r px-8 py-16 transition-colors duration-500 lg:flex ${personalRegister ? "pers-theme border-[var(--pers-border-strong)] bg-[var(--pers-surface)]" : "prof-theme border-slate-200 bg-white"}`}>
         <div>
@@ -88,7 +88,7 @@ export default function PortfolioSidebar() {
           </div>
           <nav className="space-y-1" aria-label="Main navigation">
             <Link to="/projects" aria-current={onProjects ? "page" : undefined} className="mb-4 flex w-full items-center justify-between rounded-xl bg-[#263b30] px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-[#354e40] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
-              <EditableText contentKey="labels.navProjects" fallback="Passion Projects" label="Projects navigation label" /><span aria-hidden="true">↗</span>
+              <EditableText contentKey="labels.navProjects" fallback="Passion Projects" label="Projects navigation label" /><ArrowUpRight size={16} aria-hidden="true" />
             </Link>
             {sectionLinks.slice(0, 3).map((item) => (
               <button key={item.id} type="button" onClick={() => goToSection(item.id)} className={`nav-link block w-full rounded-lg px-3 py-2 text-left text-sm font-medium ${!onProjects && activeSection === item.id ? `active ${activeClass}` : ""}`} aria-current={!onProjects && activeSection === item.id ? "page" : undefined}>
@@ -102,10 +102,10 @@ export default function PortfolioSidebar() {
               </button>
             ))}
             <a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="nav-link mt-3 flex w-full items-center gap-2 rounded-lg border-t border-current/15 px-3 py-3 text-sm font-medium" aria-label="View résumé PDF in a new tab">
-              <FileText size={16} aria-hidden="true" />Résumé <span className="ml-auto text-xs" aria-hidden="true">↗</span>
+              <FileText size={16} aria-hidden="true" />Résumé <ArrowUpRight size={12} className="ml-auto" aria-hidden="true" />
             </a>
             <a href={strengthsUrl} target="_blank" rel="noopener noreferrer" className="nav-link flex w-full items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium" aria-label="View Top Strengths Report PDF in a new tab">
-              <Award size={16} className="shrink-0" aria-hidden="true" />Top Strengths Report <span className="ml-auto text-xs" aria-hidden="true">↗</span>
+              <Award size={16} className="shrink-0" aria-hidden="true" />Top Strengths Report <ArrowUpRight size={12} className="ml-auto" aria-hidden="true" />
             </a>
           </nav>
         </div>

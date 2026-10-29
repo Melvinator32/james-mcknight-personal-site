@@ -192,18 +192,28 @@ function isValidContent(value: unknown): value is PortfolioContent {
 // Vite fingerprints image URLs on every build. A saved photo can still point to a
 // removed asset after its image changes, so resolve known photos against this build.
 function restorePhotos(saved: Photo[], defaults: Photo[], addNew = true): Photo[] {
-  const restored = saved.map((photo, index) => {
-    // Older saved copies may have different alt text, so also identify Vite
-    // assets by their original filename (the hash at the end changes).
-    const current = defaults.find((item) =>
-      item.alt === photo.alt || item.caption === photo.caption ||
-      (item.src.includes("/assets/") && photo.src.includes(item.src.replace(/-[A-Za-z0-9_-]{8}\.[^.]+$/, "-")))
-    ) ?? (photo.src.includes("/assets/") ? defaults[index] : undefined);
+  const assetName = (src: string) => src.split(/[?#]/)[0].split("/").pop()?.replace(/-[A-Za-z0-9_-]{8}(?=\.[^.]+$)/, "");
+  const restored = saved.map((photo) => {
+    // Compare complete filenames, not prefixes: photo-golf and photo-golf-young
+    // are separate photos. Prefer image identity over editable captions.
+    if (!photo.src.includes("/assets/")) return photo;
+    const byName = defaults.find((item) => item.src.includes("/assets/") && assetName(item.src) === assetName(photo.src));
+    const byCaption = defaults.find((item) => (photo.alt && item.alt === photo.alt) || (photo.caption && item.caption === photo.caption));
+    const duplicated = saved.some((item) => item !== photo && item.src === photo.src);
+    const current = duplicated && byCaption ? byCaption : byName ?? byCaption;
     return current ? { ...photo, src: current.src } : photo;
   });
+  // A previous prefix match may already have saved the same bundled image twice.
+  // Keep its matching caption when available; preserve separate uploaded photos.
+  const unique = restored.filter((photo, index) => {
+    if (!photo.src.includes("/assets/")) return true;
+    const current = defaults.find((item) => item.src === photo.src);
+    const preferred = current && restored.find((item) => item.src === photo.src && item.alt === current.alt);
+    return restored.indexOf(preferred ?? restored.find((item) => item.src === photo.src)!) === index;
+  });
   return addNew
-    ? [...restored, ...defaults.filter((photo) => !restored.some((item) => item.src === photo.src))]
-    : restored;
+    ? [...unique, ...defaults.filter((photo) => !unique.some((item) => item.src === photo.src))]
+    : unique;
 }
 
 // Keep saved copy edits while adding photos introduced after the last local save.

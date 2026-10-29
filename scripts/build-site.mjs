@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 
 const demos = spawnSync('node', ['scripts/build-demos.mjs'], { stdio: 'inherit', env: process.env });
 if (demos.status !== 0) process.exit(demos.status ?? 1);
@@ -33,6 +33,21 @@ await mkdir('dist/server', { recursive: true });
 await mkdir('dist/.openai', { recursive: true });
 await cp('artifacts/james-mcknight-portfolio/dist/public', 'dist/client', { recursive: true });
 await cp('.openai/hosting.json', 'dist/.openai/hosting.json');
+// Apply the same mobile text policy to standalone demos and resume viewers.
+async function includeMobileTextPolicy(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = `${directory}/${entry.name}`;
+    if (entry.isDirectory()) await includeMobileTextPolicy(path);
+    else if (entry.name.endsWith('.html')) {
+      const page = await readFile(path, 'utf8');
+      if (!page.includes('mobile-no-emoji.js')) {
+        const base = (process.env.BASE_PATH || '/').replace(/\/$/, '');
+        await writeFile(path, page.replace(/<head([^>]*)>/i, `<head$1><script src="${base}/mobile-no-emoji.js"></script>`));
+      }
+    }
+  }
+}
+await includeMobileTextPolicy('dist/client');
 const html = await readFile('dist/client/index.html', 'utf8');
 
 // GitHub Pages serves dist/client as plain static files, so a client-side route

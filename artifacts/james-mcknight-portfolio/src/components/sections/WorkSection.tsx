@@ -3,6 +3,7 @@ import fidelisLogo from "@/assets/timeline/fidelis.jpg";
 import imttLogo from "@/assets/timeline/imtt.png";
 import tulaneLogo from "@/assets/timeline/tulane.png";
 import mbaLogo from "@/assets/timeline/mba.jpg";
+import { ArrowUpRight } from "lucide-react";
 import { format } from "date-fns";
 import EditableText from "@/components/EditableText";
 import { useContentEditor } from "@/components/ContentEditorProvider";
@@ -47,7 +48,7 @@ export default function WorkSection() {
                   <span className="shrink-0 rounded bg-slate-100 px-2 py-0.5 text-lg font-bold text-slate-700">{isEditing ? <><EditableText contentKey={`experience.${index}.startDate`} fallback={job.startDate} label="Start date" /> – <EditableText contentKey={`experience.${index}.endDate`} fallback={job.endDate ?? "Present"} label="End date" /></> : `${startYear} – ${endYear}`}</span>
                 </div>
                 <p className="text-sm font-medium text-slate-600">{isEditing ? <EditableText contentKey={`experience.${index}.company`} fallback={job.company} label="Company" /> : <a href={companyLinks[job.id]} target="_blank" rel="noopener noreferrer" className="underline decoration-slate-300 underline-offset-4 hover:decoration-slate-700">{job.company}</a>}
-                  {job.id === "exp-3" && <> · <a href="https://www.nscale.com/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Nscale ↗</a></>}</p>
+                  {job.id === "exp-3" && <> · <a href="https://www.nscale.com/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Nscale <ArrowUpRight size={12} className="inline" aria-hidden="true" /></a></>}</p>
                 <p className="text-xs text-slate-500"><EditableText contentKey={`experience.${index}.location`} fallback={job.location} label="Location" /></p>
               </div>
             </div>
