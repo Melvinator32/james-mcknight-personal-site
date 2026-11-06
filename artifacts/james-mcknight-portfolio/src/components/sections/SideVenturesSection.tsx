@@ -16,16 +16,16 @@ export default function SideVenturesSection() {
   return (
     <section id="ventures" className="scroll-mt-24 space-y-12">
       <div className="border-b border-slate-200 pb-4"><h2 className="text-3xl font-semibold"><EditableText contentKey="labels.sectionVentures" fallback="Side Ventures" label="Side ventures section title" /></h2></div>
-      <div className={`grid items-start gap-6 ${Object.values(expanded).some(Boolean) && !isEditing ? "grid-cols-1" : "md:grid-cols-2"}`}>
+      <div className={`grid items-stretch gap-6 ${Object.values(expanded).some(Boolean) && !isEditing ? "grid-cols-1" : "md:grid-cols-2"}`}>
         {sideVentures.map((venture, index) => (
-          <article key={venture.name} className="min-w-0 rounded-3xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+          <article key={venture.name} className="h-full min-w-0 rounded-3xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
             <div className="mb-5 flex items-start gap-4">
               {venture.name.includes("Bayou Bill") && (
                 <img src={bayouBillLogo} alt="Bayou Bill logo" width={64} height={64} className="h-16 w-16 shrink-0 rounded-xl object-contain" />
               )}
               {venture.name.includes("McKnight & Co.") && (
                 <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" aria-label="Visit McKnight & Co. Creative" className="shrink-0">
-                  <img src="/mcknight-co-creative-logo.webp" alt="McKnight & Co. Creative logo" width={240} height={160} className="h-auto w-60 max-w-full rounded-xl object-contain" />
+                  <img src="/mcknight-co-creative-logo.png" alt="McKnight & Co. Creative logo" width={240} height={142} className="h-auto w-60 max-w-full rounded-xl object-contain" />
                 </a>
               )}
               {(!venture.name.includes("McKnight & Co.") || isEditing) && (
