@@ -182,9 +182,9 @@ export const sideVentures: SideVenture[] = [
       "Ahhh… my weird-brainchild-turned-independent-lifestyle-brand that started as a result of some late-night experimentation! What was initially a fun creative outlet evolved into a means of sending my friends unique personalized gifts inspired by shared interests. After a while, I eventually decided to launch a successful online store that generates ~$500 of passive revenue a month.\n\nBayou Bill is a 50+ product Etsy and personal website catalog run on roughly two hours of upkeep per month through automation, with a 200% YOY conversion lift from pricing, copy, and keyword strategy.\n\nRunning Bayou Bill has helped me develop hands-on skills in entrepreneurship, e-commerce, branding, and digital marketing. I've learned how to take products from concept to launch, analyze customer demand, refine listings and pricing, and build a consistent brand identity. Along the way, I've also developed practical Photoshop skills in graphic design, image editing, mockup creation, and preparing artwork for digital and physical products.\n\nMy content is largely inspired by the quirky culture of New Orleans and Mardi Gras, my love of live music, and the outdoors. I create original designs that can be printed or embroidered on virtually anything, but my main choice of merch are stickers, shirts, hats, and drinking glasses. I am constantly helping friends and family out with commissioned ideas as well!",
   },
   {
-    name: "McKnight & Co. Creative",
+    name: "mcknight & co. creative",
     description:
-      "I run McKnight & Co. Creative, a creative agency focused on custom website design and development. I help businesses turn their ideas into responsive websites that reflect their brand and make it easy for visitors to explore their work and get in touch.\n\nMy work spans design direction, development, website migrations, and client handoff. Building the agency has strengthened my skills in branding, project management, client communication, and turning a creative concept into a finished website.",
+      "I run mcknight & co. creative, a creative agency focused on custom website design and development. I help businesses turn their ideas into responsive websites that reflect their brand and make it easy for visitors to explore their work and get in touch.\n\nMy work spans design direction, development, website migrations, and client handoff. Building the agency has strengthened my skills in branding, project management, client communication, and turning a creative concept into a finished website.",
   },
 ];
 
@@ -192,9 +192,9 @@ export const projects: Project[] = [
   {
     id: "mcknight-co-creative",
     icon: "Pothos",
-    name: "Website Development — McKnight & Co. Creative",
+    name: "Website Development — mcknight & co. creative",
     description:
-      "The website for McKnight & Co. Creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
+      "The website for mcknight & co. creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
     techStack: ["Website Development", "Responsive Design", "Content Editing"],
     liveUrl: "https://mcknightandcocreative.com",
     thumbnail: "/mcknight-co-creative-logo.png",
