@@ -90,6 +90,19 @@ export const stats: Stat[] = [
 
 export const experience: Experience[] = [
   {
+  "id": "exp-mcknight-creative",
+  "company": "mcknight & co. creative",
+  "role": "Founder",
+  "location": "New Orleans, LA",
+  "startDate": "2026-10",
+  "endDate": null,
+  "description": "Founded a creative agency focused on custom website design and development.",
+  "highlights": [
+    "Design and develop responsive websites, guide website migrations, and manage client projects from concept through launch and handoff."
+  ],
+  "current": true
+},
+  {
     id: "exp-1",
     company: "International Matex Tank Terminals (IMTT)",
     role: "Corporate Development Analyst",

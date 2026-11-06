@@ -14,8 +14,8 @@ import { useContentEditor } from "@/components/ContentEditorProvider";
  */
 export default function WorkSection() {
   const { content, isEditing } = useContentEditor();
-  const logos: Record<string, string> = { "exp-1": imttLogo, "exp-3": fidelisLogo, "exp-6": moondanceLogo };
-  const companyLinks: Record<string, string> = { "exp-1": "https://imtt.com/", "exp-3": "https://www.fidelisinfra.com/", "exp-6": "https://moondanceadventures.com/" };
+  const logos: Record<string, string> = { "exp-mcknight-creative": "/mcknight-co-creative-logo.png", "exp-1": imttLogo, "exp-3": fidelisLogo, "exp-6": moondanceLogo };
+  const companyLinks: Record<string, string> = { "exp-mcknight-creative": "https://mcknightandcocreative.com", "exp-1": "https://imtt.com/", "exp-3": "https://www.fidelisinfra.com/", "exp-6": "https://moondanceadventures.com/" };
   const experience = content.experience
     .map((job, index) => ({ ...job, originalIndex: index }))
     .filter((job) => !["exp-4", "exp-5"].includes(job.id))
