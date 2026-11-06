@@ -161,7 +161,8 @@
         "Content Editing"
       ],
       "liveUrl": "https://mcknightandcocreative.com",
-      "status": "active"
+      "status": "active",
+      "thumbnail": "https://raw.githubusercontent.com/Melvinator32/mcknight-co-creative/main/assets/logo.png"
     },
     {
       "id": "demo-daily-wisdom",

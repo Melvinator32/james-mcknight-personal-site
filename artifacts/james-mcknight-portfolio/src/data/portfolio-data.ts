@@ -231,6 +231,7 @@ export const projects: Project[] = [
       "The website for McKnight & Co. Creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
     techStack: ["Website Development", "Responsive Design", "Content Editing"],
     liveUrl: "https://mcknightandcocreative.com",
+    thumbnail: "https://raw.githubusercontent.com/Melvinator32/mcknight-co-creative/main/assets/logo.png",
     status: "active",
   },
   {

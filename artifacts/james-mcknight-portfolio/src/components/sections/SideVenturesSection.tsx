@@ -23,6 +23,11 @@ export default function SideVenturesSection() {
               {venture.name.includes("Bayou Bill") && (
                 <img src={bayouBillLogo} alt="Bayou Bill logo" width={64} height={64} className="h-16 w-16 shrink-0 rounded-xl object-contain" />
               )}
+              {venture.name.includes("McKnight & Co.") && (
+                <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" aria-label="Visit McKnight & Co. Creative" className="shrink-0">
+                  <img src="https://raw.githubusercontent.com/Melvinator32/mcknight-co-creative/main/assets/logo.png" alt="McKnight & Co. Creative logo" width={64} height={64} className="h-16 w-16 rounded-xl object-contain" />
+                </a>
+              )}
               <h3 className="min-w-0 text-xl font-semibold leading-snug text-slate-900">
                 <EditableText contentKey={`sideVentures.${index}.name`} fallback={venture.name} label="Side venture name" />
               </h3>
