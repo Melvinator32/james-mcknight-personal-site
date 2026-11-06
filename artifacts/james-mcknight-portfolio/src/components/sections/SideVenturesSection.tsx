@@ -35,7 +35,7 @@ export default function SideVenturesSection() {
               )}
             </div>
             {venture.name.includes("mcknight & co.") && (
-              <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" className="mb-4 inline-block text-sm font-medium text-slate-900 underline underline-offset-4">Visit mcknight &amp; co. creative</a>
+              <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" className="mb-4 block text-center text-sm font-medium text-slate-900 underline underline-offset-4">Visit mcknight &amp; co. creative</a>
             )}
             {isEditing ? (
               <div className="text-sm leading-relaxed text-slate-600">
