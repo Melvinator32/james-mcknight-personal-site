@@ -304,7 +304,7 @@ function restoreProjects(saved: Project[], defaults: Project[]): Project[] {
         demoUrl: project.id === "proj-2" ? current.demoUrl : project.demoUrl,
         liveUrl: project.id === "proj-4" ? current.liveUrl : project.liveUrl,
         name: previousNames[project.id]?.includes(project.name) ? current.name : project.name,
-        thumbnail: ["sixth-street-website", "magazine-st-listening-room", "demo-radio", "demo-daily-wisdom", "demo-rewards", "demo-bayou-bill-tracker", "proj-4"].includes(project.id) ? current.thumbnail : project.thumbnail,
+        thumbnail: ["mcknight-co-creative", "sixth-street-website", "magazine-st-listening-room", "demo-radio", "demo-daily-wisdom", "demo-rewards", "demo-bayou-bill-tracker", "proj-4"].includes(project.id) ? current.thumbnail : project.thumbnail,
       };
     }),
     ...saved.filter((project) => !defaults.some((current) => current.id === project.id)),
