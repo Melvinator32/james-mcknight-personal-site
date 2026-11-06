@@ -23,7 +23,6 @@ export default function Index() {
         <div className="pers-theme min-h-screen px-6 py-24 md:px-16">
           <div className="mx-auto max-w-4xl space-y-32">
             <div className="mx-auto mb-16 max-w-2xl space-y-4 text-center">
-              <span className="inline-block rounded-full bg-[var(--pers-border)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">Beyond the Models</span>
               <h2 className="text-4xl font-semibold text-[var(--pers-text)] md:text-5xl">The Personal Register</h2>
               <p className="text-lg text-black">Underwriting infrastructure projects is my day-to-day profession. Curiosity and a thirst for adventure takes me everywhere else—from the trails of the Rockies out West to the speakeasy jazz clubs of New Orleans and into the deep rabbit hole of Vibe Coding.</p>
             </div>
