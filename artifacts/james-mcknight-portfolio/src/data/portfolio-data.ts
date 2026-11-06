@@ -207,7 +207,7 @@ export const projects: Project[] = [
     icon: "Pothos",
     name: "Website Development — mcknight & co. creative",
     description:
-      "The website for mcknight & co. creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
+      "mcknight & co. creative is a creative agency helping businesses bring their ideas to life through custom website design and development. We shape each project around the client's vision, brand, and content, with services spanning new websites, redesigns, website migrations, and launch support.",
     techStack: ["Website Development", "Responsive Design", "Content Editing"],
     liveUrl: "https://mcknightandcocreative.com",
     thumbnail: "/mcknight-co-creative-logo.png",
