@@ -25,12 +25,14 @@ export default function SideVenturesSection() {
               )}
               {venture.name.includes("McKnight & Co.") && (
                 <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" aria-label="Visit McKnight & Co. Creative" className="shrink-0">
-                  <img src="/mcknight-co-creative-logo.webp" alt="McKnight & Co. Creative logo" width={64} height={64} className="h-16 w-16 rounded-xl object-contain" />
+                  <img src="/mcknight-co-creative-logo.webp" alt="McKnight & Co. Creative logo" width={240} height={160} className="h-auto w-60 max-w-full rounded-xl object-contain" />
                 </a>
               )}
+              {(!venture.name.includes("McKnight & Co.") || isEditing) && (
               <h3 className="min-w-0 text-xl font-semibold leading-snug text-slate-900">
                 <EditableText contentKey={`sideVentures.${index}.name`} fallback={venture.name} label="Side venture name" />
               </h3>
+              )}
             </div>
             {venture.name.includes("McKnight & Co.") && (
               <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" className="mb-4 inline-block text-sm font-medium text-slate-900 underline underline-offset-4">Visit McKnight &amp; Co. Creative</a>
