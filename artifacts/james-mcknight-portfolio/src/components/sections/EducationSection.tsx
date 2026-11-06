@@ -14,7 +14,7 @@ export default function EducationSection() {
     { title: "Finance & Valuation", names: ["Financial Modeling", "DCF Valuation", "Project Finance", "Investment Analysis", "Acquisition Underwriting", "M&A Analysis", "Scenario & Sensitivity Analysis", "Commercial Due Diligence", "Excel", "Macabacus"] },
     { title: "Strategy & Research", names: ["Business Development", "Market Research & Intelligence", "Competitive Analysis", "Capital IQ", "Bloomberg", "Vortexa"] },
     { title: "Data & Automation", names: ["Process Improvement", "Data Visualization", "Workflow Automation", "Dashboard Development", "AI-Assisted Development", "Tableau", "Python"] },
-    { title: "Communication & Delivery", names: ["Executive Presentations", "PowerPoint", "Microsoft Project", "Photoshop", "Brand Creation", "Mockup / Rendering Creation"] },
+    { title: "Creative & Client Delivery", names: ["Executive Presentations", "PowerPoint", "Microsoft Project", "Photoshop", "Brand Development", "Mockups & Visual Concepts", "Client Communication", "Project Management", "Website Design & Development", "Creative Direction", "Website Migration & Launch"] },
   ];
   const knownSkills = new Set(categories.flatMap(category => category.names.map(name => name.toLowerCase())));
   const groups = categories.map(category => ({ title: category.title, skills: skills.filter(skill => category.names.some(name => name.toLowerCase() === skill.toLowerCase())) }));
