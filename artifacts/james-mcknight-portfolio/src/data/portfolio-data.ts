@@ -10,7 +10,6 @@ import wfhSetupPhoto from "@/assets/photo-wfh-setup.png";
 import houseplantPropagationBottlePhoto from "@/assets/photo-houseplant-propagation-bottle.jpeg";
 import houseplantPonytailPalmPhoto from "@/assets/photo-houseplant-ponytail-palm.jpeg";
 import houseplantPropagationStationPhoto from "@/assets/photo-houseplant-propagation-station.jpeg";
-import projectSixthStreet from "@/assets/project-sixth-street-preview.jpg";
 import projectListeningRoom from "@/assets/project-listening-room-preview.jpg";
 import projectPodShop from "@/assets/project-pod-shop.png";
 import yellowbirdSauce from "@/assets/yellowbird-serrano.webp";
@@ -183,9 +182,9 @@ export const sideVentures: SideVenture[] = [
       "Ahhh… my weird-brainchild-turned-independent-lifestyle-brand that started as a result of some late-night experimentation! What was initially a fun creative outlet evolved into a means of sending my friends unique personalized gifts inspired by shared interests. After a while, I eventually decided to launch a successful online store that generates ~$500 of passive revenue a month.\n\nBayou Bill is a 50+ product Etsy and personal website catalog run on roughly two hours of upkeep per month through automation, with a 200% YOY conversion lift from pricing, copy, and keyword strategy.\n\nRunning Bayou Bill has helped me develop hands-on skills in entrepreneurship, e-commerce, branding, and digital marketing. I've learned how to take products from concept to launch, analyze customer demand, refine listings and pricing, and build a consistent brand identity. Along the way, I've also developed practical Photoshop skills in graphic design, image editing, mockup creation, and preparing artwork for digital and physical products.\n\nMy content is largely inspired by the quirky culture of New Orleans and Mardi Gras, my love of live music, and the outdoors. I create original designs that can be printed or embroidered on virtually anything, but my main choice of merch are stickers, shirts, hats, and drinking glasses. I am constantly helping friends and family out with commissioned ideas as well!",
   },
   {
-    name: "CardWise — Credit Card Optimization",
+    name: "McKnight & Co. Creative",
     description:
-      "I manage a small credit card optimization side hustle focused on helping others get more value from their existing spending. This includes evaluating which cards best fit their spending habits, identifying worthwhile welcome offers and benefits, and helping organize rewards, credits, and annual fees so they are easier to manage.\n\nMy credit card management side hustle has taught me how to strategically evaluate rewards programs, welcome bonuses, annual fees, statement credits, and redemption options to maximize the value of everyday spending. I've developed systems to track multiple cards, benefits, deadlines, and points balances while maintaining disciplined payment habits and avoiding unnecessary fees or interest. It has also strengthened my skills in financial analysis, organization, optimization, and attention to detail by requiring me to constantly weigh costs, benefits, and opportunity tradeoffs.",
+      "I run McKnight & Co. Creative, a creative agency focused on custom website design and development. I help businesses turn their ideas into responsive websites that reflect their brand and make it easy for visitors to explore their work and get in touch.\n\nMy work spans design direction, development, website migrations, and client handoff. Building the agency has strengthened my skills in branding, project management, client communication, and turning a creative concept into a finished website.",
   },
 ];
 
@@ -225,14 +224,13 @@ export const projects: Project[] = [
     status: "active",
   },
   {
-    id: "sixth-street-website",
+    id: "mcknight-co-creative",
     icon: "Globe",
-    name: "Website Development — Sixth Street Creative",
+    name: "Website Development — McKnight & Co. Creative",
     description:
-      "A custom portfolio website for an art consulting and creative studio. The site brings its visual identity, past projects, artist relationships, and creative journey together in a responsive, image-led experience, with direct content editing to keep the work current.",
+      "The website for McKnight & Co. Creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
     techStack: ["Website Development", "Responsive Design", "Content Editing"],
-    liveUrl: "https://www.sixthstreetcreative.com",
-    thumbnail: projectSixthStreet,
+    liveUrl: "https://mcknightandcocreative.com",
     status: "active",
   },
   {

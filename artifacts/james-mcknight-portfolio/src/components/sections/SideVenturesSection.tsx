@@ -1,6 +1,5 @@
 import { useState } from "react";
 import bayouBillLogo from "@/assets/bayou-bill-logo.png";
-import cardWiseThumbnail from "@/assets/project-cardwise-perks-preview.jpg";
 import CollapsibleText from "@/components/CollapsibleText";
 import EditableText from "@/components/EditableText";
 import { useContentEditor } from "@/components/ContentEditorProvider";
@@ -24,13 +23,13 @@ export default function SideVenturesSection() {
               {venture.name.includes("Bayou Bill") && (
                 <img src={bayouBillLogo} alt="Bayou Bill logo" width={64} height={64} className="h-16 w-16 shrink-0 rounded-xl object-contain" />
               )}
-              {venture.name.includes("CardWise") && (
-                <img src={cardWiseThumbnail} alt="CardWise dashboard" width={64} height={64} className="h-16 w-16 shrink-0 rounded-xl object-cover object-left shadow-sm" />
-              )}
               <h3 className="min-w-0 text-xl font-semibold leading-snug text-slate-900">
                 <EditableText contentKey={`sideVentures.${index}.name`} fallback={venture.name} label="Side venture name" />
               </h3>
             </div>
+            {venture.name.includes("McKnight & Co.") && (
+              <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" className="mb-4 inline-block text-sm font-medium text-slate-900 underline underline-offset-4">Visit McKnight &amp; Co. Creative</a>
+            )}
             {isEditing ? (
               <div className="text-sm leading-relaxed text-slate-600">
                 <EditableText contentKey={`sideVentures.${index}.description`} fallback={venture.description} multiline label={`${venture.name} description`} />
