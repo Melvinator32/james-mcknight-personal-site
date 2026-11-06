@@ -190,6 +190,17 @@ export const sideVentures: SideVenture[] = [
 
 export const projects: Project[] = [
   {
+    id: "mcknight-co-creative",
+    icon: "Pothos",
+    name: "Website Development — McKnight & Co. Creative",
+    description:
+      "The website for McKnight & Co. Creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
+    techStack: ["Website Development", "Responsive Design", "Content Editing"],
+    liveUrl: "https://mcknightandcocreative.com",
+    thumbnail: "/mcknight-co-creative-logo.png",
+    status: "active",
+  },
+  {
     id: "magazine-st-listening-room",
     icon: "Disc3",
     name: "Magazine St. Listening Room",
@@ -221,17 +232,6 @@ export const projects: Project[] = [
     description:
       "A 50+ product Etsy catalog run on roughly two hours of upkeep per month through automation, with a 150% conversion lift from pricing, copy, and keyword strategy.",
     techStack: ["Etsy", "Print-on-Demand", "SEO", "Automation"],
-    status: "active",
-  },
-  {
-    id: "mcknight-co-creative",
-    icon: "Globe",
-    name: "Website Development — McKnight & Co. Creative",
-    description:
-      "The website for McKnight & Co. Creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
-    techStack: ["Website Development", "Responsive Design", "Content Editing"],
-    liveUrl: "https://mcknightandcocreative.com",
-    thumbnail: "/mcknight-co-creative-logo.png",
     status: "active",
   },
   {

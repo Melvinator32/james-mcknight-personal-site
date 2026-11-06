@@ -104,6 +104,20 @@
   ],
   "projects": [
     {
+      "id": "mcknight-co-creative",
+      "icon": "Pothos",
+      "name": "Website Development — McKnight & Co. Creative",
+      "description": "The website for McKnight & Co. Creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
+      "techStack": [
+        "Website Development",
+        "Responsive Design",
+        "Content Editing"
+      ],
+      "liveUrl": "https://mcknightandcocreative.com",
+      "status": "active",
+      "thumbnail": "/mcknight-co-creative-logo.png"
+    },
+    {
       "id": "magazine-st-listening-room",
       "icon": "Disc3",
       "name": "Magazine St. Listening Room",
@@ -149,20 +163,6 @@
         "Automation"
       ],
       "status": "active"
-    },
-    {
-      "id": "mcknight-co-creative",
-      "icon": "Globe",
-      "name": "Website Development — McKnight & Co. Creative",
-      "description": "The website for McKnight & Co. Creative, my creative agency. It brings together our services, selected work, and a direct way for businesses to get in touch through a responsive, visually focused experience.",
-      "techStack": [
-        "Website Development",
-        "Responsive Design",
-        "Content Editing"
-      ],
-      "liveUrl": "https://mcknightandcocreative.com",
-      "status": "active",
-      "thumbnail": "/mcknight-co-creative-logo.png"
     },
     {
       "id": "demo-daily-wisdom",

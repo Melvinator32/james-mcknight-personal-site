@@ -32,7 +32,9 @@ export default function Projects() {
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             {projects.map((project, index) => {
-              const Icon = project.icon
+              const Icon = project.id === "mcknight-co-creative"
+                ? PothosIcon
+                : project.icon
                 ? (icons as Record<string, React.ComponentType<{ className?: string; strokeWidth?: number }>>)[
                     project.icon
                   ]
@@ -194,5 +196,13 @@ function TunedInDescription({ description }: { description: string }) {
         </Dialog>
       )}
     </div>
+  );
+}
+
+function PothosIcon({ className }: { className?: string; strokeWidth?: number }) {
+  return (
+    <svg viewBox="185 5 140 140" className={className} aria-hidden="true">
+      <image href="/mcknight-co-creative-logo.png" width="505" height="299" />
+    </svg>
   );
 }
