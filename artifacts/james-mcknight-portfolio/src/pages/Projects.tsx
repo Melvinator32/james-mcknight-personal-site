@@ -54,7 +54,7 @@ export default function Projects() {
                         src={project.thumbnail}
                         alt={project.name}
                         loading="lazy"
-                        className={`w-full h-full ${["demo-radio", "demo-daily-wisdom", "demo-rewards", "demo-bayou-bill-tracker", "proj-4"].includes(project.id) ? "object-contain" : "object-cover"}`}
+                        className={`w-full h-full ${["mcknight-co-creative", "demo-radio", "demo-daily-wisdom", "demo-rewards", "demo-bayou-bill-tracker", "proj-4"].includes(project.id) ? "object-contain" : "object-cover"}`}
                         onError={(event) => {
                           event.currentTarget.classList.add("hidden");
                           event.currentTarget.nextElementSibling?.classList.remove("hidden");
