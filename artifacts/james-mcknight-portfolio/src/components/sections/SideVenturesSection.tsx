@@ -24,7 +24,7 @@ export default function SideVenturesSection() {
                 <img src={bayouBillLogo} alt="Bayou Bill logo" width={64} height={64} className="h-16 w-16 shrink-0 rounded-xl object-contain" />
               )}
               {venture.name.includes("mcknight & co.") && (
-                <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" aria-label="Visit mcknight & co. creative" className="shrink-0">
+                <a href="https://mcknightandcocreative.com" target="_blank" rel="noopener noreferrer" aria-label="Visit mcknight & co. creative" className="mx-auto block shrink-0">
                   <img src="/mcknight-co-creative-logo.png" alt="mcknight & co. creative logo" width={240} height={142} className="h-auto w-60 max-w-full rounded-xl object-contain" />
                 </a>
               )}
