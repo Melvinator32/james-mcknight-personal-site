@@ -264,7 +264,7 @@
       "id": "demo-weirwood",
       "icon": "Ship",
       "name": "Weirwood",
-      "description": "An interactive vessel and cargo movement dashboard built on Vortexa data across the IMTT terminal network, with region, product, and terminal filters, pivot views, and PDF/PPT/XLS export of any view.",
+      "description": "An interactive vessel and cargo movement dashboard covering the IMTT terminal network. It has region, product and terminal filters, pivot views, and PDF/PPT/XLS export of any view.",
       "techStack": [
         "Data Visualization",
         "Market Intelligence",
